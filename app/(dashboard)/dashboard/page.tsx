@@ -161,7 +161,7 @@ export default function DashboardPage() {
               <tr className="bg-gray-50 text-xs text-gray-500 font-semibold uppercase tracking-wide">
                 <th className="px-5 py-3 text-left">Tanggal</th>
                 <th className="px-5 py-3 text-left">Jenis</th>
-                <th className="px-5 py-3 text-left">Kategori</th>
+                {/* <th className="px-5 py-3 text-left">Kategori</th> */}
                 <th className="px-5 py-3 text-left">Subkategori</th>
                 <th className="px-5 py-3 text-left">Deskripsi</th>
                 <th className="px-5 py-3 text-right">Jumlah</th>
@@ -185,7 +185,7 @@ export default function DashboardPage() {
                         {t.type === 'income' ? 'Income' : 'Outcome'}
                       </span>
                     </td>
-                    <td className="px-5 py-3 text-gray-600">{t.categories?.name || '-'}</td>
+                    {/* <td className="px-5 py-3 text-gray-600">{t.categories?.name || '-'}</td> */}
                     <td className="px-5 py-3 text-gray-600">{t.subcategories?.name || '-'}</td>
                     <td className="px-5 py-3 text-gray-500 max-w-xs truncate">{t.description || '-'}</td>
                     <td className={`px-5 py-3 text-right font-medium ${t.type === 'income' ? 'text-green-700' : 'text-red-700'}`}>
