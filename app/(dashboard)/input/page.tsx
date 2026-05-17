@@ -12,7 +12,11 @@ export default function InputPage() {
   const [subcategoryId, setSubcategoryId] = useState('')
   const [amount, setAmount] = useState('')
   const [description, setDescription] = useState('')
-  const [date, setDate] = useState(new Date().toISOString().split('T')[0])
+  const [date, setDate] = useState(() => {
+    const now = new Date()
+    const wib = new Date(now.getTime() + 7 * 60 * 60 * 1000)
+    return wib.toISOString().slice(0, 16)
+  })
   const [search, setSearch] = useState('')
   const [categories, setCategories] = useState<Category[]>([])
   const [subcategories, setSubcategories] = useState<Subcategory[]>([])
@@ -61,7 +65,7 @@ export default function InputPage() {
   }
 
   return (
-    <div className="max-w-xl">
+    <div className="max-w-xl w-full">
       <h1 className="text-xl font-semibold text-gray-800 mb-6">Input Transaksi</h1>
       {success && <div className="bg-green-50 text-green-700 px-4 py-3 rounded-xl mb-4 text-sm">{success}</div>}
 
@@ -93,7 +97,7 @@ export default function InputPage() {
         {/* Date */}
         <div>
           <label className="text-sm font-medium text-gray-700 mb-2 block">Tanggal</label>
-          <input type="date" value={date} onChange={e => setDate(e.target.value)} required
+          <input type="datetime-local" value={date} onChange={e => setDate(e.target.value)} required
             className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"/>
         </div>
 

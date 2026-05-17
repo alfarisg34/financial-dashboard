@@ -12,8 +12,14 @@ type Transaction = {
   subcategories?: { name: string }
 }
 
-function getFirstDay(d: Date) { return new Date(d.getFullYear(), d.getMonth(), 1).toISOString().split('T')[0] }
-function getLastDay(d: Date) { return new Date(d.getFullYear(), d.getMonth() + 1, 0).toISOString().split('T')[0] }
+function toLocalDate(d: Date) {
+  const year = d.getFullYear()
+  const month = String(d.getMonth() + 1).padStart(2, '0')
+  const day = String(d.getDate()).padStart(2, '0')
+  return `${year}-${month}-${day}`
+}
+function getFirstDay(d: Date) { return toLocalDate(new Date(d.getFullYear(), d.getMonth(), 1)) }
+function getLastDay(d: Date) { return toLocalDate(new Date(d.getFullYear(), d.getMonth() + 1, 0)) }
 
 function fmt(n: number) {
   return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(n)
@@ -63,14 +69,14 @@ export default function DashboardPage() {
       <div className="flex items-center gap-3 flex-wrap">
         <span className="text-sm text-gray-500">Filter:</span>
         <input type="date" value={startDate} onChange={e => setStartDate(e.target.value)}
-          className="px-3 py-2 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"/>
+          className="px-3 py-2 rounded-xl border border-gray-200 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"/>
         <span className="text-gray-400">–</span>
         <input type="date" value={endDate} onChange={e => setEndDate(e.target.value)}
-          className="px-3 py-2 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"/>
+          className="px-3 py-2 rounded-xl border border-gray-200 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"/>
       </div>
 
       {/* Highlight cards */}
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <div className="bg-green-50 rounded-2xl p-5">
           <p className="text-xs font-medium text-green-600 uppercase tracking-wide mb-1">Total Income</p>
           <p className="text-2xl font-semibold text-green-700">{fmt(totalIncome)}</p>
@@ -86,7 +92,7 @@ export default function DashboardPage() {
       </div>
 
       {/* Big pie charts */}
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {[
           { title: 'Income per Kategori', data: incomeByCategory, color: '#10b981' },
           { title: 'Outcome per Kategori', data: outcomeByCategory, color: '#ef4444' }
@@ -108,29 +114,43 @@ export default function DashboardPage() {
         ))}
       </div>
 
-      {/* Smaller subcategory charts */}
-      <div className="grid grid-cols-2 gap-4">
-        {[
-          { title: 'Income per Subkategori', data: incomeBySubcategory },
-          { title: 'Outcome per Subkategori', data: outcomeBySubcategory }
-        ].map(({ title, data }) => (
-          <div key={title} className="bg-white rounded-2xl border border-gray-100 p-5">
-            <h2 className="text-sm font-semibold text-gray-700 mb-4">{title}</h2>
-            {data.length === 0
-              ? <p className="text-sm text-gray-400 text-center py-6">Tidak ada data</p>
-              : <ResponsiveContainer width="100%" height={160}>
-                  <PieChart>
-                    <Pie data={data} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={60} innerRadius={30}>
-                      {data.map((_, i) => <Cell key={i} fill={COLORS[i % COLORS.length]}/>)}
-                    </Pie>
-                    <Tooltip formatter={(v: any) => fmt(v)}/>
-                    <Legend iconSize={10} wrapperStyle={{fontSize: '11px'}}/>
-                  </PieChart>
-                </ResponsiveContainer>
-            }
+      {/* Subcategory pie charts per category */}
+      {['income', 'outcome'].map(t => {
+        const txs = transactions.filter(tx => tx.type === t)
+        const categoryNames = [...new Set(txs.map(tx => tx.categories?.name).filter(Boolean))] as string[]
+
+        if (categoryNames.length === 0) return null
+
+        return (
+          <div key={t}>
+            <h2 className={`text-sm font-semibold mb-3 ${t === 'income' ? 'text-green-700' : 'text-red-700'}`}>
+              {t === 'income' ? '📈 Income' : '📉 Outcome'} per Subkategori
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {categoryNames.map(catName => {
+                const catTxs = txs.filter(tx => tx.categories?.name === catName)
+                const data = groupBy(catTxs, tx => tx.subcategories?.name || 'Lainnya')
+                if (data.length === 0) return null
+                return (
+                  <div key={catName} className="bg-white rounded-2xl border border-gray-100 p-5">
+                    <h3 className="text-sm font-semibold text-gray-700 mb-4">{catName}</h3>
+                    <ResponsiveContainer width="100%" height={200}>
+                      <PieChart>
+                        <Pie data={data} dataKey="value" nameKey="name"
+                          cx="50%" cy="50%" outerRadius={65} innerRadius={30}>
+                          {data.map((_, i) => <Cell key={i} fill={COLORS[i % COLORS.length]}/>)}
+                        </Pie>
+                        <Tooltip formatter={(v: any) => fmt(v)}/>
+                        <Legend iconSize={10} wrapperStyle={{fontSize: '11px'}}/>
+                      </PieChart>
+                    </ResponsiveContainer>
+                  </div>
+                )
+              })}
+            </div>
           </div>
-        ))}
-      </div>
+  )
+})}
 
       {/* Detail table */}
       <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden">
@@ -152,7 +172,14 @@ export default function DashboardPage() {
                 ? <tr><td colSpan={6} className="text-center py-8 text-gray-400">Belum ada transaksi</td></tr>
                 : transactions.map(t => (
                   <tr key={t.id} className="hover:bg-gray-50 transition-colors">
-                    <td className="px-5 py-3 text-gray-600">{t.date}</td>
+                    <td className="px-5 py-3 text-gray-600">
+                      {new Date(t.date).toLocaleString('id-ID', {
+                        day: '2-digit', month: '2-digit', year: 'numeric',
+                        hour: '2-digit', minute: '2-digit',
+                        hour12: false,
+                        timeZone: 'Asia/Jakarta'
+                      })}
+                    </td>
                     <td className="px-5 py-3">
                       <span className={`px-2 py-1 rounded-lg text-xs font-medium ${t.type === 'income' ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-700'}`}>
                         {t.type === 'income' ? 'Income' : 'Outcome'}
