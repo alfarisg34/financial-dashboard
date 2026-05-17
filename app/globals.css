@@ -24,3 +24,28 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+::placeholder {
+  color: #9ca3af;
+  opacity: 1;
+}
+
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="number"] {
+  color: #374151;
+}
+
+select,
+input[type="datetime-local"] {
+  color: #374151;
+}
+
+select option {
+  color: #374151;
+}
+
+input[type="datetime-local"] {
+  color: #374151;
+}
