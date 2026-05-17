@@ -1,0 +1,485 @@
+Date,Time,Income/Outcome,Main Category,Sub Category,Nominal,Desc
+01-01-2026,8:00,Pengeluaran,FOOD & GROCERIES,Groceries,Rp33.000,telur 1kg
+01-01-2026,8:00,Pemasukan,PENGHASILAN UTAMA,Gaji Pokok,Rp2.244.500,
+05-01-2026,8:00,Pengeluaran,FOOD & GROCERIES,Groceries,Rp33.000,telur 1kg
+05-01-2026,8:00,Pengeluaran,FOOD & GROCERIES,Groceries,Rp13.000,tahu 1
+06-01-2026,8:00,Pengeluaran,HOUSING & UTILITAS,Household Supplies,Rp37.000,belanja bumbu
+06-01-2026,8:00,Pengeluaran,FOOD & GROCERIES,Groceries,Rp44.000,sayur
+06-01-2026,8:00,Pemasukan,PENGHASILAN PASIF & LAINNYA,Hadiah / Warisan,Rp1.400.000,temen kantor
+06-01-2026,8:00,Pengeluaran,FOOD & GROCERIES,Groceries,Rp81.000,"bumbu, sayur"
+06-01-2026,8:00,Pengeluaran,HOUSING & UTILITAS,Household Supplies,Rp60.800,"okamoto, roma sari gandum"
+08-01-2026,8:00,Pengeluaran,FOOD & GROCERIES,Groceries,Rp25.000,sayur gado2
+09-01-2026,8:00,Pengeluaran,HOUSING & UTILITAS,Household Supplies,Rp595.564,naga
+09-01-2026,8:00,Pengeluaran,TRANSPORTATION,Parking,Rp6.000,parkir naga
+09-01-2026,8:00,Pengeluaran,FOOD & GROCERIES,Dining Out,Rp117.501,sambal bakar
+09-01-2026,8:00,Pengeluaran,FOOD & GROCERIES,Jajan/Snack,Rp20.000,circle k bandara
+09-01-2026,8:00,Pemasukan,PENGHASILAN PASIF & LAINNYA,Hadiah / Warisan,Rp500.000,bulek indah
+09-01-2026,8:00,Pengeluaran,FOOD & GROCERIES,Dining Out,Rp48.600,"kwetiau, wedang, es krim"
+10-01-2026,8:00,Pemasukan,PENGHASILAN PASIF & LAINNYA,Hadiah / Warisan,Rp1.150.000,keluarga ayah
+11-01-2026,8:00,Pengeluaran,TRANSPORTATION,Fuel,Rp150.000,bensin mobil dan tol
+11-01-2026,8:00,Pengeluaran,FOOD & GROCERIES,Jajan/Snack,Rp46.000,kopisoe
+11-01-2026,8:00,Pengeluaran,"GIFTS, PETS & MISC.",Family/Adek/My Beb,Rp100.000,sakha
+11-01-2026,8:00,Pengeluaran,"GIFTS, PETS & MISC.",Family/Adek/My Beb,Rp177.386,kado mba ciki
+11-01-2026,8:00,Pengeluaran,HOUSING & UTILITAS,Household Supplies,Rp40.000,"softex, kiranti"
+11-01-2026,8:00,Pengeluaran,FOOD & GROCERIES,Jajan/Snack,Rp53.000,gamchi
+12-01-2026,8:00,Pengeluaran,FOOD & GROCERIES,Groceries,Rp19.000,"sayur sop, tempe"
+13-01-2026,8:00,Pengeluaran,FOOD & GROCERIES,Jajan/Snack,Rp15.000,puyo
+13-01-2026,8:00,Pengeluaran,FOOD & GROCERIES,Jajan/Snack,Rp21.000,reddog
+13-01-2026,8:00,Pengeluaran,FOOD & GROCERIES,Dining Out,Rp59.000,halal guys
+13-01-2026,8:00,Pengeluaran,HOUSING & UTILITAS,Household Supplies,Rp57.500,"indomaret. hansaplast, sabun, rexona"
+13-01-2026,8:00,Pengeluaran,PERSONAL CARE & HEALTH,Clothing,Rp360.000,jaket
+13-01-2026,8:00,Pengeluaran,"GIFTS, PETS & MISC.",Family/Adek/My Beb,Rp179.900,flat shoes
+15-01-2026,8:00,Pengeluaran,"GIFTS, PETS & MISC.",Clothing,Rp60.000,jahit baju
+16-01-2026,8:00,Pengeluaran,HOUSING & UTILITAS,Household Supplies,Rp3.500.000,kasur
+16-01-2026,8:00,Pengeluaran,HOUSING & UTILITAS,Household Supplies,Rp29.100,"mama lemon, teh celup"
+16-01-2026,8:00,Pengeluaran,TRANSPORTATION,Parking,Rp3.000,BCBD
+17-01-2026,8:00,Pengeluaran,FOOD & GROCERIES,Groceries,Rp80.000,wisma asri
+18-01-2026,8:00,Pengeluaran,FOOD & GROCERIES,Jajan/Snack,Rp35.000,mbok darmi
+18-01-2026,8:00,Pengeluaran,TRANSPORTATION,Vehicle Maintenance,Rp325.000,ban depan
+19-01-2026,8:00,Pengeluaran,HOUSING & UTILITAS,Maintenance or Repairs,Rp54.000,wallpaper
+20-01-2026,8:00,Pengeluaran,FOOD & GROCERIES,Groceries,Rp106.000,gulai ayam
+20-01-2026,8:00,Pengeluaran,FOOD & GROCERIES,Jajan/Snack,Rp15.000,kantin kemnaker
+20-01-2026,8:00,Pengeluaran,FOOD & GROCERIES,Dining Out,Rp122.000,jatinangor house
+21-01-2026,8:00,Pengeluaran,"GIFTS, PETS & MISC.",Family/Adek/My Beb,Rp68.000,kue ultah adek
+21-01-2026,8:00,Pengeluaran,"GIFTS, PETS & MISC.",Family/Adek/My Beb,Rp384.013,hadiah kursi gaming
+21-01-2026,8:00,Pengeluaran,PERSONAL CARE & HEALTH,Family/Adek/My Beb,Rp39.405,pensil alis
+21-01-2026,8:00,Pengeluaran,FOOD & GROCERIES,Groceries,Rp32.120,alfamidi
+22-01-2026,8:00,Pengeluaran,EDUCATION & SELF-IMPROVEMENT,FC & Print,Rp26.000,print + materai
+22-01-2026,8:00,Pengeluaran,FOOD & GROCERIES,Dining Out,Rp33.000,mie ayam
+22-01-2026,8:00,Pengeluaran,FOOD & GROCERIES,Jajan/Snack,Rp33.500,cokro
+23-01-2026,8:00,Pengeluaran,FOOD & GROCERIES,Groceries,Rp22.000,tempe + krupuk
+24-01-2026,8:00,Pengeluaran,TRANSPORTATION,Parking,Rp3.000,parkir
+24-01-2026,8:00,Pengeluaran,PERSONAL CARE & HEALTH,Medical,Rp150.000,scaling
+24-01-2026,8:00,Pengeluaran,FOOD & GROCERIES,Dining Out,Rp167.000,haka dimsum
+24-01-2026,8:00,Pengeluaran,FOOD & GROCERIES,Groceries,Rp56.000,telur 2kg
+24-01-2026,8:00,Pengeluaran,FOOD & GROCERIES,Jajan/Snack,Rp28.000,es krim duren
+25-01-2026,8:00,Pengeluaran,"GIFTS, PETS & MISC.",Family/Adek/My Beb,Rp100.000,mas danu
+25-01-2026,8:00,Pengeluaran,TRANSPORTATION,Parking,Rp3.000,parkir
+25-01-2026,8:00,Pengeluaran,FOOD & GROCERIES,Dining Out,Rp74.000,solaria
+25-01-2026,8:00,Pengeluaran,FOOD & GROCERIES,Jajan/Snack,Rp12.000,tarobun
+25-01-2026,8:00,Pengeluaran,FOOD & GROCERIES,Dining Out,Rp104.500,aeon
+26-01-2026,8:00,Pengeluaran,FOOD & GROCERIES,Groceries,Rp40.000,ayam 1 ekor
+27-01-2026,8:00,Pengeluaran,PERSONAL CARE & HEALTH,Clothing,Rp59.334,ponco hujan
+28-01-2026,8:00,Pengeluaran,HOUSING & UTILITAS,Gas,Rp50.000,2 tabung
+28-01-2026,8:00,Pengeluaran,FOOD & GROCERIES,Jajan/Snack,Rp30.000,"pastel, sosis"
+28-01-2026,8:00,Pengeluaran,FOOD & GROCERIES,Dining Out,Rp74.000,padang guci
+28-01-2026,8:00,Pengeluaran,TRANSPORTATION,Parking,Rp2.000,
+29-01-2026,9:00,Pengeluaran,FOOD & GROCERIES,Jajan/Snack,Rp32.000,"susu beruang, ritz"
+30-01-2026,8:00,Pengeluaran,FOOD & GROCERIES,Dining Out,Rp38.000,Bakso
+30-01-2026,8:00,Pengeluaran,FOOD & GROCERIES,Dining Out,Rp50.000,Ayam Kalasan
+30-01-2026,8:00,Pengeluaran,FOOD & GROCERIES,Jajan/Snack,Rp25.000,broker
+30-01-2026,8:00,Pengeluaran,TRANSPORTATION,Parking,Rp2.000,
+30-01-2026,8:00,Pengeluaran,ENTERTAINMENT & HOBBIES,Clothing,Rp629.800,excecutive
+30-01-2026,8:00,Pengeluaran,PERSONAL CARE & HEALTH,Medical,Rp16.000,obat diare
+31-01-2026,8:00,Pengeluaran,TRANSPORTATION,Fuel,Rp60.000,
+31-01-2026,8:00,Pengeluaran,FOOD & GROCERIES,Jajan/Snack,Rp51.000,tarobun
+31-01-2026,8:00,Pengeluaran,FOOD & GROCERIES,Groceries,Rp40.000,ayam 12 potong
+31-01-2026,8:00,Pengeluaran,TRANSPORTATION,Bus/Taxi Fare,Rp40.000,bus jemputan
+31-01-2026,8:00,Pengeluaran,TRANSPORTATION,Fuel,Rp70.000,
+31-01-2026,8:00,Pengeluaran,FOOD & GROCERIES,Jajan/Snack,Rp20.000,lumpia semarang
+31-01-2026,8:00,Pengeluaran,FOOD & GROCERIES,Groceries,Rp187.100,naga
+01-02-2026,8:00,Pemasukan,PENGHASILAN UTAMA,Gaji Pokok,Rp2.244.500,
+01-02-2026,8:00,Pengeluaran,LOANS & DEBTS,Friend (Repayment),Rp1.200.000,utang pc
+01-02-2026,8:00,Pengeluaran,FOOD & GROCERIES,Dining Out,Rp36.000,pecel
+01-02-2026,8:00,Pengeluaran,FOOD & GROCERIES,Jajan/Snack,Rp10.000,misro cobro
+01-02-2026,8:00,Pengeluaran,TRANSPORTATION,Parking,Rp5.000,
+01-02-2026,8:00,Pengeluaran,FOOD & GROCERIES,Dining Out,Rp20.000,bubur
+01-02-2026,8:00,Pengeluaran,HOUSING & UTILITAS,Water and Sewer,Rp413.100,
+01-02-2026,8:00,Pengeluaran,"GIFTS, PETS & MISC.",Family/Adek/My Beb,Rp200.000,adek
+01-02-2026,8:00,Pengeluaran,FOOD & GROCERIES,Jajan/Snack,Rp25.000,wedang
+01-02-2026,8:00,Pengeluaran,FOOD & GROCERIES,Jajan/Snack,Rp10.000,susu beruang
+01-02-2026,8:00,Pengeluaran,PERSONAL CARE & HEALTH,Medical,Rp25.000,"panadol, paracetamol"
+01-02-2026,8:00,Pengeluaran,FOOD & GROCERIES,Jajan/Snack,Rp27.200,"susu beruang,ritz,capbadak"
+02-02-2026,8:00,Pemasukan,PENGHASILAN SAMPINGAN,Tunjangan,Rp686.000,
+02-02-2026,8:00,Pengeluaran,FOOD & GROCERIES,Groceries,Rp40.000,ayam seekor
+03-02-2026,8:00,Pengeluaran,FOOD & GROCERIES,Dining Out,Rp12.000,bubur
+03-02-2026,8:00,Pengeluaran,HOUSING & UTILITAS,Household Supplies,Rp23.500,tisu
+03-02-2026,8:00,Pengeluaran,FOOD & GROCERIES,Groceries,Rp15.000,sayur
+03-02-2026,8:00,Pengeluaran,ENTERTAINMENT & HOBBIES,Shopping (Non-Clothing),Rp23.111,lanyard freshcare
+03-02-2026,8:00,Pengeluaran,ENTERTAINMENT & HOBBIES,Shopping (Non-Clothing),Rp14.059,ikat pinggang
+03-02-2026,8:00,Pengeluaran,FOOD & GROCERIES,Groceries,Rp32.000,putih telur
+04-02-2026,8:00,Pengeluaran,FOOD & GROCERIES,Groceries,Rp37.700,happy harvest
+04-02-2026,8:00,Pengeluaran,PERSONAL CARE & HEALTH,Skin and Body Care,Rp62.000,"kapas, micelar"
+04-02-2026,8:00,Pengeluaran,FOOD & GROCERIES,Dining Out,Rp24.000,dkriuk
+04-02-2026,8:00,Pengeluaran,TRANSPORTATION,Parking,Rp30.000,parkir sebulan
+04-02-2026,8:00,Pengeluaran,FOOD & GROCERIES,Jajan/Snack,Rp9.900,roti
+05-02-2026,8:00,Pengeluaran,EDUCATION & SELF-IMPROVEMENT,FC & Print,Rp9.000,print
+05-02-2026,8:00,Pengeluaran,FOOD & GROCERIES,Jajan/Snack,Rp10.000,tebs
+05-02-2026,8:00,Pengeluaran,FOOD & GROCERIES,Jajan/Snack,Rp10.000,pisang mas
+05-02-2026,8:00,Pengeluaran,FOOD & GROCERIES,Dining Out,Rp20.000,warteg
+05-02-2026,8:00,Pengeluaran,FOOD & GROCERIES,Jajan/Snack,Rp60.000,kripik
+05-02-2026,8:00,Pengeluaran,TRANSPORTATION,Fuel,Rp75.000,
+06-02-2026,8:00,Pengeluaran,FOOD & GROCERIES,Groceries,Rp70.000,pasar asri
+06-02-2026,8:00,Pengeluaran,FOOD & GROCERIES,Jajan/Snack,Rp65.600,toblerone
+06-02-2026,8:00,Pengeluaran,FOOD & GROCERIES,Jajan/Snack,Rp16.000,kopi
+06-02-2026,8:00,Pengeluaran,FOOD & GROCERIES,Jajan/Snack,Rp5.000,mizone
+07-02-2026,8:00,Pengeluaran,"GIFTS, PETS & MISC.",Donation & Gift,Rp100.000,mas farhan
+07-02-2026,8:00,Pengeluaran,TRANSPORTATION,Parking,Rp2.000,gedung nikah
+07-02-2026,8:00,Pengeluaran,TRANSPORTATION,Toll,Rp53.000,tol
+07-02-2026,8:00,Pengeluaran,TRANSPORTATION,Parking,Rp15.000,summarecon
+07-02-2026,8:00,Pengeluaran,ENTERTAINMENT & HOBBIES,Other Entertainment,Rp110.000,KAI Bogor-Sukabumi
+07-02-2026,8:00,Pengeluaran,FOOD & GROCERIES,Dining Out,Rp142.065,toast box
+07-02-2026,8:00,Pengeluaran,FOOD & GROCERIES,Groceries,Rp291.726,"naga, persiapan romadon"
+08-02-2026,8:00,Pengeluaran,"GIFTS, PETS & MISC.",Donation & Gift,Rp100.000,sedekah ramadhan
+08-02-2026,8:00,Pengeluaran,ENTERTAINMENT & HOBBIES,Other Entertainment,Rp386.106,hotel sukabumi
+08-02-2026,8:00,Pengeluaran,FOOD & GROCERIES,Jajan/Snack,Rp20.000,fam cafe
+12-02-2026,8:00,Pengeluaran,FOOD & GROCERIES,Jajan/Snack,Rp14.000,roti
+09-02-2026,8:00,Pengeluaran,FOOD & GROCERIES,Groceries,Rp91.000,wisma asri
+12-02-2026,8:00,Pengeluaran,FOOD & GROCERIES,Dining Out,Rp20.000,warteg
+10-02-2026,8:00,Pengeluaran,PERSONAL CARE & HEALTH,Skin and Body Care,Rp62.740,cuci muka kkg 2
+10-02-2026,8:00,Pengeluaran,ENTERTAINMENT & HOBBIES,Other Entertainment,Rp160.000,tkt sukabumi-bogor executive
+11-02-2026,8:00,Pengeluaran,HOUSING & UTILITAS,Household Supplies,Rp20.000,filter mesin cuci
+11-02-2026,8:00,Pengeluaran,HOUSING & UTILITAS,Maintenance or Repairs,Rp12.043,timer air
+11-02-2026,8:00,Pengeluaran,HOUSING & UTILITAS,Household Supplies,Rp62.000,gantungan pakaian
+11-02-2026,8:00,Pengeluaran,HOUSING & UTILITAS,Household Supplies,Rp18.000,tali tambang
+12-02-2026,8:00,Pengeluaran,ENTERTAINMENT & HOBBIES,Shopping (Non-Clothing),Rp38.356,temperglass
+12-02-2026,8:00,Pengeluaran,FOOD & GROCERIES,Jajan/Snack,Rp30.000,"kopi,roti"
+13-02-2026,8:00,Pengeluaran,TRANSPORTATION,Fuel,Rp70.000,
+13-02-2026,8:00,Pengeluaran,HOUSING & UTILITAS,Household Supplies,Rp2.200.000,mesin cuci
+14-02-2026,8:00,Pengeluaran,FOOD & GROCERIES,Dining Out,Rp64.000,ramen
+14-02-2026,8:00,Pengeluaran,ENTERTAINMENT & HOBBIES,"Streaming (Youtube, Netflix, dll.)",Rp76.000,
+14-02-2026,8:00,Pengeluaran,FOOD & GROCERIES,Dining Out,Rp15.000,soto mie bogor
+14-02-2026,8:00,Pengeluaran,"GIFTS, PETS & MISC.",Donation & Gift,Rp100.000,"adit,icam"
+14-02-2026,8:00,Pengeluaran,FOOD & GROCERIES,Groceries,Rp67.100,"minyak,tisu"
+14-02-2026,8:00,Pengeluaran,"GIFTS, PETS & MISC.",Donation & Gift,Rp128.000,elud
+15-02-2026,8:00,Pengeluaran,TRANSPORTATION,Bus/Taxi Fare,Rp12.000,krl
+15-02-2026,8:00,Pengeluaran,FIXED BILLS & INSURANCE,Mobile Phone Bill/Pulsa,Rp51.000,kuota
+15-02-2026,8:00,Pengeluaran,TRANSPORTATION,Bus/Taxi Fare,Rp7.000,krl
+15-02-2026,8:00,Pengeluaran,HOUSING & UTILITAS,Household Supplies,Rp170.910,dudukan mesin cuci
+15-02-2026,8:00,Pengeluaran,HOUSING & UTILITAS,Household Supplies,Rp27.730,cover mesin cuci
+15-02-2026,8:00,Pengeluaran,TRANSPORTATION,Bus/Taxi Fare,Rp27.000,maxim ke rmh ppap
+15-02-2026,8:00,Pengeluaran,TRANSPORTATION,Bus/Taxi Fare,Rp15.000,maxim ke alun
+15-02-2026,8:00,Pengeluaran,FOOD & GROCERIES,Dining Out,Rp59.000,di alun alun
+15-02-2026,8:00,Pengeluaran,FOOD & GROCERIES,Dining Out,Rp35.750,sono coffe
+15-02-2026,8:00,Pengeluaran,HOUSING & UTILITAS,Maintenance or Repairs,Rp25.000,tukang mesin cuci
+15-02-2026,8:00,Pemasukan,PENGHASILAN UTAMA,Tunjangan,Rp3.132.760,tukin
+18-02-2026,8:00,Pemasukan,PENGHASILAN UTAMA,Tunjangan,Rp527.510,uang makan
+19-02-2026,16:04,Pengeluaran,FOOD & GROCERIES,Jajan/Snack,Rp20.000,takjil
+19-02-2026,20:09,Pengeluaran,FOOD & GROCERIES,Jajan/Snack,Rp5.800,Teh pucuk less sugar
+19-02-2026,22:15,Pengeluaran,TRANSPORTATION,Parking,Rp5.000,bebek perdikan
+19-02-2026,22:15,Pengeluaran,FOOD & GROCERIES,Dining Out,Rp152.327,bukber bebek perdikan
+20-02-2026,12:34,Pengeluaran,PERSONAL CARE & HEALTH,Skin and Body Care,Rp57.800,2 sampo tresemme
+20-02-2026,12:39,Pemasukan,PENGHASILAN UTAMA,Bonus/Komisi,Rp20.000,selisih beli elud umi
+20-02-2026,12:41,Pengeluaran,"GIFTS, PETS & MISC.",Family/Adek/My Beb,Rp116.000,3 box elud buat bekasi dan bukber
+20-02-2026,12:41,Pengeluaran,TRANSPORTATION,Fuel,Rp20.000,bensin beat
+20-02-2026,12:41,Pengeluaran,"GIFTS, PETS & MISC.",Family/Adek/My Beb,Rp105.000,sendal sakha dan hilya
+17-02-2026,17:00,Pengeluaran,FOOD & GROCERIES,Dining Out,Rp79.500,richeese
+17-02-2026,17:00,Pengeluaran,TRANSPORTATION,Parking,Rp3.000,parkir richeese
+18-02-2026,8:00,Pengeluaran,FOOD & GROCERIES,Groceries,Rp76.000,belanja sayur dan ayam
+20-02-2026,16:24,Pemasukan,PENGHASILAN UTAMA,Tunjangan,Rp2.058.000,rapat balai bekasi
+20-02-2026,10:00,Pengeluaran,FOOD & GROCERIES,Dining Out,Rp200.000,dp maranggi
+21-02-2026,14:03,Pengeluaran,FOOD & GROCERIES,Groceries,Rp42.000,"tepung, kulit lumpia"
+21-02-2026,16:05,Pengeluaran,ENTERTAINMENT & HOBBIES,Shopping (Non-Clothing),Rp39.500,Ring kipas angin
+22-02-2026,14:11,Pengeluaran,FOOD & GROCERIES,Groceries,Rp13.496,amplop lebaran
+22-02-2026,14:12,Pengeluaran,HOUSING & UTILITAS,Household Supplies,Rp36.052,tisu
+22-02-2026,14:13,Pengeluaran,HOUSING & UTILITAS,Household Supplies,Rp19.081,tisu basah
+22-02-2026,14:14,Pengeluaran,HOUSING & UTILITAS,Household Supplies,Rp15.447,lampu tidur
+22-02-2026,14:15,Pengeluaran,ENTERTAINMENT & HOBBIES,Shopping (Non-Clothing),Rp32.615,sendal nenis
+22-02-2026,14:16,Pengeluaran,HOUSING & UTILITAS,Household Supplies,Rp28.355,keset
+22-02-2026,14:16,Pengeluaran,HOUSING & UTILITAS,Household Supplies,Rp35.950,jemuran besi
+22-02-2026,14:16,Pengeluaran,HOUSING & UTILITAS,Household Supplies,Rp21.607,sapu kasur
+22-02-2026,16:22,Pengeluaran,FOOD & GROCERIES,Groceries,Rp34.000,pasar duta
+22-02-2026,16:23,Pengeluaran,"GIFTS, PETS & MISC.",Family/Adek/My Beb,Rp38.300,tepung titipan umi
+22-02-2026,16:24,Pengeluaran,FOOD & GROCERIES,Groceries,Rp4.000,kulit lumpia
+22-02-2026,17:51,Pengeluaran,FOOD & GROCERIES,Jajan/Snack,Rp10.000,corndog
+22-02-2026,19:10,Pengeluaran,HOUSING & UTILITAS,Household Supplies,Rp3.000,Baut kipas
+22-02-2026,19:57,Pengeluaran,"GIFTS, PETS & MISC.",Donation & Gift,Rp2.000,
+22-02-2026,21:02,Pengeluaran,FOOD & GROCERIES,Dining Out,Rp35.000,Bakso
+22-02-2026,21:02,Pengeluaran,TRANSPORTATION,Parking,Rp2.000,
+23-02-2026,8:21,Pengeluaran,TRANSPORTATION,Fuel,Rp15.000,
+23-02-2026,11:40,Pengeluaran,PERSONAL CARE & HEALTH,Skin and Body Care,Rp119.000,facial
+23-02-2026,15:57,Pengeluaran,"GIFTS, PETS & MISC.",Donation & Gift,Rp20.000,Sumbangan duka
+23-02-2026,15:57,Pengeluaran,TRANSPORTATION,Fuel,Rp72.782,
+23-02-2026,15:59,Pengeluaran,FIXED BILLS & INSURANCE,Taxes (Admin Fee/Bank),Rp10.000,
+23-02-2026,15:57,Pengeluaran,"GIFTS, PETS & MISC.",Donation & Gift,Rp10.000,satpam dompet ilang
+24-02-2026,10:22,Pengeluaran,FOOD & GROCERIES,Groceries,Rp96.800,"sampo, telur, saos, mie"
+24-02-2026,10:23,Pengeluaran,FOOD & GROCERIES,Groceries,Rp20.000,tahu tempe
+24-02-2026,12:44,Pengeluaran,FOOD & GROCERIES,Groceries,Rp48.000,teh botol 1 dus
+24-02-2026,15:25,Pengeluaran,FOOD & GROCERIES,Jajan/Snack,Rp22.000,Kopi jago
+25-02-2026,21:41,Pengeluaran,FOOD & GROCERIES,Jajan/Snack,Rp5.000,es batu
+26-02-2026,10:38,Pengeluaran,PERSONAL CARE & HEALTH,Clothing,Rp57.120,setelan hitam
+26-02-2026,15:23,Pengeluaran,PERSONAL CARE & HEALTH,Medical,Rp55.000,"Neurobion, Sangobion"
+26-02-2026,21:29,Pengeluaran,PERSONAL CARE & HEALTH,Skin and Body Care,Rp40.000,cukur
+26-02-2026,21:29,Pengeluaran,FOOD & GROCERIES,Jajan/Snack,Rp32.000,burger kfc
+26-02-2026,21:29,Pengeluaran,FOOD & GROCERIES,Groceries,Rp64.800,"roll on, dettol, wipol"
+28-02-2026,10:41,Pengeluaran,FOOD & GROCERIES,Groceries,Rp10.000,cabe keriting
+28-02-2026,10:42,Pengeluaran,FOOD & GROCERIES,Groceries,Rp10.000,cabe merah
+28-02-2026,11:02,Pengeluaran,HOUSING & UTILITAS,Household Supplies,Rp5.000,penguis
+28-02-2026,11:02,Pengeluaran,TRANSPORTATION,Parking,Rp3.000,golden city
+28-02-2026,11:03,Pengeluaran,PERSONAL CARE & HEALTH,Clothing,Rp30.000,permak celana
+28-02-2026,20:25,Pengeluaran,TRANSPORTATION,Fuel,Rp70.000,
+28-02-2026,20:25,Pengeluaran,FOOD & GROCERIES,Dining Out,Rp100.000,Pizze Hut
+28-02-2026,20:26,Pengeluaran,TRANSPORTATION,Parking,Rp8.000,
+28-02-2026,20:26,Pengeluaran,"GIFTS, PETS & MISC.",Donation & Gift,Rp5.000,
+28-02-2026,20:27,Pengeluaran,FOOD & GROCERIES,Dining Out,Rp20.000,Sate Padang
+28-02-2026,20:28,Pengeluaran,TRANSPORTATION,Parking,Rp2.000,
+28-02-2026,20:51,Pengeluaran,TRANSPORTATION,Parking,Rp3.000,pizza hut
+01-03-2026,5:39,Pengeluaran,HOUSING & UTILITAS,Water and Sewer,Rp307.500,pdam maret
+01-03-2026,5:39,Pengeluaran,"GIFTS, PETS & MISC.",Family/Adek/My Beb,Rp200.000,
+01-03-2026,5:40,Pengeluaran,FIXED BILLS & INSURANCE,Health Insurance,Rp37.500,
+01-03-2026,5:40,Pengeluaran,FIXED BILLS & INSURANCE,Mobile Phone Bill/Pulsa,Rp60.000,kuota nenis
+01-03-2026,11:37,Pemasukan,PENGHASILAN UTAMA,Gaji Pokok,Rp2.244.500,
+01-03-2026,6:10,Pengeluaran,FOOD & GROCERIES,Groceries,Rp80.000,pasar asri
+01-03-2026,13:30,Pengeluaran,LOANS & DEBTS,Friend (Repayment),Rp1.200.000,
+01-03-2026,12:56,Pengeluaran,FOOD & GROCERIES,Groceries,Rp5.000,es
+01-03-2026,17:40,Pengeluaran,HOUSING & UTILITAS,Maintenance or Repairs,Rp50.000,Perbaikan kipas angin
+02-03-2026,14:09,Pemasukan,PENGHASILAN UTAMA,Tunjangan,Rp1.360.000,Rapat bekasi
+03-03-2026,14:18,Pengeluaran,"GIFTS, PETS & MISC.",Donation & Gift,Rp102.500,Zakat fitrah
+03-03-2026,16:13,Pengeluaran,TRANSPORTATION,Vehicle Maintenance,Rp20.000,Cuci motor
+03-03-2026,16:13,Pengeluaran,TRANSPORTATION,Vehicle Maintenance,Rp85.500,"Oli mesin, Oli gardan"
+03-03-2026,16:31,Pengeluaran,TRANSPORTATION,Fuel,Rp50.000,
+04-03-2026,9:41,Pengeluaran,FOOD & GROCERIES,Groceries,Rp45.000,ayam
+05-03-2026,12:47,Pengeluaran,FIXED BILLS & INSURANCE,Mobile Phone Bill/Pulsa,Rp42.500,
+05-03-2026,12:51,Pengeluaran,TRANSPORTATION,Parking,Rp30.000,Member sebulan
+04-03-2026,20:00,Pengeluaran,FOOD & GROCERIES,Jajan/Snack,Rp2.000,es batu
+05-03-2026,18:10,Pengeluaran,HOUSING & UTILITAS,Household Supplies,Rp10.000,kanebo
+05-03-2026,21:17,Pengeluaran,PERSONAL CARE & HEALTH,Skin and Body Care,Rp28.900,odol dan sabun
+05-03-2026,21:17,Pengeluaran,PERSONAL CARE & HEALTH,Medical,Rp63.400,"bear brand, lasegar"
+06-03-2026,9:21,Pemasukan,PENGHASILAN UTAMA,Tunjangan,Rp3.132.760,Tukin
+07-03-2026,11:13,Pengeluaran,ENTERTAINMENT & HOBBIES,Shopping (Non-Clothing),Rp61.057,Thumbgrip joystick
+07-03-2026,20:46,Pengeluaran,TRANSPORTATION,Parking,Rp15.000,kota bintang
+07-03-2026,21:53,Pengeluaran,TRANSPORTATION,Fuel,Rp50.000,mobil kota bintang
+08-03-2026,12:58,Pengeluaran,TRANSPORTATION,Parking,Rp2.000,naga
+08-03-2026,12:58,Pengeluaran,TRANSPORTATION,Fuel,Rp47.000,nmax
+08-03-2026,16:49,Pengeluaran,FOOD & GROCERIES,Jajan/Snack,Rp5.350,naga
+08-03-2026,16:49,Pengeluaran,HOUSING & UTILITAS,Household Supplies,Rp23.685,"molto, sabun"
+08-03-2026,16:49,Pengeluaran,FOOD & GROCERIES,Dining Out,Rp88.833,bukber mba dona
+08-03-2026,21:30,Pengeluaran,FOOD & GROCERIES,Jajan/Snack,Rp13.000,teh pucuk
+09-03-2026,10:09,Pengeluaran,FOOD & GROCERIES,Groceries,Rp45.000,ayam
+09-03-2026,11:20,Pengeluaran,FOOD & GROCERIES,Groceries,Rp30.000,jeruk
+09-03-2026,12:43,Pemasukan,PENGHASILAN UTAMA,THR/Gaji ke-13,Rp2.486.000,THR gapok only
+09-03-2026,19:25,Pengeluaran,TRANSPORTATION,Bus/Taxi Fare,Rp16.000,bekasi lenteng agung
+09-03-2026,19:26,Pengeluaran,TRANSPORTATION,Parking,Rp10.000,parkir stasiun
+09-03-2026,19:26,Pengeluaran,FOOD & GROCERIES,Jajan/Snack,Rp12.000,takjil
+10-03-2026,11:56,Pemasukan,PENGHASILAN UTAMA,THR/Gaji ke-13,Rp3.132.760,THR tukin
+10-03-2026,12:41,Pengeluaran,"GIFTS, PETS & MISC.",Family/Adek/My Beb,Rp500.000,THR sepupu
+10-03-2026,12:42,Pengeluaran,"GIFTS, PETS & MISC.",Family/Adek/My Beb,Rp300.000,THR ponakan
+10-03-2026,12:45,Pengeluaran,"GIFTS, PETS & MISC.",Family/Adek/My Beb,Rp1.000.000,THR my beb
+10-03-2026,12:46,Pengeluaran,"GIFTS, PETS & MISC.",Family/Adek/My Beb,Rp250.000,THR ayah ibu
+10-03-2026,15:49,Pengeluaran,HOUSING & UTILITAS,Household Supplies,Rp10.940,pouch gantung
+10-03-2026,15:50,Pengeluaran,PERSONAL CARE & HEALTH,Clothing,Rp11.989,tas ke masjid
+10-03-2026,15:51,Pengeluaran,HOUSING & UTILITAS,Household Supplies,Rp27.949,rak rinso
+10-03-2026,15:51,Pengeluaran,HOUSING & UTILITAS,Household Supplies,Rp107.459,kotak bekal
+10-03-2026,15:52,Pengeluaran,HOUSING & UTILITAS,Household Supplies,Rp58.002,keranjang baju bersih
+10-03-2026,21:25,Pengeluaran,HOUSING & UTILITAS,Household Supplies,Rp4.000,goodie bag
+10-03-2026,21:25,Pengeluaran,TRANSPORTATION,Bus/Taxi Fare,Rp23.500,bukber hansel
+11-03-2026,20:51,Pengeluaran,TRANSPORTATION,Vehicle Maintenance,Rp340.500,"Aki, bearing"
+12-03-2026,10:44,Pengeluaran,PERSONAL CARE & HEALTH,Skin and Body Care,Rp75.000,micellar; kapas
+12-03-2026,10:44,Pengeluaran,"GIFTS, PETS & MISC.",Family/Adek/My Beb,Rp100.000,patungan halbil
+12-03-2026,11:52,Pemasukan,PENGHASILAN UTAMA,Tunjangan,Rp562.400,Uang makan
+12-03-2026,16:12,Pengeluaran,PERSONAL CARE & HEALTH,Medical,Rp74.000,Alpro obat tensi
+13-03-2026,21:06,Pengeluaran,FOOD & GROCERIES,Dining Out,Rp53.000,bakso sri raja wisma asri
+13-03-2026,21:06,Pengeluaran,FOOD & GROCERIES,Jajan/Snack,Rp10.000,dimsum keju goreng
+14-03-2026,20:39,Pengeluaran,TRANSPORTATION,Fuel,Rp73.844,
+14-03-2026,20:39,Pemasukan,PENGHASILAN UTAMA,Tunjangan,Rp680.000,
+14-03-2026,20:40,Pengeluaran,PERSONAL CARE & HEALTH,Clothing,Rp517.900,Matahari
+14-03-2026,21:24,Pengeluaran,TRANSPORTATION,Parking,Rp9.000,mm
+14-03-2026,21:25,Pengeluaran,FOOD & GROCERIES,Dining Out,Rp129.000,wingstop
+15-03-2026,15:45,Pengeluaran,FOOD & GROCERIES,Groceries,Rp31.500,ayam
+15-03-2026,15:45,Pengeluaran,FOOD & GROCERIES,Groceries,Rp15.000,sayur tahu tempe
+15-03-2026,21:46,Pengeluaran,FOOD & GROCERIES,Jajan/Snack,Rp6.000,es batu dan jajan
+16-03-2026,12:08,Pengeluaran,TRANSPORTATION,Parking,Rp2.000,proyek
+16-03-2026,12:08,Pengeluaran,"GIFTS, PETS & MISC.",Family/Adek/My Beb,Rp5.000,ban beat
+16-03-2026,19:29,Pengeluaran,FOOD & GROCERIES,Jajan/Snack,Rp57.400,snack indomaret
+16-03-2026,19:49,Pengeluaran,FOOD & GROCERIES,Groceries,Rp40.000,tahu bakso
+16-03-2026,20:15,Pengeluaran,TRANSPORTATION,Fuel,Rp27.754,
+16-03-2026,20:04,Pengeluaran,HOUSING & UTILITAS,Household Supplies,Rp30.000,Masker
+17-03-2026,10:07,Pengeluaran,FOOD & GROCERIES,Groceries,Rp25.000,camay
+17-03-2026,10:22,Pengeluaran,FOOD & GROCERIES,Jajan/Snack,Rp2.000,es batu
+18-03-2026,10:22,Pengeluaran,TRANSPORTATION,Parking,Rp3.000,parkir pasar
+18-03-2026,10:23,Pengeluaran,FOOD & GROCERIES,Groceries,Rp28.000,dumpling
+18-03-2026,10:23,Pengeluaran,FOOD & GROCERIES,Groceries,Rp30.000,bumbu lebaran
+18-03-2026,16:49,Pengeluaran,FOOD & GROCERIES,Jajan/Snack,Rp4.000,es batu
+18-03-2026,18:05,Pengeluaran,HOUSING & UTILITAS,Gas,Rp25.000,
+18-03-2026,20:17,Pengeluaran,FOOD & GROCERIES,Jajan/Snack,Rp31.600,kopi indomaret
+18-03-2026,21:48,Pengeluaran,FOOD & GROCERIES,Jajan/Snack,Rp4.500,teh botol less sugar
+18-03-2026,21:48,Pengeluaran,FOOD & GROCERIES,Jajan/Snack,Rp10.000,otak2
+19-03-2026,14:40,Pengeluaran,TRANSPORTATION,Toll,Rp50.000,bni tap cash
+19-03-2026,21:09,Pengeluaran,"GIFTS, PETS & MISC.",Family/Adek/My Beb,Rp50.000,doorprize
+19-03-2026,21:09,Pengeluaran,FOOD & GROCERIES,Dining Out,Rp67.000,solaria
+19-03-2026,21:10,Pengeluaran,TRANSPORTATION,Parking,Rp5.000,solaria
+19-03-2026,21:10,Pengeluaran,FOOD & GROCERIES,Jajan/Snack,Rp16.000,kopi janjiw
+19-03-2026,21:10,Pengeluaran,"GIFTS, PETS & MISC.",Family/Adek/My Beb,Rp700.000,kulkas
+20-03-2026,12:11,Pengeluaran,TRANSPORTATION,Parking,Rp2.000,pasar
+20-03-2026,12:12,Pengeluaran,FOOD & GROCERIES,Groceries,Rp10.000,tempe
+20-03-2026,14:43,Pengeluaran,TRANSPORTATION,Vehicle Maintenance,Rp40.000,Cuci mobil
+20-03-2026,14:43,Pengeluaran,TRANSPORTATION,Vehicle Maintenance,Rp20.000,Isi ban mobil
+21-03-2026,13:19,Pengeluaran,FOOD & GROCERIES,Jajan/Snack,Rp68.600,"kacang, teh"
+21-03-2026,21:10,Pengeluaran,PERSONAL CARE & HEALTH,Medical,Rp33.200,neurobion
+22-03-2026,12:33,Pengeluaran,FOOD & GROCERIES,Jajan/Snack,Rp25.000,Kopi nescafe indomaret
+22-03-2026,15:17,Pengeluaran,TRANSPORTATION,Parking,Rp5.000,masjid 
+22-03-2026,15:19,Pengeluaran,FOOD & GROCERIES,Jajan/Snack,Rp13.000,jus alpukat
+23-03-2026,18:16,Pengeluaran,"GIFTS, PETS & MISC.",Family/Adek/My Beb,Rp46.000,sarapan
+23-03-2026,18:17,Pengeluaran,FOOD & GROCERIES,Dining Out,Rp32.000,sarapan
+23-03-2026,18:18,Pengeluaran,PERSONAL CARE & HEALTH,Skin and Body Care,Rp10.000,kapas
+24-03-2026,20:34,Pengeluaran,FOOD & GROCERIES,Jajan/Snack,Rp20.000,burayot
+25-03-2026,14:21,Pengeluaran,ENTERTAINMENT & HOBBIES,Shopping (Non-Clothing),Rp140.000,in parfume
+25-03-2026,20:00,Pengeluaran,FOOD & GROCERIES,Jajan/Snack,Rp20.000,ayam
+25-03-2026,20:00,Pengeluaran,FOOD & GROCERIES,Groceries,Rp203.532,naga
+26-03-2026,16:03,Pengeluaran,FOOD & GROCERIES,Groceries,Rp23.000,lauk
+26-03-2026,21:54,Pengeluaran,FOOD & GROCERIES,Jajan/Snack,Rp10.000,cimol
+26-03-2026,21:55,Pengeluaran,FOOD & GROCERIES,Dining Out,Rp36.000,bakso
+27-03-2026,7:49,Pengeluaran,FOOD & GROCERIES,Groceries,Rp27.000,sayur
+27-03-2026,7:50,Pengeluaran,FOOD & GROCERIES,Groceries,Rp45.000,ayam 12 potong
+27-03-2026,7:51,Pengeluaran,FOOD & GROCERIES,Jajan/Snack,Rp20.000,bubur
+27-03-2026,7:51,Pengeluaran,"GIFTS, PETS & MISC.",Donation & Gift,Rp36.000,semangka makwo
+27-03-2026,11:14,Pengeluaran,FOOD & GROCERIES,Groceries,Rp13.000,pepaya
+27-03-2026,12:04,Pengeluaran,FIXED BILLS & INSURANCE,Mobile Phone Bill/Pulsa,Rp60.000,
+27-03-2026,12:04,Pengeluaran,FOOD & GROCERIES,Jajan/Snack,Rp61.000,Kopi selama lebaran
+27-03-2026,12:05,Pengeluaran,ENTERTAINMENT & HOBBIES,Games,Rp129.000,"Detroit, COD"
+27-03-2026,12:05,Pengeluaran,ENTERTAINMENT & HOBBIES,Shopping (Non-Clothing),Rp77.050,Kabel cas c to c
+27-03-2026,12:06,Pengeluaran,FIXED BILLS & INSURANCE,Taxes (Admin Fee/Bank),Rp10.000,
+27-03-2026,13:43,Pengeluaran,"GIFTS, PETS & MISC.",Family/Adek/My Beb,Rp100.000,sakha
+27-03-2026,13:44,Pengeluaran,FOOD & GROCERIES,Jajan/Snack,Rp40.296,holand + pajak
+29-03-2026,19:39,Pengeluaran,ENTERTAINMENT & HOBBIES,Electronic,Rp10.000,jual barang bekas + beli monitor
+29-03-2026,19:40,Pengeluaran,FOOD & GROCERIES,Dining Out,Rp110.000,mie aceh kak salma
+29-03-2026,19:40,Pengeluaran,FOOD & GROCERIES,Jajan/Snack,Rp74.400,Hokkaido cheese tart
+29-03-2026,19:41,Pengeluaran,FOOD & GROCERIES,Dining Out,Rp40.000,ayam bakar kalasan
+31-03-2026,9:50,Pengeluaran,FOOD & GROCERIES,Groceries,Rp24.600,sarden maya
+31-03-2026,9:50,Pengeluaran,FOOD & GROCERIES,Groceries,Rp25.000,sayur lodeh
+31-03-2026,12:29,Pengeluaran,ENTERTAINMENT & HOBBIES,Shopping (Non-Clothing),Rp93.200,usb hub
+31-03-2026,17:38,Pengeluaran,FOOD & GROCERIES,Jajan/Snack,Rp41.000,Kebab Republik
+31-03-2026,17:38,Pengeluaran,TRANSPORTATION,Fuel,Rp75.000,
+31-03-2026,18:00,Pengeluaran,FOOD & GROCERIES,Jajan/Snack,Rp20.000,1 bal es kristal
+01-04-2026,5:06,Pengeluaran,HOUSING & UTILITAS,Water and Sewer,Rp252.200,pdam
+01-04-2026,5:21,Pengeluaran,"GIFTS, PETS & MISC.",Family/Adek/My Beb,Rp200.000,
+01-04-2026,5:21,Pengeluaran,FIXED BILLS & INSURANCE,Mobile Phone Bill/Pulsa,Rp50.000,kuota 13gb nenis
+01-04-2026,5:21,Pengeluaran,FIXED BILLS & INSURANCE,Health Insurance,Rp37.500,bpjs nenis
+01-04-2026,10:57,Pemasukan,PENGHASILAN UTAMA,Gaji Pokok,Rp2.244.500,
+01-04-2026,11:08,Pengeluaran,FOOD & GROCERIES,Groceries,Rp279.658,naga
+01-04-2026,11:08,Pengeluaran,FOOD & GROCERIES,Jajan/Snack,Rp19.440,naga
+01-04-2026,11:09,Pengeluaran,PERSONAL CARE & HEALTH,Skin and Body Care,Rp180.560,naga
+01-04-2026,11:09,Pengeluaran,TRANSPORTATION,Parking,Rp2.000,ramen bajuri
+01-04-2026,20:16,Pengeluaran,FOOD & GROCERIES,Dining Out,Rp37.400,ramen bajuri
+01-04-2026,20:17,Pengeluaran,PERSONAL CARE & HEALTH,Medical,Rp34.000,bioplacenton
+01-04-2026,20:18,Pengeluaran,FOOD & GROCERIES,Jajan/Snack,Rp22.000,sabana
+03-04-2026,9:42,Pengeluaran,FOOD & GROCERIES,Jajan/Snack,Rp20.000,aicha
+03-04-2026,9:42,Pengeluaran,FOOD & GROCERIES,Dining Out,Rp45.000,bubur
+03-04-2026,11:57,Pengeluaran,TRANSPORTATION,Parking,Rp60.000,Member parkir 2 bulan
+02-04-2026,19:42,Pengeluaran,TRANSPORTATION,Parking,Rp3.000,aicha
+03-04-2026,7:00,Pengeluaran,"GIFTS, PETS & MISC.",Donation & Gift,Rp25.000,bolu
+03-04-2026,19:15,Pengeluaran,ENTERTAINMENT & HOBBIES,Other Entertainment,Rp60.000,fotobox
+03-04-2026,19:15,Pengeluaran,HOUSING & UTILITAS,Gas,Rp150.000,3 tabung
+03-04-2026,19:18,Pemasukan,PENGHASILAN SAMPINGAN,Other Sampingan,Rp500.000,sisa bulan maret
+03-04-2026,19:23,Pengeluaran,LOANS & DEBTS,Friend (Repayment),Rp1.200.000,cicilan pc
+04-04-2026,16:15,Pengeluaran,FOOD & GROCERIES,Groceries,Rp23.000,ayam
+04-04-2026,16:16,Pengeluaran,FOOD & GROCERIES,Jajan/Snack,Rp10.000,Kopi sj
+04-04-2026,20:08,Pengeluaran,FOOD & GROCERIES,Dining Out,Rp30.000,bakso mie ayam
+05-04-2026,7:43,Pengeluaran,FOOD & GROCERIES,Dining Out,Rp126.000,Nasduk
+05-04-2026,15:34,Pengeluaran,FOOD & GROCERIES,Dining Out,Rp126.000,steak ultah wisma asri
+05-04-2026,20:28,Pengeluaran,FOOD & GROCERIES,Jajan/Snack,Rp19.500,susu
+06-04-2026,9:46,Pengeluaran,FOOD & GROCERIES,Groceries,Rp40.000,ayam
+06-04-2026,9:47,Pengeluaran,FOOD & GROCERIES,Groceries,Rp34.000,telur
+06-04-2026,9:47,Pengeluaran,"GIFTS, PETS & MISC.",Family/Adek/My Beb,Rp148.000,bcbd cirebon
+06-04-2026,11:07,Pengeluaran,FOOD & GROCERIES,Groceries,Rp20.000,camay
+06-04-2026,19:50,Pengeluaran,FOOD & GROCERIES,Jajan/Snack,Rp16.700,es krim
+07-04-2026,19:00,Pengeluaran,FOOD & GROCERIES,Jajan/Snack,Rp29.000,lawson
+08-04-2026,9:47,Pengeluaran,FOOD & GROCERIES,Jajan/Snack,Rp13.000,es batu
+09-04-2026,9:15,Pengeluaran,FOOD & GROCERIES,Groceries,Rp45.000,camay
+10-04-2026,11:00,Pengeluaran,PERSONAL CARE & HEALTH,Skin and Body Care,Rp54.200,micellar facetology
+10-04-2026,19:15,Pengeluaran,FOOD & GROCERIES,Groceries,Rp50.000,moji
+12-04-2026,7:13,Pengeluaran,TRANSPORTATION,Parking,Rp100.000,e money
+12-04-2026,16:25,Pengeluaran,FOOD & GROCERIES,Dining Out,Rp70.000,iga bakar kayuringin
+12-04-2026,16:26,Pengeluaran,FOOD & GROCERIES,Jajan/Snack,Rp21.000,snack nonton
+13-04-2026,18:53,Pengeluaran,FOOD & GROCERIES,Jajan/Snack,Rp22.000,jus dan misro
+14-04-2026,15:58,Pengeluaran,TRANSPORTATION,Fuel,Rp80.000,
+14-04-2026,15:59,Pengeluaran,TRANSPORTATION,Vehicle Maintenance,Rp10.000,Angin ban
+14-04-2026,15:59,Pengeluaran,HOUSING & UTILITAS,Household Supplies,Rp66.000,"Sabun Muka, Tisu basah di Kantor"
+14-04-2026,16:00,Pengeluaran,FOOD & GROCERIES,Jajan/Snack,Rp34.000,"Susu, kiranti"
+14-04-2026,16:00,Pengeluaran,TRANSPORTATION,Fuel,Rp73.000,
+14-04-2026,16:00,Pengeluaran,TRANSPORTATION,Parking,Rp9.000,
+14-04-2026,16:00,Pengeluaran,"GIFTS, PETS & MISC.",Donation & Gift,Rp50.000,Batik Pak Ses
+14-04-2026,16:01,Pengeluaran,FOOD & GROCERIES,Jajan/Snack,Rp10.000,"Batagor, kue apem"
+14-04-2026,18:49,Pengeluaran,FOOD & GROCERIES,Groceries,Rp70.000,camay
+14-04-2026,18:49,Pengeluaran,HOUSING & UTILITAS,Maintenance or Repairs,Rp60.000,cuci ac
+14-04-2026,18:50,Pengeluaran,PERSONAL CARE & HEALTH,Medical,Rp11.000,asam mefenamat
+14-04-2026,18:52,Pemasukan,PENGHASILAN UTAMA,Tunjangan,Rp3.123.362,tukin
+15-04-2026,13:25,Pengeluaran,ENTERTAINMENT & HOBBIES,"Streaming (Youtube, Netflix, dll.)",Rp76.000,
+15-04-2026,13:25,Pengeluaran,FOOD & GROCERIES,Dining Out,Rp10.000,Nasduk
+15-04-2026,16:49,Pengeluaran,PERSONAL CARE & HEALTH,Medical,Rp585.000,MCU
+15-04-2026,21:24,Pengeluaran,TRANSPORTATION,Parking,Rp2.000,puskesmas
+15-04-2026,21:25,Pengeluaran,FOOD & GROCERIES,Dining Out,Rp12.000,bubur
+15-04-2026,21:25,Pengeluaran,FOOD & GROCERIES,Dining Out,Rp15.000,dkriuk
+15-04-2026,21:25,Pengeluaran,FOOD & GROCERIES,Jajan/Snack,Rp32.000,mi yamin
+15-04-2026,21:26,Pengeluaran,"GIFTS, PETS & MISC.",Donation & Gift,Rp2.000,tip shopeefood
+15-04-2026,21:26,Pengeluaran,FOOD & GROCERIES,Jajan/Snack,Rp26.560,roti bakar
+17-04-2026,19:11,Pengeluaran,TRANSPORTATION,Parking,Rp3.000,
+17-04-2026,19:12,Pengeluaran,FOOD & GROCERIES,Jajan/Snack,Rp77.000,"Lawson, cokro"
+18-04-2026,9:42,Pengeluaran,PERSONAL CARE & HEALTH,Skin and Body Care,Rp45.800,"Body soap, korek kuping, shave"
+31-01-2026,19:40,Pemasukan,PENGHASILAN UTAMA,Tunjangan,Rp3.132.760,
+31-01-2026,19:43,Pengeluaran,HOUSING & UTILITAS,Water and Sewer,Rp254.700,
+20-04-2026,8:27,Pengeluaran,FOOD & GROCERIES,Jajan/Snack,Rp5.000,es kelapa
+20-04-2026,8:27,Pengeluaran,FOOD & GROCERIES,Jajan/Snack,Rp12.000,Jus mangga
+20-04-2026,8:28,Pengeluaran,TRANSPORTATION,Vehicle Maintenance,Rp6.000,isi angin
+20-04-2026,8:28,Pengeluaran,FOOD & GROCERIES,Jajan/Snack,Rp25.000,elud
+20-04-2026,8:28,Pengeluaran,TRANSPORTATION,Fuel,Rp51.000,
+20-04-2026,8:28,Pengeluaran,PERSONAL CARE & HEALTH,Skin and Body Care,Rp33.000,"korek kuping, alat cukur jenggot"
+20-04-2026,8:29,Pengeluaran,PERSONAL CARE & HEALTH,Medical,Rp52.000,obat tensi
+25-04-2026,7:59,Pemasukan,PENGHASILAN UTAMA,Gaji Pokok,Rp527.250,Uang makan
+25-04-2026,8:00,Pemasukan,PENGHASILAN UTAMA,Tunjangan,Rp560.000,DL
+25-04-2026,8:03,Pengeluaran,FOOD & GROCERIES,Jajan/Snack,Rp5.000,Gorengan
+25-04-2026,8:03,Pengeluaran,FIXED BILLS & INSURANCE,Taxes (Admin Fee/Bank),Rp10.000,
+25-04-2026,8:03,Pengeluaran,FOOD & GROCERIES,Jajan/Snack,Rp9.700,
+25-04-2026,8:04,Pengeluaran,FOOD & GROCERIES,Dining Out,Rp10.000,Dining out
+25-04-2026,8:04,Pengeluaran,FOOD & GROCERIES,Jajan/Snack,Rp18.600,Indomaret
+25-04-2026,8:05,Pengeluaran,TRANSPORTATION,Fuel,Rp51.000,
+21-04-2026,8:05,Pengeluaran,FOOD & GROCERIES,Groceries,Rp40.000,ayam jangkung
+25-04-2026,8:05,Pengeluaran,TRANSPORTATION,Vehicle Maintenance,Rp6.000,Isi angin
+25-04-2026,8:05,Pengeluaran,FOOD & GROCERIES,Dining Out,Rp12.000,Bubur
+17-04-2026,8:05,Pengeluaran,FIXED BILLS & INSURANCE,Taxes (Admin Fee/Bank),Rp10.000,bca
+25-04-2026,8:06,Pengeluaran,FIXED BILLS & INSURANCE,Taxes (Admin Fee/Bank),Rp5.500,
+22-04-2026,8:06,Pengeluaran,FOOD & GROCERIES,Jajan/Snack,Rp18.000,asinan phr
+23-04-2026,8:06,Pengeluaran,FOOD & GROCERIES,Jajan/Snack,Rp10.000,bakso goreng
+25-04-2026,8:07,Pengeluaran,FOOD & GROCERIES,Dining Out,Rp24.000,bubur
+23-04-2026,8:07,Pengeluaran,FOOD & GROCERIES,Groceries,Rp5.900,air indomaret cikini
+13-04-2026,8:08,Pengeluaran,FOOD & GROCERIES,Groceries,Rp40.500,"fresh care, rexona"
+25-04-2026,15:01,Pengeluaran,PERSONAL CARE & HEALTH,Skin and Body Care,Rp35.000,cukur
+25-04-2026,15:02,Pengeluaran,FOOD & GROCERIES,Jajan/Snack,Rp10.000,sempol
+26-04-2026,10:33,Pengeluaran,FOOD & GROCERIES,Groceries,Rp294.978,naga
+26-04-2026,11:14,Pengeluaran,TRANSPORTATION,Parking,Rp2.000,naga
+27-04-2026,15:42,Pengeluaran,FOOD & GROCERIES,Groceries,Rp55.000,ayam sambel 
+29-04-2026,11:28,Pengeluaran,FOOD & GROCERIES,Dining Out,Rp403.436,Steak 21
+29-04-2026,11:29,Pengeluaran,FOOD & GROCERIES,Jajan/Snack,Rp12.000,Kopi
+29-04-2026,11:30,Pengeluaran,FOOD & GROCERIES,Dining Out,Rp20.000,"mie rebus, teh"
+29-04-2026,11:30,Pengeluaran,"GIFTS, PETS & MISC.",Family/Adek/My Beb,Rp150.000,ayang salon
+29-04-2026,15:00,Pengeluaran,PERSONAL CARE & HEALTH,Skin and Body Care,Rp52.000,salon
+30-04-2026,16:00,Pengeluaran,FIXED BILLS & INSURANCE,Mobile Phone Bill/Pulsa,Rp60.000,kuota
+30-04-2026,16:00,Pengeluaran,FOOD & GROCERIES,Dining Out,Rp12.000,nasgor
+30-04-2026,16:00,Pengeluaran,FOOD & GROCERIES,Jajan/Snack,Rp10.000,batagor
+30-04-2026,16:00,Pengeluaran,FOOD & GROCERIES,Jajan/Snack,Rp9.700,susu
+30-04-2026,16:00,Pengeluaran,FOOD & GROCERIES,Dining Out,Rp83.000,pancong
+30-04-2026,16:00,Pengeluaran,FOOD & GROCERIES,Jajan/Snack,Rp10.000,cilor
+30-04-2026,17:38,Pengeluaran,TRANSPORTATION,Fuel,Rp70.000,
+01-05-2026,13:56,Pemasukan,PENGHASILAN UTAMA,Gaji Pokok,Rp2.519.700,
+01-05-2026,13:56,Pengeluaran,HOUSING & UTILITAS,Water and Sewer,Rp307.500,
+01-05-2026,13:57,Pengeluaran,"GIFTS, PETS & MISC.",Family/Adek/My Beb,Rp200.000,
+01-05-2026,13:58,Pengeluaran,LOANS & DEBTS,Friend (Repayment),Rp1.200.000,
+01-05-2026,14:04,Pengeluaran,"GIFTS, PETS & MISC.",Family/Adek/My Beb,Rp1.500.000,
+03-05-2026,10:39,Pengeluaran,PERSONAL CARE & HEALTH,Skin and Body Care,Rp99.580,Sabun mandi 3 pouch
+03-05-2026,8:35,Pengeluaran,TRANSPORTATION,Vehicle Maintenance,Rp161.500,"service rutin, oli mesin, oli gardan"
+05-05-2026,8:36,Pengeluaran,"GIFTS, PETS & MISC.",Family/Adek/My Beb,Rp50.000,bpjs
+05-05-2026,8:37,Pengeluaran,FOOD & GROCERIES,Dining Out,Rp18.000,hisana
+05-05-2026,8:37,Pengeluaran,PERSONAL CARE & HEALTH,Skin and Body Care,Rp72.699,fashwash
+05-05-2026,8:38,Pengeluaran,FOOD & GROCERIES,Jajan/Snack,Rp21.900,Indomaret
+06-05-2026,8:38,Pengeluaran,"GIFTS, PETS & MISC.",Donation & Gift,Rp100.000,Mba may nikah
+06-05-2026,8:38,Pengeluaran,ENTERTAINMENT & HOBBIES,Shopping (Non-Clothing),Rp35.500,lap kacamata
+06-05-2026,8:39,Pengeluaran,"GIFTS, PETS & MISC.",Family/Adek/My Beb,Rp100.000,kado abi
+07-05-2026,8:39,Pengeluaran,FOOD & GROCERIES,Jajan/Snack,Rp12.000,buah potong
+07-05-2026,8:39,Pengeluaran,FOOD & GROCERIES,Jajan/Snack,Rp15.000,cimol cilok
+08-05-2026,8:39,Pengeluaran,EDUCATION & SELF-IMPROVEMENT,FC & Print,Rp6.000,
+08-05-2026,8:41,Pengeluaran,TRANSPORTATION,Parking,Rp2.000,
+08-05-2026,8:41,Pengeluaran,"GIFTS, PETS & MISC.",Family/Adek/My Beb,Rp30.000,sate ayam
+08-05-2026,8:41,Pengeluaran,FOOD & GROCERIES,Jajan/Snack,Rp35.900,indomaret
+11-05-2026,8:41,Pengeluaran,FOOD & GROCERIES,Jajan/Snack,Rp12.000,buah potong
+11-05-2026,8:42,Pengeluaran,ENTERTAINMENT & HOBBIES,Shopping (Non-Clothing),Rp40.948,case hp
+11-05-2026,8:42,Pengeluaran,TRANSPORTATION,Toll,Rp58.000,toll bandara
+11-05-2026,8:47,Pengeluaran,TRANSPORTATION,Parking,Rp23.000,parkir bandara
+11-05-2026,8:48,Pemasukan,PENGHASILAN UTAMA,Tunjangan,Rp3.132.760,tukin
+11-05-2026,16:05,Pengeluaran,FOOD & GROCERIES,Dining Out,Rp18.000,warteg
+11-05-2026,16:06,Pengeluaran,FOOD & GROCERIES,Jajan/Snack,Rp10.000,
+11-05-2026,16:06,Pengeluaran,TRANSPORTATION,Fuel,Rp81.000,
+11-05-2026,16:06,Pemasukan,PENGHASILAN UTAMA,Tunjangan,Rp680.000,dinas bekasi
+14-05-2026,16:07,Pengeluaran,FOOD & GROCERIES,Jajan/Snack,Rp9.700,susu
+14-05-2026,16:07,Pengeluaran,TRANSPORTATION,Parking,Rp3.000,
+14-05-2026,16:08,Pemasukan,PENGHASILAN UTAMA,Tunjangan,Rp527.250,uang makan
+14-05-2026,16:11,Pengeluaran,ENTERTAINMENT & HOBBIES,"Streaming (Youtube, Netflix, dll.)",Rp22.089,member raditya dika
