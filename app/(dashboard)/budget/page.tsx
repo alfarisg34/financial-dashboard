@@ -1,9 +1,9 @@
 'use client'
 import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
+import { Check } from 'lucide-react'
 
-type Subcategory = { id: string; name: string; categories: { name: string } }
-type Budget = { id: string; subcategory_id: string; month: number; year: number; amount: number }
+type Budget = { id: string; subcategory_id: string; month: number; year: number; amount: number; type: string }
 
 export default function BudgetPage() {
   const supabase = createClient()
@@ -12,7 +12,10 @@ export default function BudgetPage() {
   const [year, setYear] = useState(now.getFullYear())
   const [subcategories, setSubcategories] = useState<any[]>([])
   const [budgets, setBudgets] = useState<Budget[]>([])
-  const [amounts, setAmounts] = useState<Record<string, string>>({})
+  const [outcomeAmounts, setOutcomeAmounts] = useState<Record<string, string>>({})
+  const [incomeAmounts, setIncomeAmounts] = useState<Record<string, string>>({})
+  const [savedId, setSavedId] = useState<string | null>(null)
+  const [errorId, setErrorId] = useState<string | null>(null)
 
   async function load() {
     const { data: { user } } = await supabase.auth.getUser()
@@ -23,24 +26,86 @@ export default function BudgetPage() {
     ])
     setSubcategories(subs || [])
     setBudgets(buds || [])
-    const init: Record<string, string> = {}
-    ;(buds || []).forEach((b: Budget) => { init[b.subcategory_id] = String(b.amount) })
-    setAmounts(init)
+
+    const initOutcome: Record<string, string> = {}
+    const initIncome: Record<string, string> = {}
+    ;(buds || []).forEach((b: Budget) => {
+      if (b.type === 'outcome') initOutcome[b.subcategory_id] = String(b.amount)
+      if (b.type === 'income') initIncome[b.subcategory_id] = String(b.amount)
+    })
+    setOutcomeAmounts(initOutcome)
+    setIncomeAmounts(initIncome)
   }
 
   useEffect(() => { load() }, [month, year])
 
-  async function saveBudget(subcategoryId: string) {
+  async function saveBudget(subcategoryId: string, type: 'income' | 'outcome') {
     const { data: { user } } = await supabase.auth.getUser()
-    const amount = parseFloat(amounts[subcategoryId] || '0')
-    await supabase.from('budgets').upsert(
-      { user_id: user?.id, subcategory_id: subcategoryId, month, year, amount },
-      { onConflict: 'user_id,subcategory_id,month,year' }
+    const amount = parseFloat(
+      (type === 'outcome' ? outcomeAmounts : incomeAmounts)[subcategoryId] || '0'
     )
+    const saveKey = `${subcategoryId}-${type}`
+    const { error } = await supabase.from('budgets').upsert(
+      { user_id: user?.id, subcategory_id: subcategoryId, month, year, amount, type },
+      { onConflict: 'user_id,subcategory_id,month,year,type' }
+    )
+    if (!error) {
+      setSavedId(saveKey)
+      setTimeout(() => setSavedId(null), 2000)
+    } else {
+      setErrorId(saveKey)
+      setTimeout(() => setErrorId(null), 2000)
+    }
   }
 
   const months = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Ags','Sep','Okt','Nov','Des']
-  const outcomesSubs = subcategories.filter(s => s.categories?.type === 'outcome')
+  const outcomeSubs = subcategories.filter(s => s.categories?.type === 'outcome')
+  const incomeSubs = subcategories.filter(s => s.categories?.type === 'income')
+
+  function BudgetRow({ sub, type }: { sub: any, type: 'income' | 'outcome' }) {
+    const saveKey = `${sub.id}-${type}`
+    const isSaved = savedId === saveKey
+    const isError = errorId === saveKey
+    const amounts = type === 'outcome' ? outcomeAmounts : incomeAmounts
+    const setAmounts = type === 'outcome' ? setOutcomeAmounts : setIncomeAmounts
+
+    return (
+      <div className="flex flex-wrap items-center gap-2 px-5 py-3 border-b border-gray-50 last:border-0">
+        <span className="hidden sm:block text-xs text-gray-400 flex-1 min-w-0">
+          {sub.categories?.name}
+        </span>
+        <span className="hidden sm:block text-sm text-gray-700 flex-1 min-w-0">
+          {sub.name}
+        </span>
+        <div className="sm:hidden flex flex-col flex-1 min-w-0">
+          <span className="text-xs text-gray-400">{sub.categories?.name}</span>
+          <span className="text-sm text-gray-700">{sub.name}</span>
+        </div>
+        <div className="flex gap-2 ml-auto items-center">
+          <input
+            type="number"
+            value={amounts[sub.id] || ''}
+            onChange={e => setAmounts(prev => ({ ...prev, [sub.id]: e.target.value }))}
+            placeholder="0"
+            className="w-28 px-3 py-2 rounded-lg border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+          <button
+            onClick={() => saveBudget(sub.id, type)}
+            className={`px-3 py-2 text-xs rounded-lg transition-colors font-medium whitespace-nowrap flex items-center gap-1
+              ${isSaved
+                ? 'bg-green-500 text-white'
+                : isError
+                ? 'bg-red-100 text-red-700'
+                : type === 'outcome'
+                ? 'bg-green-50 text-green-700 hover:bg-green-100'
+                : 'bg-blue-50 text-blue-700 hover:bg-blue-100'
+              }`}>
+            {isSaved ? <><Check size={13}/> Tersimpan</> : isError ? 'Gagal!' : 'Simpan'}
+          </button>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="max-w-2xl w-full">
@@ -59,57 +124,36 @@ export default function BudgetPage() {
         <span className="text-sm text-gray-500">Budget untuk {months[month-1]} {year}</span>
       </div>
 
-      {/* Budget list */}
-      <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden">
-
-        {/* Header — hanya tampil di sm ke atas */}
-        <div className="hidden sm:grid sm:grid-cols-3 text-xs font-semibold text-gray-500 uppercase tracking-wide px-5 py-3 border-b border-gray-100">
-          <span>Kategori</span>
-          <span>Subkategori</span>
-          <span>Budget (Rp)</span>
+      {/* Outcome Budget */}
+      <div className="mb-6">
+        <h2 className="text-xs font-semibold uppercase tracking-wider text-red-600 mb-3">📉 Budget Pengeluaran</h2>
+        <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden">
+          <div className="hidden sm:grid sm:grid-cols-3 text-xs font-semibold text-gray-500 uppercase tracking-wide px-5 py-3 border-b border-gray-100">
+            <span>Kategori</span>
+            <span>Subkategori</span>
+            <span>Budget (Rp)</span>
+          </div>
+          {outcomeSubs.length === 0
+            ? <p className="px-5 py-8 text-sm text-gray-400 text-center">Belum ada subkategori outcome.</p>
+            : outcomeSubs.map(sub => <BudgetRow key={sub.id} sub={sub} type="outcome"/>)
+          }
         </div>
+      </div>
 
-        {outcomesSubs.length === 0
-          ? (
-            <p className="px-5 py-8 text-sm text-gray-400 text-center">
-              Belum ada subkategori outcome. Tambahkan dulu di menu Kategori.
-            </p>
-          )
-          : outcomesSubs.map(sub => (
-            <div key={sub.id} className="flex flex-wrap items-center gap-2 px-5 py-3 border-b border-gray-50 last:border-0">
-
-              {/* Desktop: 3 kolom */}
-              <span className="hidden sm:block text-xs text-gray-400 flex-1 min-w-0">
-                {sub.categories?.name}
-              </span>
-              <span className="hidden sm:block text-sm text-gray-700 flex-1 min-w-0">
-                {sub.name}
-              </span>
-
-              {/* Mobile: kategori + sub dalam satu baris */}
-              <div className="sm:hidden flex flex-col flex-1 min-w-0">
-                <span className="text-xs text-gray-400">{sub.categories?.name}</span>
-                <span className="text-sm text-gray-700">{sub.name}</span>
-              </div>
-
-              {/* Input + tombol simpan */}
-              <div className="flex gap-2 ml-auto">
-                <input
-                  type="number"
-                  value={amounts[sub.id] || ''}
-                  onChange={e => setAmounts(prev => ({ ...prev, [sub.id]: e.target.value }))}
-                  placeholder="0"
-                  className="w-28 px-3 py-2 rounded-lg border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-                <button
-                  onClick={() => saveBudget(sub.id)}
-                  className="px-3 py-2 bg-green-50 text-green-700 text-xs rounded-lg hover:bg-green-100 transition-colors font-medium whitespace-nowrap">
-                  Simpan
-                </button>
-              </div>
-            </div>
-          ))
-        }
+      {/* Income Target */}
+      <div>
+        <h2 className="text-xs font-semibold uppercase tracking-wider text-green-600 mb-3">📈 Target Pemasukan</h2>
+        <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden">
+          <div className="hidden sm:grid sm:grid-cols-3 text-xs font-semibold text-gray-500 uppercase tracking-wide px-5 py-3 border-b border-gray-100">
+            <span>Kategori</span>
+            <span>Subkategori</span>
+            <span>Target (Rp)</span>
+          </div>
+          {incomeSubs.length === 0
+            ? <p className="px-5 py-8 text-sm text-gray-400 text-center">Belum ada subkategori income.</p>
+            : incomeSubs.map(sub => <BudgetRow key={sub.id} sub={sub} type="income"/>)
+          }
+        </div>
       </div>
     </div>
   )

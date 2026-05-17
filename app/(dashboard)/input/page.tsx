@@ -5,6 +5,10 @@ import { createClient } from '@/lib/supabase/client'
 type Category = { id: string; name: string; type: string }
 type Subcategory = { id: string; name: string; category_id: string }
 
+function fmt(n: number) {
+  return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(n)
+}
+
 export default function InputPage() {
   const supabase = createClient()
   const [type, setType] = useState<'income' | 'outcome'>('outcome')
@@ -21,6 +25,8 @@ export default function InputPage() {
   const [categories, setCategories] = useState<Category[]>([])
   const [subcategories, setSubcategories] = useState<Subcategory[]>([])
   const [success, setSuccess] = useState('')
+  const [budgetInfo, setBudgetInfo] = useState<{ budget: number; spent: number } | null>(null)
+  const [loadingBudget, setLoadingBudget] = useState(false)
 
   useEffect(() => {
     supabase.from('categories').select('*').then(({ data }) => setCategories(data || []))
@@ -30,6 +36,7 @@ export default function InputPage() {
     setCategoryId('')
     setSubcategoryId('')
     setSearch('')
+    setBudgetInfo(null)
   }, [type])
 
   useEffect(() => {
@@ -39,11 +46,57 @@ export default function InputPage() {
       .then(({ data }) => setSubcategories(data || []))
   }, [categoryId])
 
+  useEffect(() => {
+    if (!subcategoryId || type !== 'outcome') { setBudgetInfo(null); return }
+
+    async function fetchBudgetInfo() {
+      setLoadingBudget(true)
+
+      // Ambil bulan & tahun dari input date
+      const selectedDate = new Date(date)
+      const month = selectedDate.getMonth() + 1
+      const year = selectedDate.getFullYear()
+
+      // Hitung start & end bulan (WIB)
+      const startOfMonth = `${year}-${String(month).padStart(2, '0')}-01T00:00:00+07:00`
+      const lastDay = new Date(year, month, 0).getDate()
+      const endOfMonth = `${year}-${String(month).padStart(2, '0')}-${lastDay}T23:59:59+07:00`
+
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) return
+
+      const [{ data: budgetData }, { data: txData }] = await Promise.all([
+        supabase.from('budgets')
+          .select('amount')
+          .eq('user_id', user.id)
+          .eq('subcategory_id', subcategoryId)
+          .eq('month', month)
+          .eq('year', year)
+          .single(),
+        supabase.from('transactions')
+          .select('amount')
+          .eq('user_id', user.id)
+          .eq('subcategory_id', subcategoryId)
+          .eq('type', 'outcome')
+          .gte('date', startOfMonth)
+          .lte('date', endOfMonth)
+      ])
+
+      const budget = budgetData?.amount || 0
+      const spent = (txData || []).reduce((s: number, t: any) => s + t.amount, 0)
+      setBudgetInfo({ budget, spent })
+      setLoadingBudget(false)
+    }
+
+    fetchBudgetInfo()
+  }, [subcategoryId, date])
+
   const filteredCategories = categories.filter(c => c.type === type)
   const filteredSubs = subcategories.filter(s =>
     s.name.toLowerCase().includes(search.toLowerCase())
   )
   const selectedCategory = categories.find(c => c.id === categoryId)
+  const sisa = budgetInfo ? budgetInfo.budget - budgetInfo.spent : 0
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -59,7 +112,8 @@ export default function InputPage() {
 
     if (!error) {
       setSuccess('Transaksi berhasil disimpan!')
-      setAmount(''); setDescription(''); setCategoryId(''); setSubcategoryId(''); setSearch('')
+      setAmount(''); setDescription(''); setCategoryId(''); setSubcategoryId('')
+      setSearch(''); setBudgetInfo(null)
       setTimeout(() => setSuccess(''), 3000)
     }
   }
@@ -129,6 +183,41 @@ export default function InputPage() {
                 <option key={s.id} value={s.id}>{s.name}</option>
               ))}
             </select>
+
+            {/* Budget info */}
+            {subcategoryId && type === 'outcome' && (
+              <div className="mt-3">
+                {loadingBudget ? (
+                  <div className="text-xs text-gray-400 px-4 py-3 bg-gray-50 rounded-xl">
+                    Mengambil info budget...
+                  </div>
+                ) : budgetInfo && budgetInfo.budget > 0 ? (
+                  <div className={`px-4 py-3 rounded-xl text-sm space-y-1
+                    ${sisa >= 0 ? 'bg-green-50' : 'bg-red-50'}`}>
+                    <div className="flex justify-between text-xs text-gray-500">
+                      <span>Budget bulan ini</span>
+                      <span>{fmt(budgetInfo.budget)}</span>
+                    </div>
+                    <div className="flex justify-between text-xs text-gray-500">
+                      <span>Sudah dipakai</span>
+                      <span className="text-red-600">{fmt(budgetInfo.spent)}</span>
+                    </div>
+                    <div className={`flex justify-between text-xs font-semibold pt-1 border-t
+                      ${sisa >= 0 ? 'border-green-200 text-green-700' : 'border-red-200 text-red-700'}`}>
+                      <span>Sisa budget</span>
+                      <span>{fmt(sisa)}</span>
+                    </div>
+                    {sisa < 0 && (
+                      <p className="text-xs text-red-500 pt-0.5">⚠️ Budget sudah melebihi batas!</p>
+                    )}
+                  </div>
+                ) : (
+                  <div className="text-xs text-gray-400 px-4 py-3 bg-gray-50 rounded-xl">
+                    Belum ada budget untuk subkategori ini di bulan yang dipilih.
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         )}
 
