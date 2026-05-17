@@ -156,7 +156,7 @@ export default function DashboardPage() {
       <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden">
         <h2 className="text-sm font-semibold text-gray-700 px-5 py-4 border-b border-gray-100">Detail Transaksi</h2>
         <div className="overflow-x-auto">
-          <table className="w-full text-sm">
+          <table className="w-full text-sm min-w-[600px]">
             <thead>
               <tr className="bg-gray-50 text-xs text-gray-500 font-semibold uppercase tracking-wide">
                 <th className="px-5 py-3 text-left">Tanggal</th>
