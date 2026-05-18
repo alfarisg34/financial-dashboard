@@ -31,6 +31,8 @@ export default function DashboardPage() {
   const [startDate, setStartDate] = useState(getFirstDay(now))
   const [endDate, setEndDate] = useState(getLastDay(now))
   const [transactions, setTransactions] = useState<Transaction[]>([])
+  const [projectedCost, setProjectedCost] = useState(0)
+  const [projectedIncome, setProjectedIncome] = useState(0)
 
   useEffect(() => {
     supabase.from('transactions')
@@ -40,10 +42,43 @@ export default function DashboardPage() {
       .then(({ data }) => setTransactions(data || []))
   }, [startDate, endDate])
 
+  // Fetch projected cost & income berdasarkan bulan dari startDate
+  useEffect(() => {
+    async function fetchProjections() {
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) return
+
+      const d = new Date(startDate)
+      const month = d.getMonth() + 1
+      const year = d.getFullYear()
+
+      const { data: budgets } = await supabase
+        .from('budgets')
+        .select('amount, type')
+        .eq('user_id', user.id)
+        .eq('month', month)
+        .eq('year', year)
+
+      if (!budgets) return
+
+      const cost = budgets
+        .filter(b => b.type === 'outcome')
+        .reduce((s, b) => s + b.amount, 0)
+      const income = budgets
+        .filter(b => b.type === 'income')
+        .reduce((s, b) => s + b.amount, 0)
+
+      setProjectedCost(cost)
+      setProjectedIncome(income)
+    }
+    fetchProjections()
+  }, [startDate])
+
   const income = transactions.filter(t => t.type === 'income')
   const outcome = transactions.filter(t => t.type === 'outcome')
   const totalIncome = income.reduce((s, t) => s + t.amount, 0)
   const totalOutcome = outcome.reduce((s, t) => s + t.amount, 0)
+  const projectedBalance = projectedIncome - projectedCost
 
   const days = useMemo(() => {
     const d1 = new Date(startDate), d2 = new Date(endDate)
@@ -60,8 +95,6 @@ export default function DashboardPage() {
 
   const incomeByCategory = groupBy(income, t => t.categories?.name || 'Lainnya')
   const outcomeByCategory = groupBy(outcome, t => t.categories?.name || 'Lainnya')
-  const incomeBySubcategory = groupBy(income, t => t.subcategories?.name || 'Lainnya')
-  const outcomeBySubcategory = groupBy(outcome, t => t.subcategories?.name || 'Lainnya')
 
   return (
     <div className="space-y-6">
@@ -75,27 +108,58 @@ export default function DashboardPage() {
           className="px-3 py-2 rounded-xl border border-gray-200 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"/>
       </div>
 
-      {/* Highlight cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <div className="bg-green-50 rounded-2xl p-5">
-          <p className="text-xs font-medium text-green-600 uppercase tracking-wide mb-1">Total Income</p>
-          <p className="text-2xl font-semibold text-green-700">{fmt(totalIncome)}</p>
+      {/* Actual highlight cards */}
+      <div>
+        <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-3">Realisasi</p>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div className="bg-green-50 rounded-2xl p-5">
+            <p className="text-xs font-medium text-green-600 uppercase tracking-wide mb-1">Total Income</p>
+            <p className="text-2xl font-semibold text-green-700">{fmt(totalIncome)}</p>
+          </div>
+          <div className="bg-red-50 rounded-2xl p-5">
+            <p className="text-xs font-medium text-red-600 uppercase tracking-wide mb-1">Total Outcome</p>
+            <p className="text-2xl font-semibold text-red-700">{fmt(totalOutcome)}</p>
+          </div>
+          <div className="bg-blue-50 rounded-2xl p-5">
+            <p className="text-xs font-medium text-blue-600 uppercase tracking-wide mb-1">Avg. Spent/Hari</p>
+            <p className="text-2xl font-semibold text-blue-700">{fmt(Math.round(avgPerDay))}</p>
+          </div>
         </div>
-        <div className="bg-red-50 rounded-2xl p-5">
-          <p className="text-xs font-medium text-red-600 uppercase tracking-wide mb-1">Total Outcome</p>
-          <p className="text-2xl font-semibold text-red-700">{fmt(totalOutcome)}</p>
-        </div>
-        <div className="bg-blue-50 rounded-2xl p-5">
-          <p className="text-xs font-medium text-blue-600 uppercase tracking-wide mb-1">Avg. Spent/Hari</p>
-          <p className="text-2xl font-semibold text-blue-700">{fmt(Math.round(avgPerDay))}</p>
+      </div>
+
+      {/* Projected highlight cards */}
+      <div>
+        <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-3">Proyeksi Bulan Ini</p>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div className="bg-emerald-50 rounded-2xl p-5">
+            <p className="text-xs font-medium text-emerald-600 uppercase tracking-wide mb-1">Projected Income</p>
+            <p className="text-2xl font-semibold text-emerald-700">{fmt(projectedIncome)}</p>
+            <p className="text-xs text-emerald-500 mt-1">Target pemasukan</p>
+          </div>
+          <div className="bg-orange-50 rounded-2xl p-5">
+            <p className="text-xs font-medium text-orange-600 uppercase tracking-wide mb-1">Projected Cost</p>
+            <p className="text-2xl font-semibold text-orange-700">{fmt(projectedCost)}</p>
+            <p className="text-xs text-orange-500 mt-1">Total budget pengeluaran</p>
+          </div>
+          <div className={`rounded-2xl p-5 ${projectedBalance >= 0 ? 'bg-teal-50' : 'bg-rose-50'}`}>
+            <p className={`text-xs font-medium uppercase tracking-wide mb-1 ${projectedBalance >= 0 ? 'text-teal-600' : 'text-rose-600'}`}>
+              Projected Balance
+            </p>
+            <p className={`text-2xl font-semibold ${projectedBalance >= 0 ? 'text-teal-700' : 'text-rose-700'}`}>
+              {fmt(projectedBalance)}
+            </p>
+            <p className={`text-xs mt-1 ${projectedBalance >= 0 ? 'text-teal-500' : 'text-rose-500'}`}>
+              {projectedBalance >= 0 ? 'Surplus' : '⚠️ Defisit'}
+            </p>
+          </div>
         </div>
       </div>
 
       {/* Big pie charts */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {[
-          { title: 'Income per Kategori', data: incomeByCategory, color: '#10b981' },
-          { title: 'Outcome per Kategori', data: outcomeByCategory, color: '#ef4444' }
+          { title: 'Income per Kategori', data: incomeByCategory },
+          { title: 'Outcome per Kategori', data: outcomeByCategory }
         ].map(({ title, data }) => (
           <div key={title} className="bg-white rounded-2xl border border-gray-100 p-5">
             <h2 className="text-sm font-semibold text-gray-700 mb-4">{title}</h2>
@@ -103,7 +167,9 @@ export default function DashboardPage() {
               ? <p className="text-sm text-gray-400 text-center py-8">Tidak ada data</p>
               : <ResponsiveContainer width="100%" height={220}>
                   <PieChart>
-                    <Pie data={data} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={80} label={({ name, percent }) => `${name} ${((percent ?? 0) * 100).toFixed(0)}%` } labelLine={false} fontSize={11}>
+                    <Pie data={data} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={80}
+                      label={({ name, percent }) => `${name} ${((percent ?? 0) * 100).toFixed(0)}%`}
+                      labelLine={false} fontSize={11}>
                       {data.map((_, i) => <Cell key={i} fill={COLORS[i % COLORS.length]}/>)}
                     </Pie>
                     <Tooltip formatter={(v: any) => fmt(v)}/>
@@ -118,9 +184,7 @@ export default function DashboardPage() {
       {['income', 'outcome'].map(t => {
         const txs = transactions.filter(tx => tx.type === t)
         const categoryNames = [...new Set(txs.map(tx => tx.categories?.name).filter(Boolean))] as string[]
-
         if (categoryNames.length === 0) return null
-
         return (
           <div key={t}>
             <h2 className={`text-sm font-semibold mb-3 ${t === 'income' ? 'text-green-700' : 'text-red-700'}`}>
@@ -149,27 +213,26 @@ export default function DashboardPage() {
               })}
             </div>
           </div>
-  )
-})}
+        )
+      })}
 
       {/* Detail table */}
       <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden">
         <h2 className="text-sm font-semibold text-gray-700 px-5 py-4 border-b border-gray-100">Detail Transaksi</h2>
         <div className="overflow-x-auto">
-          <table className="w-full text-sm min-w-[600px]">
-            <thead>
-              <tr className="bg-gray-50 text-xs text-gray-500 font-semibold uppercase tracking-wide">
+<table className="w-full text-sm min-w-[600px]">
+<thead>
+<tr className="bg-gray-50 text-xs text-gray-500 font-semibold uppercase tracking-wide">
                 <th className="px-5 py-3 text-left">Tanggal</th>
                 <th className="px-5 py-3 text-left">Jenis</th>
-                {/* <th className="px-5 py-3 text-left">Kategori</th> */}
                 <th className="px-5 py-3 text-left">Subkategori</th>
                 <th className="px-5 py-3 text-left">Deskripsi</th>
                 <th className="px-5 py-3 text-right">Jumlah</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-50">
+</tr>
+</thead>
+<tbody className="divide-y divide-gray-50">
               {transactions.length === 0
-                ? <tr><td colSpan={6} className="text-center py-8 text-gray-400">Belum ada transaksi</td></tr>
+                ? <tr><td colSpan={5} className="text-center py-8 text-gray-400">Belum ada transaksi</td></tr>
                 : transactions.map(t => (
                   <tr key={t.id} className="hover:bg-gray-50 transition-colors">
                     <td className="px-5 py-3 text-gray-600">
@@ -185,7 +248,6 @@ export default function DashboardPage() {
                         {t.type === 'income' ? 'Income' : 'Outcome'}
                       </span>
                     </td>
-                    {/* <td className="px-5 py-3 text-gray-600">{t.categories?.name || '-'}</td> */}
                     <td className="px-5 py-3 text-gray-600">{t.subcategories?.name || '-'}</td>
                     <td className="px-5 py-3 text-gray-500 max-w-xs truncate">{t.description || '-'}</td>
                     <td className={`px-5 py-3 text-right font-medium ${t.type === 'income' ? 'text-green-700' : 'text-red-700'}`}>
@@ -194,8 +256,8 @@ export default function DashboardPage() {
                   </tr>
                 ))
               }
-            </tbody>
-          </table>
+</tbody>
+</table>
         </div>
       </div>
     </div>
