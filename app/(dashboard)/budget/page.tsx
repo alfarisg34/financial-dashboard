@@ -17,6 +17,38 @@ export default function BudgetPage() {
   const [savedId, setSavedId] = useState<string | null>(null)
   const [errorId, setErrorId] = useState<string | null>(null)
 
+  // Helper: format angka ke Rupiah (tanpa "Rp" untuk nilai input)
+  const formatToRupiah = (value: number | string): string => {
+    let num = typeof value === 'string' ? parseFloat(value.replace(/[^0-9.-]/g, '')) : value
+    if (isNaN(num)) return ''
+    return new Intl.NumberFormat('id-ID').format(num)
+  }
+
+  // Helper: parse dari format Rupiah ke number
+  const parseRupiahToNumber = (rupiahStr: string): number => {
+    const clean = rupiahStr.replace(/[^0-9,-]/g, '').replace(',', '.')
+    return parseFloat(clean) || 0
+  }
+
+  // Handle change dengan formatting visual
+  const handleAmountChange = (
+    id: string,
+    rawValue: string,
+    type: 'income' | 'outcome'
+  ) => {
+    // Hanya angka saja yang diproses
+    const numericValue = rawValue.replace(/[^0-9]/g, '')
+    const numberValue = numericValue === '' ? 0 : parseInt(numericValue, 10)
+    
+    const formatted = numberValue === 0 ? '' : formatToRupiah(numberValue)
+    
+    if (type === 'outcome') {
+      setOutcomeAmounts(prev => ({ ...prev, [id]: formatted }))
+    } else {
+      setIncomeAmounts(prev => ({ ...prev, [id]: formatted }))
+    }
+  }
+
   async function load() {
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) return
@@ -30,8 +62,9 @@ export default function BudgetPage() {
     const initOutcome: Record<string, string> = {}
     const initIncome: Record<string, string> = {}
     ;(buds || []).forEach((b: Budget) => {
-      if (b.type === 'outcome') initOutcome[b.subcategory_id] = String(b.amount)
-      if (b.type === 'income') initIncome[b.subcategory_id] = String(b.amount)
+      const formatted = b.amount ? formatToRupiah(b.amount) : ''
+      if (b.type === 'outcome') initOutcome[b.subcategory_id] = formatted
+      if (b.type === 'income') initIncome[b.subcategory_id] = formatted
     })
     setOutcomeAmounts(initOutcome)
     setIncomeAmounts(initIncome)
@@ -41,9 +74,9 @@ export default function BudgetPage() {
 
   async function saveBudget(subcategoryId: string, type: 'income' | 'outcome') {
     const { data: { user } } = await supabase.auth.getUser()
-    const amount = parseFloat(
-      (type === 'outcome' ? outcomeAmounts : incomeAmounts)[subcategoryId] || '0'
-    )
+    const rawAmount = (type === 'outcome' ? outcomeAmounts : incomeAmounts)[subcategoryId] || '0'
+    const amount = parseRupiahToNumber(rawAmount)
+    
     const saveKey = `${subcategoryId}-${type}`
     const { error } = await supabase.from('budgets').upsert(
       { user_id: user?.id, subcategory_id: subcategoryId, month, year, amount, type },
@@ -63,49 +96,67 @@ export default function BudgetPage() {
   const incomeSubs = subcategories.filter(s => s.categories?.type === 'income')
 
   function BudgetRow({ sub, type }: { sub: any, type: 'income' | 'outcome' }) {
-    const saveKey = `${sub.id}-${type}`
-    const isSaved = savedId === saveKey
-    const isError = errorId === saveKey
-    const amounts = type === 'outcome' ? outcomeAmounts : incomeAmounts
-    const setAmounts = type === 'outcome' ? setOutcomeAmounts : setIncomeAmounts
+  const saveKey = `${sub.id}-${type}`
+  const isSaved = savedId === saveKey
+  const isError = errorId === saveKey
+  const amounts = type === 'outcome' ? outcomeAmounts : incomeAmounts
+  const displayValue = amounts[sub.id] || ''
 
-    return (
-      <div className="flex flex-wrap items-center gap-2 px-5 py-3 border-b border-gray-50 last:border-0">
-        <span className="hidden sm:block text-xs text-gray-400 flex-1 min-w-0">
-          {sub.categories?.name}
-        </span>
-        <span className="hidden sm:block text-sm text-gray-700 flex-1 min-w-0">
-          {sub.name}
-        </span>
-        <div className="sm:hidden flex flex-col flex-1 min-w-0">
-          <span className="text-xs text-gray-400">{sub.categories?.name}</span>
-          <span className="text-sm text-gray-700">{sub.name}</span>
-        </div>
-        <div className="flex gap-2 ml-auto items-center">
-          <input
-            type="number"
-            value={amounts[sub.id] || ''}
-            onChange={e => setAmounts(prev => ({ ...prev, [sub.id]: e.target.value }))}
-            placeholder="0"
-            className="w-28 px-3 py-2 rounded-lg border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-          <button
-            onClick={() => saveBudget(sub.id, type)}
-            className={`px-3 py-2 text-xs rounded-lg transition-colors font-medium whitespace-nowrap flex items-center gap-1
-              ${isSaved
-                ? 'bg-green-500 text-white'
-                : isError
-                ? 'bg-red-100 text-red-700'
-                : type === 'outcome'
-                ? 'bg-green-50 text-green-700 hover:bg-green-100'
-                : 'bg-blue-50 text-blue-700 hover:bg-blue-100'
-              }`}>
-            {isSaved ? <><Check size={13}/> Tersimpan</> : isError ? 'Gagal!' : 'Simpan'}
-          </button>
-        </div>
-      </div>
-    )
+  // Handle keydown untuk mencegah default behavior backspace
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Backspace') {
+      // Mencegah event bubbling ke parent
+      e.stopPropagation()
+      
+      // Jika value sudah kosong, tetap prevent default agar tidak navigasi mundur
+      if (displayValue === '') {
+        e.preventDefault()
+      }
+    }
   }
+
+  return (
+    <div className="flex flex-wrap items-center gap-2 px-5 py-3 border-b border-gray-50 last:border-0">
+      <span className="hidden sm:block text-xs text-gray-400 flex-1 min-w-0">
+        {sub.categories?.name}
+      </span>
+      <span className="hidden sm:block text-sm text-gray-700 flex-1 min-w-0">
+        {sub.name}
+      </span>
+      <div className="sm:hidden flex flex-col flex-1 min-w-0">
+        <span className="text-xs text-gray-400">{sub.categories?.name}</span>
+        <span className="text-sm text-gray-700">{sub.name}</span>
+      </div>
+      <div className="flex gap-2 ml-auto items-center">
+        <div className="relative">
+          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 text-sm">Rp</span>
+          <input
+            type="text"
+            inputMode="numeric"
+            value={displayValue}
+            onChange={(e) => handleAmountChange(sub.id, e.target.value, type)}
+            onKeyDown={handleKeyDown}
+            placeholder="0"
+            className="w-36 pl-8 pr-3 py-2 rounded-lg border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+        </div>
+        <button
+          onClick={() => saveBudget(sub.id, type)}
+          className={`px-3 py-2 text-xs rounded-lg transition-colors font-medium whitespace-nowrap flex items-center gap-1
+            ${isSaved
+              ? 'bg-green-500 text-white'
+              : isError
+              ? 'bg-red-100 text-red-700'
+              : type === 'outcome'
+              ? 'bg-green-50 text-green-700 hover:bg-green-100'
+              : 'bg-blue-50 text-blue-700 hover:bg-blue-100'
+            }`}>
+          {isSaved ? <><Check size={13}/> Tersimpan</> : isError ? 'Gagal!' : 'Simpan'}
+        </button>
+      </div>
+    </div>
+  )
+}
 
   return (
     <div className="max-w-2xl w-full">
