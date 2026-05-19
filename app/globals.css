@@ -49,3 +49,7 @@ select option {
 input[type="datetime-local"] {
   color: #374151;
 }
+
+textarea {
+  color: #374151;
+}
