@@ -10,8 +10,8 @@ import {
 
 const navItems = [
   { href: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
-  { href: '/input', icon: PlusCircle, label: 'Input Transaksi' },
-  { href: '/categories', icon: Tag, label: 'Manage Kategori' },
+  { href: '/input', icon: PlusCircle, label: 'Transaction Input' },
+  { href: '/categories', icon: Tag, label: 'Manage Category' },
   { href: '/budget', icon: Wallet, label: 'Manage Budget' },
 ]
 

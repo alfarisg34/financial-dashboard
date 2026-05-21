@@ -381,14 +381,14 @@ export default function InputPage() {
 
   return (
     <div className="max-w-xl w-full mx-auto">
-      <h1 className="text-xl font-semibold text-gray-800 mb-6">Input Transaksi</h1>
+      <h1 className="text-xl font-semibold text-gray-800 mb-6">Transaction Input</h1>
       {success && <div className="bg-green-50 text-green-700 px-4 py-3 rounded-xl mb-4 text-sm">{success}</div>}
 
       <form onSubmit={handleSubmit} className="bg-white rounded-2xl border border-gray-100 p-6 space-y-5">
 
         {/* Type toggle */}
         <div>
-          <label className="text-sm font-medium text-gray-700 mb-2 block">Jenis Transaksi</label>
+          <label className="text-sm font-medium text-gray-700 mb-2 block">Type of Transaction</label>
           <div className="flex gap-2">
             {(['income', 'outcome'] as const).map(t => (
               <button key={t} type="button" onClick={() => setType(t)}
@@ -404,7 +404,7 @@ export default function InputPage() {
 
         {/* Amount */}
         <div>
-          <label className="text-sm font-medium text-gray-700 mb-2 block">Jumlah (Rp)</label>
+          <label className="text-sm font-medium text-gray-700 mb-2 block">Amount (Rp)</label>
           <div className="relative">
             <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-sm pointer-events-none">Rp</span>
             <input type="number" value={amount} onChange={e => setAmount(e.target.value)}
@@ -417,14 +417,14 @@ export default function InputPage() {
 
         {/* Date */}
         <div>
-          <label className="text-sm font-medium text-gray-700 mb-2 block">Tanggal</label>
+          <label className="text-sm font-medium text-gray-700 mb-2 block">Date</label>
           <input type="datetime-local" value={date} onChange={e => setDate(e.target.value)} required
             className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"/>
         </div>
 
         {/* Subcategory searchable dropdown */}
         <div>
-          <label className="text-sm font-medium text-gray-700 mb-2 block">Sub Kategori</label>
+          <label className="text-sm font-medium text-gray-700 mb-2 block">Subcategory</label>
           <div className="relative" ref={dropdownRef}>
 
             {/* Trigger */}
@@ -432,7 +432,7 @@ export default function InputPage() {
               className={`w-full px-4 py-3 rounded-xl border text-sm text-left flex items-center justify-between transition-colors
                 ${dropdownOpen ? 'border-blue-500 ring-2 ring-blue-500' : 'border-gray-200'}
                 ${subcategoryId ? 'text-gray-800' : 'text-gray-400'}`}>
-              <span>{subcategoryId ? subcategoryName : '-- Pilih Subkategori --'}</span>
+              <span>{subcategoryId ? subcategoryName : '-- Choose Subcategory --'}</span>
               <ChevronDown size={16} className={`text-gray-400 transition-transform ${dropdownOpen ? 'rotate-180' : ''}`}/>
             </button>
 
@@ -446,7 +446,7 @@ export default function InputPage() {
                     value={search}
                     onChange={e => setSearch(e.target.value)}
                     onKeyDown={handleSearchKeyDown}
-                    placeholder="Cari subkategori..."
+                    placeholder="Find subcategory..."
                     className="w-full px-3 py-2 rounded-lg border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
@@ -480,10 +480,10 @@ export default function InputPage() {
 
         {/* Category (auto-fill, readonly) */}
         <div>
-          <label className="text-sm font-medium text-gray-700 mb-2 block">Kategori</label>
+          <label className="text-sm font-medium text-gray-700 mb-2 block">Category</label>
           <div className={`w-full px-4 py-3 rounded-xl border text-sm
             ${categoryName ? 'border-gray-200 text-gray-700 bg-gray-50' : 'border-gray-200 text-gray-400 bg-gray-50'}`}>
-            {categoryName || 'Otomatis terisi setelah pilih subkategori'}
+            {categoryName || 'Automatically filled after selecting a subcategory'}
           </div>
         </div>
 
@@ -521,21 +521,21 @@ export default function InputPage() {
 
         {/* Description */}
         <div>
-          <label className="text-sm font-medium text-gray-700 mb-2 block">Deskripsi</label>
+          <label className="text-sm font-medium text-gray-700 mb-2 block">Description</label>
           <textarea value={description} onChange={e => setDescription(e.target.value)}
-            placeholder="Catatan tambahan..." rows={3}
+            placeholder="Additional notes..." rows={3}
             className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm resize-none"/>
         </div>
 
         <button type="submit"
           className="w-full bg-blue-600 text-white py-3 rounded-xl font-medium hover:bg-blue-700 transition-colors">
-          Simpan Transaksi
+          Save Transaction
         </button>
       </form>
 
       {/* Daftar Transaksi 30 Hari Terakhir */}
       <div className="mt-8">
-        <h2 className="text-lg font-semibold text-gray-800 mb-4">Transaksi 30 Hari Terakhir</h2>
+        <h2 className="text-lg font-semibold text-gray-800 mb-4">Last 30 Days Transactions</h2>
         
         {loadingTransactions ? (
           <div className="text-center py-8 text-gray-400">Memuat transaksi...</div>

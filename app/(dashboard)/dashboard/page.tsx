@@ -153,7 +153,7 @@ export default function DashboardPage() {
 
       {/* Actual highlight cards */}
       <div>
-        <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-3">Realisasi</p>
+        <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-3">Realization</p>
         <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
           <div className="bg-green-50 rounded-2xl p-5">
             <p className="text-xs font-medium text-green-600 uppercase tracking-wide mb-1">Total Income</p>
@@ -171,11 +171,11 @@ export default function DashboardPage() {
               {fmt(actualBalance)}
             </p>
             <p className={`text-xs mt-1 ${actualBalance >= 0 ? 'text-blue-500' : 'text-rose-500'}`}>
-              {actualBalance >= 0 ? 'Surplus' : '⚠️ Defisit'}
+              {actualBalance >= 0 ? 'Surplus' : '⚠️ Deficit'}
             </p>
           </div>
           <div className="bg-purple-50 rounded-2xl p-5">
-            <p className="text-xs font-medium text-purple-600 uppercase tracking-wide mb-1">Avg. Spent/Hari</p>
+            <p className="text-xs font-medium text-purple-600 uppercase tracking-wide mb-1">Avg. Spent/Day</p>
             <p className="text-2xl font-semibold text-purple-700">{fmt(Math.round(avgPerDay))}</p>
           </div>
         </div>
@@ -188,12 +188,12 @@ export default function DashboardPage() {
           <div className="bg-emerald-50 rounded-2xl p-5">
             <p className="text-xs font-medium text-emerald-600 uppercase tracking-wide mb-1">Projected Income</p>
             <p className="text-2xl font-semibold text-emerald-700">{fmt(projectedIncome)}</p>
-            <p className="text-xs text-emerald-500 mt-1">Target pemasukan</p>
+            <p className="text-xs text-emerald-500 mt-1">Revenue target</p>
           </div>
           <div className="bg-orange-50 rounded-2xl p-5">
             <p className="text-xs font-medium text-orange-600 uppercase tracking-wide mb-1">Projected Cost</p>
             <p className="text-2xl font-semibold text-orange-700">{fmt(projectedCost)}</p>
-            <p className="text-xs text-orange-500 mt-1">Total budget pengeluaran</p>
+            <p className="text-xs text-orange-500 mt-1">Total expenditure budget</p>
           </div>
           <div className={`rounded-2xl p-5 ${projectedBalance >= 0 ? 'bg-teal-50' : 'bg-rose-50'}`}>
             <p className={`text-xs font-medium uppercase tracking-wide mb-1 ${projectedBalance >= 0 ? 'text-teal-600' : 'text-rose-600'}`}>
@@ -212,13 +212,13 @@ export default function DashboardPage() {
       {/* Big pie charts */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {[
-          { title: 'Income per Kategori', data: incomeByCategory },
-          { title: 'Outcome per Kategori', data: outcomeByCategory }
+          { title: 'Income per Category', data: incomeByCategory },
+          { title: 'Outcome per Category', data: outcomeByCategory }
         ].map(({ title, data }) => (
           <div key={title} className="bg-white rounded-2xl border border-gray-100 p-5">
             <h2 className="text-sm font-semibold text-gray-700 mb-4">{title}</h2>
             {data.length === 0
-              ? <p className="text-sm text-gray-400 text-center py-8">Tidak ada data</p>
+              ? <p className="text-sm text-gray-400 text-center py-8">No Data</p>
               : <ResponsiveContainer width="100%" height={220}>
                   <PieChart>
                     <Pie data={data} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={80}
@@ -242,7 +242,7 @@ export default function DashboardPage() {
         return (
           <div key={t}>
             <h2 className={`text-sm font-semibold mb-3 ${t === 'income' ? 'text-green-700' : 'text-red-700'}`}>
-              {t === 'income' ? '📈 Income' : '📉 Outcome'} per Subkategori
+              {t === 'income' ? '📈 Income' : '📉 Outcome'} per Subcategory
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {categoryNames.map(catName => {
@@ -271,30 +271,30 @@ export default function DashboardPage() {
       })}
       {/* Detail table */}
       <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden">
-        <h2 className="text-sm font-semibold text-gray-700 px-5 py-4 border-b border-gray-100">Detail Transaksi</h2>
+        <h2 className="text-sm font-semibold text-gray-700 px-5 py-4 border-b border-gray-100">Transaction Details</h2>
         <div className="overflow-x-auto">
       <table className="w-full text-sm min-w-[600px]">
       <thead>
       <tr className="bg-gray-50 text-xs text-gray-500 font-semibold uppercase tracking-wide">
             <th className="px-5 py-3 text-left cursor-pointer hover:text-blue-600 select-none"
               onClick={() => handleSort('date')}>
-              Tanggal <SortIcon col="date"/>
+              Date <SortIcon col="date"/>
             </th>
             <th className="px-5 py-3 text-left cursor-pointer hover:text-blue-600 select-none"
               onClick={() => handleSort('type')}>
-              Jenis <SortIcon col="type"/>
+              Type <SortIcon col="type"/>
             </th>
             <th className="px-5 py-3 text-left cursor-pointer hover:text-blue-600 select-none"
               onClick={() => handleSort('subcategory')}>
-              Subkategori <SortIcon col="subcategory"/>
+              Subcategory <SortIcon col="subcategory"/>
             </th>
             <th className="px-5 py-3 text-left cursor-pointer hover:text-blue-600 select-none"
               onClick={() => handleSort('description')}>
-              Deskripsi <SortIcon col="description"/>
+              Description <SortIcon col="description"/>
             </th>
             <th className="px-5 py-3 text-right cursor-pointer hover:text-blue-600 select-none"
               onClick={() => handleSort('amount')}>
-              Jumlah <SortIcon col="amount"/>
+              Amount <SortIcon col="amount"/>
             </th>
       </tr>
       </thead>
