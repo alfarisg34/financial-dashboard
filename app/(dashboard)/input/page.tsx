@@ -210,6 +210,14 @@ export default function InputPage() {
       ...s,
       categoryName: categories.find(c => c.id === s.category_id)?.name || ''
     }))
+    .sort((a, b) => {
+      // Urutkan berdasarkan categoryName terlebih dahulu
+      if (a.categoryName !== b.categoryName) {
+        return a.categoryName.localeCompare(b.categoryName)
+      }
+      // Kemudian urutkan berdasarkan name
+      return a.name.localeCompare(b.name)
+    })
 
   // Untuk edit modal
   const editFilteredSubs = allSubcategories
@@ -222,6 +230,14 @@ export default function InputPage() {
       ...s,
       categoryName: categories.find(c => c.id === s.category_id)?.name || ''
     }))
+    .sort((a, b) => {
+      // Urutkan berdasarkan categoryName terlebih dahulu
+      if (a.categoryName !== b.categoryName) {
+        return a.categoryName.localeCompare(b.categoryName)
+      }
+      // Kemudian urutkan berdasarkan name
+      return a.name.localeCompare(b.name)
+    })
 
   function selectSubcategory(sub: typeof filteredSubs[0]) {
     setSubcategoryId(sub.id)
