@@ -1,10 +1,23 @@
 'use client'
+
 import { useState, useEffect, useRef } from 'react'
 import { createClient } from '@/lib/supabase/client'
-import { ChevronDown, Check } from 'lucide-react'
+import { ChevronDown, Check, Pencil, Trash2, X } from 'lucide-react'
 
 type Category = { id: string; name: string; type: string }
 type Subcategory = { id: string; name: string; category_id: string }
+
+type Transaction = {
+  id: string
+  type: 'income' | 'outcome'
+  category_id: string | null
+  subcategory_id: string | null
+  amount: number
+  description: string
+  date: string
+  category_name?: string
+  subcategory_name?: string
+}
 
 function fmt(n: number) {
   return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(n)
@@ -31,6 +44,27 @@ export default function InputPage() {
   const [success, setSuccess] = useState('')
   const [budgetInfo, setBudgetInfo] = useState<{ budget: number; spent: number } | null>(null)
   const [loadingBudget, setLoadingBudget] = useState(false)
+
+  // State untuk daftar transaksi
+  const [transactions, setTransactions] = useState<Transaction[]>([])
+  const [loadingTransactions, setLoadingTransactions] = useState(false)
+
+  // State untuk modal edit
+  const [editingTransaction, setEditingTransaction] = useState<Transaction | null>(null)
+  const [editAmount, setEditAmount] = useState('')
+  const [editDescription, setEditDescription] = useState('')
+  const [editDate, setEditDate] = useState('')
+  const [editSubcategoryId, setEditSubcategoryId] = useState('')
+  const [editSubcategoryName, setEditSubcategoryName] = useState('')
+  const [editCategoryId, setEditCategoryId] = useState('')
+  const [editCategoryName, setEditCategoryName] = useState('')
+  const [editSearch, setEditSearch] = useState('')
+  const [editDropdownOpen, setEditDropdownOpen] = useState(false)
+  const editDropdownRef = useRef<HTMLDivElement>(null)
+  const editSearchRef = useRef<HTMLInputElement>(null)
+
+  // State untuk modal delete
+  const [deleteConfirm, setDeleteConfirm] = useState<{ show: boolean; transactionId: string | null }>({ show: false, transactionId: null })
 
   const dropdownRef = useRef<HTMLDivElement>(null)
   const searchRef = useRef<HTMLInputElement>(null)
@@ -88,6 +122,50 @@ export default function InputPage() {
     fetchBudgetInfo()
   }, [subcategoryId, date])
 
+  // Load transactions (30 hari terakhir)
+  async function loadTransactions() {
+    setLoadingTransactions(true)
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) {
+      setLoadingTransactions(false)
+      return
+    }
+
+    const thirtyDaysAgo = new Date()
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30)
+    const startDate = thirtyDaysAgo.toISOString()
+
+    const { data: txData, error } = await supabase
+      .from('transactions')
+      .select('*')
+      .eq('user_id', user.id)
+      .gte('date', startDate)
+      .order('date', { ascending: false })
+
+    if (error) {
+      console.error('Error loading transactions:', error)
+      setLoadingTransactions(false)
+      return
+    }
+
+    // Enrich dengan nama kategori dan subkategori
+    const enriched = (txData || []).map(tx => ({
+      ...tx,
+      category_name: categories.find(c => c.id === tx.category_id)?.name || '',
+      subcategory_name: allSubcategories.find(s => s.id === tx.subcategory_id)?.name || ''
+    }))
+
+    setTransactions(enriched)
+    setLoadingTransactions(false)
+  }
+
+  // Reload transactions ketika categories atau subcategories berubah
+  useEffect(() => {
+    if (categories.length > 0 || allSubcategories.length > 0) {
+      loadTransactions()
+    }
+  }, [categories, allSubcategories])
+
   // Close dropdown saat klik di luar
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
@@ -100,10 +178,26 @@ export default function InputPage() {
     return () => document.removeEventListener('mousedown', handleClickOutside)
   }, [])
 
+  // Close edit dropdown saat klik di luar
+  useEffect(() => {
+    function handleClickOutside(e: MouseEvent) {
+      if (editDropdownRef.current && !editDropdownRef.current.contains(e.target as Node)) {
+        setEditDropdownOpen(false)
+        setEditSearch('')
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [])
+
   // Focus search saat dropdown buka
   useEffect(() => {
     if (dropdownOpen) setTimeout(() => searchRef.current?.focus(), 50)
   }, [dropdownOpen])
+
+  useEffect(() => {
+    if (editDropdownOpen) setTimeout(() => editSearchRef.current?.focus(), 50)
+  }, [editDropdownOpen])
 
   // Semua subcategory berdasarkan type, dikelompokkan dengan category name
   const filteredSubs = allSubcategories
@@ -112,6 +206,18 @@ export default function InputPage() {
       return cat?.type === type
     })
     .filter(s => s.name.toLowerCase().includes(search.toLowerCase()))
+    .map(s => ({
+      ...s,
+      categoryName: categories.find(c => c.id === s.category_id)?.name || ''
+    }))
+
+  // Untuk edit modal
+  const editFilteredSubs = allSubcategories
+    .filter(s => {
+      const cat = categories.find(c => c.id === s.category_id)
+      return cat?.type === editingTransaction?.type
+    })
+    .filter(s => s.name.toLowerCase().includes(editSearch.toLowerCase()))
     .map(s => ({
       ...s,
       categoryName: categories.find(c => c.id === s.category_id)?.name || ''
@@ -126,6 +232,15 @@ export default function InputPage() {
     setSearch('')
   }
 
+  function selectEditSubcategory(sub: typeof editFilteredSubs[0]) {
+    setEditSubcategoryId(sub.id)
+    setEditSubcategoryName(sub.name)
+    setEditCategoryId(sub.category_id)
+    setEditCategoryName(sub.categoryName)
+    setEditDropdownOpen(false)
+    setEditSearch('')
+  }
+
   function handleSearchKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
     if (e.key === 'Enter') {
       e.preventDefault()
@@ -137,12 +252,24 @@ export default function InputPage() {
     }
   }
 
+  function handleEditSearchKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
+    if (e.key === 'Enter') {
+      e.preventDefault()
+      if (editFilteredSubs.length > 0) selectEditSubcategory(editFilteredSubs[0])
+    }
+    if (e.key === 'Escape') {
+      setEditDropdownOpen(false)
+      setEditSearch('')
+    }
+  }
+
   const sisa = budgetInfo ? budgetInfo.budget - budgetInfo.spent : 0
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) return
+
     const { error } = await supabase.from('transactions').insert({
       user_id: user.id,
       type,
@@ -152,18 +279,92 @@ export default function InputPage() {
       description,
       date
     })
+
     if (!error) {
       setSuccess('Transaksi berhasil disimpan!')
-      setAmount(''); setDescription('')
-      setCategoryId(''); setCategoryName('')
-      setSubcategoryId(''); setSubcategoryName('')
-      setSearch(''); setBudgetInfo(null)
+      setAmount('')
+      setDescription('')
+      setCategoryId('')
+      setCategoryName('')
+      setSubcategoryId('')
+      setSubcategoryName('')
+      setSearch('')
+      setBudgetInfo(null)
+      loadTransactions() // Reload daftar transaksi
       setTimeout(() => setSuccess(''), 3000)
     }
   }
 
+  async function handleEditSubmit() {
+    if (!editingTransaction) return
+
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return
+
+    const updateData: any = {
+      amount: parseFloat(editAmount),
+      description: editDescription,
+      date: editDate,
+    }
+
+    if (editSubcategoryId) {
+      updateData.subcategory_id = editSubcategoryId
+      updateData.category_id = editCategoryId || null
+    }
+
+    const { error } = await supabase
+      .from('transactions')
+      .update(updateData)
+      .eq('id', editingTransaction.id)
+      .eq('user_id', user.id)
+
+    if (!error) {
+      setEditingTransaction(null)
+      loadTransactions()
+      setSuccess('Transaksi berhasil diupdate!')
+      setTimeout(() => setSuccess(''), 3000)
+    } else {
+      alert('Gagal mengupdate transaksi')
+    }
+  }
+
+  async function handleDelete() {
+    if (!deleteConfirm.transactionId) return
+
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return
+
+    const { error } = await supabase
+      .from('transactions')
+      .delete()
+      .eq('id', deleteConfirm.transactionId)
+      .eq('user_id', user.id)
+
+    if (!error) {
+      setDeleteConfirm({ show: false, transactionId: null })
+      loadTransactions()
+      setSuccess('Transaksi berhasil dihapus!')
+      setTimeout(() => setSuccess(''), 3000)
+    } else {
+      alert('Gagal menghapus transaksi')
+    }
+  }
+
+  function openEditModal(transaction: Transaction) {
+    setEditingTransaction(transaction)
+    setEditAmount(transaction.amount.toString())
+    setEditDescription(transaction.description || '')
+    setEditDate(transaction.date.slice(0, 16))
+    setEditSubcategoryId(transaction.subcategory_id || '')
+    setEditSubcategoryName(transaction.subcategory_name || '')
+    setEditCategoryId(transaction.category_id || '')
+    setEditCategoryName(transaction.category_name || '')
+    setEditSearch('')
+    setEditDropdownOpen(false)
+  }
+
   return (
-    <div className="max-w-xl w-full">
+    <div className="max-w-xl w-full mx-auto">
       <h1 className="text-xl font-semibold text-gray-800 mb-6">Input Transaksi</h1>
       {success && <div className="bg-green-50 text-green-700 px-4 py-3 rounded-xl mb-4 text-sm">{success}</div>}
 
@@ -222,7 +423,6 @@ export default function InputPage() {
             {/* Dropdown */}
             {dropdownOpen && (
               <div className="absolute z-50 w-full mt-1 bg-white border border-gray-200 rounded-xl shadow-lg overflow-hidden">
-                {/* Search input */}
                 <div className="p-2 border-b border-gray-100">
                   <input
                     ref={searchRef}
@@ -234,14 +434,11 @@ export default function InputPage() {
                     className="w-full px-3 py-2 rounded-lg border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
-
-                {/* List */}
                 <ul className="max-h-56 overflow-y-auto">
                   {filteredSubs.length === 0
                     ? <li className="px-4 py-3 text-sm text-gray-400 text-center">Tidak ditemukan</li>
                     : filteredSubs.map((sub, idx) => (
                       <li key={sub.id}>
-                        {/* Tampilkan category header jika berbeda dari sebelumnya */}
                         {(idx === 0 || filteredSubs[idx - 1].categoryName !== sub.categoryName) && (
                           <div className="px-4 py-1.5 text-xs font-semibold text-gray-400 uppercase tracking-wide bg-gray-50">
                             {sub.categoryName}
@@ -319,6 +516,235 @@ export default function InputPage() {
           Simpan Transaksi
         </button>
       </form>
+
+      {/* Daftar Transaksi 30 Hari Terakhir */}
+      <div className="mt-8">
+        <h2 className="text-lg font-semibold text-gray-800 mb-4">Transaksi 30 Hari Terakhir</h2>
+        
+        {loadingTransactions ? (
+          <div className="text-center py-8 text-gray-400">Memuat transaksi...</div>
+        ) : transactions.length === 0 ? (
+          <div className="text-center py-8 text-gray-400 bg-white rounded-xl border border-gray-100">
+            Belum ada transaksi dalam 30 hari terakhir
+          </div>
+        ) : (
+          <div className="space-y-3">
+            {transactions.map((tx) => (
+              <div key={tx.id} className="bg-white rounded-xl border border-gray-100 p-4 shadow-sm">
+                <div className="flex justify-between items-start">
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className={`text-xs px-2 py-0.5 rounded-full ${tx.type === 'income' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+                        {tx.type === 'income' ? 'Income' : 'Outcome'}
+                      </span>
+                      <span className="text-xs text-gray-400">
+                        {new Date(tx.date).toLocaleString('id-ID')}
+                      </span>
+                    </div>
+                    <div className="font-semibold text-gray-800">
+                      {fmt(tx.amount)}
+                    </div>
+                    <div className="text-sm text-gray-500 mt-1">
+                      {tx.subcategory_name && (
+                        <span className="inline-block bg-gray-100 rounded-md px-2 py-0.5 text-xs mr-2">
+                          {tx.subcategory_name}
+                        </span>
+                      )}
+                      {tx.category_name && (
+                        <span className="text-xs text-gray-400">
+                          {tx.category_name}
+                        </span>
+                      )}
+                    </div>
+                    {tx.description && (
+                      <div className="text-xs text-gray-400 mt-2">
+                        📝 {tx.description}
+                      </div>
+                    )}
+                  </div>
+                  <div className="flex gap-2 ml-4">
+                    <button
+                      onClick={() => openEditModal(tx)}
+                      className="p-2 text-blue-500 hover:bg-blue-50 rounded-lg transition-colors"
+                    >
+                      <Pencil size={16} />
+                    </button>
+                    <button
+                      onClick={() => setDeleteConfirm({ show: true, transactionId: tx.id })}
+                      className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-colors"
+                    >
+                      <Trash2 size={16} />
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* Modal Edit */}
+      {editingTransaction && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl max-w-md w-full max-h-[90vh] overflow-y-auto">
+            <div className="flex justify-between items-center p-5 border-b border-gray-100">
+              <h3 className="font-semibold text-gray-800">Edit Transaksi</h3>
+              <button onClick={() => setEditingTransaction(null)} className="text-gray-400 hover:text-gray-600">
+                <X size={20} />
+              </button>
+            </div>
+            <div className="p-5 space-y-4">
+              {/* Type (readonly) */}
+              <div>
+                <label className="text-sm font-medium text-gray-700 mb-2 block">Jenis Transaksi</label>
+                <div className={`px-4 py-3 rounded-xl text-sm ${editingTransaction.type === 'income' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+                  {editingTransaction.type === 'income' ? '📈 Income' : '📉 Outcome'}
+                </div>
+              </div>
+
+              {/* Amount */}
+              <div>
+                <label className="text-sm font-medium text-gray-700 mb-2 block">Jumlah (Rp)</label>
+                <input
+                  type="number"
+                  value={editAmount}
+                  onChange={e => setEditAmount(e.target.value)}
+                  className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                />
+              </div>
+
+              {/* Date */}
+              <div>
+                <label className="text-sm font-medium text-gray-700 mb-2 block">Tanggal</label>
+                <input
+                  type="datetime-local"
+                  value={editDate}
+                  onChange={e => setEditDate(e.target.value)}
+                  className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                />
+              </div>
+
+              {/* Subcategory Edit */}
+              <div>
+                <label className="text-sm font-medium text-gray-700 mb-2 block">Sub Kategori</label>
+                <div className="relative" ref={editDropdownRef}>
+                  <button
+                    type="button"
+                    onClick={() => setEditDropdownOpen(prev => !prev)}
+                    className={`w-full px-4 py-3 rounded-xl border text-sm text-left flex items-center justify-between transition-colors
+                      ${editDropdownOpen ? 'border-blue-500 ring-2 ring-blue-500' : 'border-gray-200'}
+                      ${editSubcategoryId ? 'text-gray-800' : 'text-gray-400'}`}
+                  >
+                    <span>{editSubcategoryId ? editSubcategoryName : '-- Pilih Subkategori --'}</span>
+                    <ChevronDown size={16} className={`text-gray-400 transition-transform ${editDropdownOpen ? 'rotate-180' : ''}`}/>
+                  </button>
+
+                  {editDropdownOpen && (
+                    <div className="absolute z-50 w-full mt-1 bg-white border border-gray-200 rounded-xl shadow-lg overflow-hidden">
+                      <div className="p-2 border-b border-gray-100">
+                        <input
+                          ref={editSearchRef}
+                          type="text"
+                          value={editSearch}
+                          onChange={e => setEditSearch(e.target.value)}
+                          onKeyDown={handleEditSearchKeyDown}
+                          placeholder="Cari subkategori..."
+                          className="w-full px-3 py-2 rounded-lg border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        />
+                      </div>
+                      <ul className="max-h-56 overflow-y-auto">
+                        {editFilteredSubs.length === 0
+                          ? <li className="px-4 py-3 text-sm text-gray-400 text-center">Tidak ditemukan</li>
+                          : editFilteredSubs.map((sub, idx) => (
+                            <li key={sub.id}>
+                              {(idx === 0 || editFilteredSubs[idx - 1].categoryName !== sub.categoryName) && (
+                                <div className="px-4 py-1.5 text-xs font-semibold text-gray-400 uppercase tracking-wide bg-gray-50">
+                                  {sub.categoryName}
+                                </div>
+                              )}
+                              <button
+                                type="button"
+                                onClick={() => selectEditSubcategory(sub)}
+                                className={`w-full px-4 py-2.5 text-sm text-left flex items-center justify-between hover:bg-blue-50 transition-colors
+                                  ${editSubcategoryId === sub.id ? 'text-blue-700 font-medium' : 'text-gray-700'}`}
+                              >
+                                <span>{sub.name}</span>
+                                {editSubcategoryId === sub.id && <Check size={14} className="text-blue-600"/>}
+                              </button>
+                            </li>
+                          ))
+                        }
+                      </ul>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Category (readonly) */}
+              <div>
+                <label className="text-sm font-medium text-gray-700 mb-2 block">Kategori</label>
+                <div className="w-full px-4 py-3 rounded-xl border border-gray-200 text-sm text-gray-700 bg-gray-50">
+                  {editCategoryName || 'Otomatis terisi setelah pilih subkategori'}
+                </div>
+              </div>
+
+              {/* Description */}
+              <div>
+                <label className="text-sm font-medium text-gray-700 mb-2 block">Deskripsi</label>
+                <textarea
+                  value={editDescription}
+                  onChange={e => setEditDescription(e.target.value)}
+                  rows={3}
+                  className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm resize-none"
+                />
+              </div>
+            </div>
+            <div className="flex gap-3 p-5 border-t border-gray-100">
+              <button
+                onClick={() => setEditingTransaction(null)}
+                className="flex-1 py-3 rounded-xl border border-gray-200 text-gray-600 font-medium hover:bg-gray-50 transition-colors"
+              >
+                Batal
+              </button>
+              <button
+                onClick={handleEditSubmit}
+                className="flex-1 bg-blue-600 text-white py-3 rounded-xl font-medium hover:bg-blue-700 transition-colors"
+              >
+                Simpan Perubahan
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal Delete Confirmation */}
+      {deleteConfirm.show && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl max-w-sm w-full">
+            <div className="p-6 text-center">
+              <div className="w-12 h-12 mx-auto mb-4 rounded-full bg-red-100 flex items-center justify-center">
+                <Trash2 size={24} className="text-red-500" />
+              </div>
+              <h3 className="text-lg font-semibold text-gray-800 mb-2">Hapus Transaksi?</h3>
+              <p className="text-sm text-gray-500">Apakah anda yakin ingin menghapus transaksi ini? Tindakan ini tidak dapat dibatalkan.</p>
+            </div>
+            <div className="flex gap-3 p-5 border-t border-gray-100">
+              <button
+                onClick={() => setDeleteConfirm({ show: false, transactionId: null })}
+                className="flex-1 py-3 rounded-xl border border-gray-200 text-gray-600 font-medium hover:bg-gray-50 transition-colors"
+              >
+                Batal
+              </button>
+              <button
+                onClick={handleDelete}
+                className="flex-1 bg-red-500 text-white py-3 rounded-xl font-medium hover:bg-red-600 transition-colors"
+              >
+                Hapus
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
