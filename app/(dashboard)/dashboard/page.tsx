@@ -82,6 +82,7 @@ export default function DashboardPage() {
   const totalIncome = income.reduce((s, t) => s + t.amount, 0)
   const totalOutcome = outcome.reduce((s, t) => s + t.amount, 0)
   const projectedBalance = projectedIncome - projectedCost
+  const actualBalance = totalIncome - totalOutcome
 
   const days = useMemo(() => {
     const d1 = new Date(startDate), d2 = new Date(endDate)
@@ -153,7 +154,7 @@ export default function DashboardPage() {
       {/* Actual highlight cards */}
       <div>
         <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-3">Realisasi</p>
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
           <div className="bg-green-50 rounded-2xl p-5">
             <p className="text-xs font-medium text-green-600 uppercase tracking-wide mb-1">Total Income</p>
             <p className="text-2xl font-semibold text-green-700">{fmt(totalIncome)}</p>
@@ -162,9 +163,20 @@ export default function DashboardPage() {
             <p className="text-xs font-medium text-red-600 uppercase tracking-wide mb-1">Total Outcome</p>
             <p className="text-2xl font-semibold text-red-700">{fmt(totalOutcome)}</p>
           </div>
-          <div className="bg-blue-50 rounded-2xl p-5">
-            <p className="text-xs font-medium text-blue-600 uppercase tracking-wide mb-1">Avg. Spent/Hari</p>
-            <p className="text-2xl font-semibold text-blue-700">{fmt(Math.round(avgPerDay))}</p>
+          <div className={`rounded-2xl p-5 ${actualBalance >= 0 ? 'bg-blue-50' : 'bg-rose-50'}`}>
+            <p className={`text-xs font-medium uppercase tracking-wide mb-1 ${actualBalance >= 0 ? 'text-blue-600' : 'text-rose-600'}`}>
+              Actual Balance
+            </p>
+            <p className={`text-2xl font-semibold ${actualBalance >= 0 ? 'text-blue-700' : 'text-rose-700'}`}>
+              {fmt(actualBalance)}
+            </p>
+            <p className={`text-xs mt-1 ${actualBalance >= 0 ? 'text-blue-500' : 'text-rose-500'}`}>
+              {actualBalance >= 0 ? 'Surplus' : '⚠️ Defisit'}
+            </p>
+          </div>
+          <div className="bg-purple-50 rounded-2xl p-5">
+            <p className="text-xs font-medium text-purple-600 uppercase tracking-wide mb-1">Avg. Spent/Hari</p>
+            <p className="text-2xl font-semibold text-purple-700">{fmt(Math.round(avgPerDay))}</p>
           </div>
         </div>
       </div>
