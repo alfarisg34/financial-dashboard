@@ -304,12 +304,12 @@ export default function DashboardPage() {
               : sortedTransactions.map(t => (
                 <tr key={t.id} className="hover:bg-gray-50 transition-colors">
                   <td className="px-5 py-3 text-gray-600">
-                    {new Date(t.date).toLocaleString('id-ID', {
-                      day: '2-digit', month: '2-digit', year: 'numeric',
-                      hour: '2-digit', minute: '2-digit',
-                      hour12: false,
-                      timeZone: 'Asia/Jakarta'
-                    })}
+                    {(() => {
+                      const [datePart, timePart] = t.date.split('T');
+                      const timeWithoutSeconds = timePart.slice(0, 5);
+                      const [year, month, day] = datePart.split('-');
+                      return `${day}-${month}-${year} ${timeWithoutSeconds}`;
+                    })()}
                   </td>
                   <td className="px-5 py-3">
                     <span className={`px-2 py-1 rounded-lg text-xs font-medium ${t.type === 'income' ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-700'}`}>

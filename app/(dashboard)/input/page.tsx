@@ -554,7 +554,11 @@ export default function InputPage() {
                         {tx.type === 'income' ? 'Income' : 'Outcome'}
                       </span>
                       <span className="text-xs text-gray-400">
-                        {new Date(tx.date).toLocaleString('id-ID')}
+                        {(() => {
+                          const [date, time] = tx.date.slice(0, 16).split('T');
+                          const [year, month, day] = date.split('-');
+                          return `${day}-${month}-${year} ${time}`;
+                        })()}
                       </span>
                     </div>
                     <div className="font-semibold text-gray-800">
