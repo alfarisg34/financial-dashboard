@@ -1,0 +1,60 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="100%" height="100%">
+  <defs>
+    <!-- Background Gradient -->
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0f172a" />
+      <stop offset="100%" stop-color="#020617" />
+    </linearGradient>
+
+    <!-- Main Metallic Coin Gradient -->
+    <linearGradient id="coinGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#38bdf8" />
+      <stop offset="50%" stop-color="#2563eb" />
+      <stop offset="100%" stop-color="#4f46e5" />
+    </linearGradient>
+
+    <!-- Glow Effect -->
+    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="16" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+
+    <!-- Trend Arrow Gradient -->
+    <linearGradient id="arrowGrad" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#34d399" />
+      <stop offset="100%" stop-color="#10b981" />
+    </linearGradient>
+  </defs>
+
+  <!-- Base Rounded Container -->
+  <rect width="512" height="512" rx="128" fill="url(#bgGrad)" />
+  <rect width="504" height="504" x="4" y="4" rx="124" fill="none" stroke="#1e293b" stroke-width="8" />
+
+  <!-- Outer Neon Ring -->
+  <circle cx="256" cy="256" r="180" fill="none" stroke="#38bdf8" stroke-width="6" opacity="0.3" filter="url(#glow)" />
+
+  <!-- Main Circle Shield -->
+  <circle cx="256" cy="256" r="160" fill="url(#coinGrad)" filter="url(#glow)" />
+
+  <!-- Inner Spark Ring -->
+  <circle cx="256" cy="256" r="140" fill="none" stroke="#ffffff" stroke-width="4" opacity="0.25" />
+
+  <!-- Stylized Dollar Symbol '$' -->
+  <path d="M 256 120 V 392 M 295 180 H 235 C 205 180 205 230 256 240 C 307 250 307 305 277 305 H 215" 
+        fill="none" 
+        stroke="#ffffff" 
+        stroke-width="32" 
+        stroke-linecap="round" 
+        stroke-linejoin="round" />
+
+  <!-- Upward Growth Arrow (Bottom Left to Top Right) -->
+  <path d="M 150 360 L 250 260 L 300 300 L 390 190" 
+        fill="none" 
+        stroke="url(#arrowGrad)" 
+        stroke-width="24" 
+        stroke-linecap="round" 
+        stroke-linejoin="round" 
+        filter="url(#glow)" />
+  
+  <polygon points="390,190 350,190 390,230" fill="#10b981" />
+</svg>

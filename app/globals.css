@@ -1,10 +1,13 @@
 @import "tailwindcss";
 
 :root {
+  --background: #f8fafc;
+  --foreground: #0f172a;
+}
+
+.dark {
   --background: #090d16;
   --foreground: #f1f5f9;
-  --card-bg: rgba(17, 24, 39, 0.7);
-  --card-border: rgba(255, 255, 255, 0.08);
 }
 
 @theme inline {
@@ -13,90 +16,155 @@
   --font-sans: var(--font-inter), system-ui, -apple-system, sans-serif;
 }
 
+/* Base Body Styling */
 body {
-  background-color: #090d16;
+  background-color: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans);
+  min-height: 100vh;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Dark mode specific body background gradient */
+.dark body {
   background-image: 
     radial-gradient(at 0% 0%, rgba(30, 58, 138, 0.25) 0px, transparent 50%),
     radial-gradient(at 100% 0%, rgba(88, 28, 135, 0.2) 0px, transparent 50%),
     radial-gradient(at 50% 100%, rgba(15, 23, 42, 0.8) 0px, transparent 50%);
   background-attachment: fixed;
-  color: #f1f5f9;
-  font-family: var(--font-sans);
-  min-height: 100vh;
 }
 
-/* Custom scrollbar for dark theme */
+/* Light mode specific body background gradient */
+.light body {
+  background-image: 
+    radial-gradient(at 0% 0%, rgba(219, 234, 254, 0.5) 0px, transparent 50%),
+    radial-gradient(at 100% 0%, rgba(238, 242, 255, 0.5) 0px, transparent 50%);
+  background-attachment: fixed;
+}
+
+/* Custom scrollbar */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
 }
 
-::-webkit-scrollbar-track {
+.dark ::-webkit-scrollbar-track {
   background: rgba(15, 23, 42, 0.6);
 }
 
-::-webkit-scrollbar-thumb {
+.dark ::-webkit-scrollbar-thumb {
   background: rgba(255, 255, 255, 0.15);
   border-radius: 9999px;
 }
 
-::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.3);
+.light ::-webkit-scrollbar-track {
+  background: #f1f5f9;
 }
 
-/* Inputs & Form Elements styling in Dark Theme */
-::placeholder {
-  color: #64748b;
-  opacity: 1;
+.light ::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 9999px;
 }
 
-input[type="text"],
-input[type="email"],
-input[type="password"],
-input[type="number"],
-input[type="date"],
-input[type="datetime-local"],
-select,
-textarea {
-  color: #f8fafc !important;
-  background-color: rgba(15, 23, 42, 0.75) !important;
-}
-
-select option {
-  background-color: #0f172a !important;
-  color: #f8fafc !important;
-}
-
-/* Glassmorphism utility classes */
+/* Glassmorphism card utility */
 .glass-card {
+  transition: background-color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.dark .glass-card {
   background: rgba(15, 23, 42, 0.65);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
   border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
+.light .glass-card {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(226, 232, 240, 0.8);
+  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.05);
+}
+
 .glass-card-hover {
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.glass-card-hover:hover {
+.dark .glass-card-hover:hover {
   border-color: rgba(255, 255, 255, 0.18);
   transform: translateY(-2px);
-  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5), 0 8px 10px -6px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
 }
 
-.glow-blue {
-  box-shadow: 0 0 20px -5px rgba(59, 130, 246, 0.3);
+.light .glass-card-hover:hover {
+  border-color: rgba(148, 163, 184, 0.4);
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.08);
 }
 
-.glow-emerald {
-  box-shadow: 0 0 20px -5px rgba(16, 185, 129, 0.3);
+/* Light mode override utility classes for text/backgrounds in existing Tailwind components */
+.light .text-white {
+  color: #0f172a !important;
 }
 
-.glow-rose {
-  box-shadow: 0 0 20px -5px rgba(244, 63, 94, 0.3);
+.light .text-slate-100,
+.light .text-slate-200 {
+  color: #1e293b !important;
 }
 
-.glow-purple {
-  box-shadow: 0 0 20px -5px rgba(168, 85, 247, 0.3);
+.light .text-slate-300,
+.light .text-slate-400 {
+  color: #475569 !important;
+}
+
+.light .text-slate-500 {
+  color: #64748b !important;
+}
+
+.light .bg-slate-900\/80,
+.light .bg-slate-900\/90,
+.light .bg-slate-900,
+.light .bg-slate-950\/40,
+.light .bg-slate-950\/50,
+.light .bg-slate-950\/60,
+.light .bg-slate-950\/80 {
+  background-color: #f1f5f9 !important;
+}
+
+.light .bg-slate-800,
+.light .bg-slate-800\/80,
+.light .bg-slate-800\/60,
+.light .bg-slate-800\/50,
+.light .bg-slate-800\/40,
+.light .bg-slate-800\/30 {
+  background-color: #e2e8f0 !important;
+}
+
+.light .border-slate-800,
+.light .border-slate-800\/80,
+.light .border-slate-800\/70,
+.light .border-slate-800\/60,
+.light .border-slate-800\/50,
+.light .border-slate-700\/80,
+.light .border-slate-700\/60,
+.light .border-slate-700\/50 {
+  border-color: #cbd5e1 !important;
+}
+
+.light input[type="text"],
+.light input[type="email"],
+.light input[type="password"],
+.light input[type="number"],
+.light input[type="date"],
+.light input[type="datetime-local"],
+.light select,
+.light textarea {
+  color: #0f172a !important;
+  background-color: #ffffff !important;
+  border-color: #cbd5e1 !important;
+}
+
+.light select option {
+  background-color: #ffffff !important;
+  color: #0f172a !important;
 }

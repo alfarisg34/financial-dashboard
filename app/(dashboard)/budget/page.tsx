@@ -38,6 +38,8 @@ type BudgetRowProps = {
   incomeAmounts: Record<string, string>
   prevOutcomeBudgets: Record<string, number>
   prevIncomeBudgets: Record<string, number>
+  prevOutcomeSpent: Record<string, number>
+  prevIncomeSpent: Record<string, number>
   setOutcomeAmounts: React.Dispatch<React.SetStateAction<Record<string, string>>>
   setIncomeAmounts: React.Dispatch<React.SetStateAction<Record<string, string>>>
   savedId: string | null
@@ -49,6 +51,7 @@ function BudgetRow({
   sub, type,
   outcomeAmounts, incomeAmounts,
   prevOutcomeBudgets, prevIncomeBudgets,
+  prevOutcomeSpent, prevIncomeSpent,
   setOutcomeAmounts, setIncomeAmounts,
   savedId, errorId, onSave
 }: BudgetRowProps) {
@@ -57,12 +60,16 @@ function BudgetRow({
   const isError = errorId === saveKey
   const displayValue = (type === 'outcome' ? outcomeAmounts : incomeAmounts)[sub.id] || ''
 
-  // Fallback placeholder from previous month if current amount is 0/empty
-  const prevAmount = (type === 'outcome' ? prevOutcomeBudgets : prevIncomeBudgets)[sub.id] || 0
-  const placeholderText = prevAmount > 0 ? formatToRupiah(prevAmount) : '0'
+  // Budget & Actual Spent bulan lalu
+  const prevBudget = (type === 'outcome' ? prevOutcomeBudgets : prevIncomeBudgets)[sub.id] || 0
+  const prevActual = (type === 'outcome' ? prevOutcomeSpent : prevIncomeSpent)[sub.id] || 0
+
+  const hasPrevBudget = prevBudget > 0
+  const hasPrevActual = prevActual > 0
+  const hasAnyPrevInfo = hasPrevBudget || hasPrevActual
 
   return (
-    <div className="flex flex-wrap items-center gap-3 px-5 py-3.5 border-b border-slate-800/60 last:border-0 hover:bg-slate-800/30 transition-colors">
+    <div className={`flex flex-wrap items-center gap-3 px-5 border-b border-slate-800/60 last:border-0 hover:bg-slate-800/30 transition-colors ${hasAnyPrevInfo ? 'pt-5 pb-3.5' : 'py-3.5'}`}>
       <div className="hidden sm:block flex-1 min-w-0">
         <span className="text-xs font-semibold text-slate-400 block">{sub.categories?.name}</span>
         <span className="text-sm font-semibold text-slate-200 block truncate">{sub.name}</span>
@@ -71,23 +78,36 @@ function BudgetRow({
         <span className="text-xs font-semibold text-slate-400">{sub.categories?.name}</span>
         <span className="text-sm font-semibold text-slate-200 truncate">{sub.name}</span>
       </div>
+
       <div className="flex gap-2.5 ml-auto items-center">
         <div className="relative">
+          {/* Top badges for previous month budget and actual spent */}
+          {hasAnyPrevInfo && (
+            <div className="absolute -top-3.5 right-0 flex items-center gap-1 z-10 pointer-events-none whitespace-nowrap">
+              {hasPrevBudget && (
+                <span className="px-1.5 py-0.2 bg-slate-900/95 text-[9px] font-semibold text-blue-400 rounded border border-blue-500/30 shadow-sm">
+                  Budget Lalu: {formatToRupiah(prevBudget)}
+                </span>
+              )}
+              {hasPrevActual && (
+                <span className="px-1.5 py-0.2 bg-slate-900/95 text-[9px] font-semibold text-indigo-300 rounded border border-indigo-500/30 shadow-sm">
+                  Real Lalu: {formatToRupiah(prevActual)}
+                </span>
+              )}
+            </div>
+          )}
+
           <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs font-semibold pointer-events-none">Rp</span>
           <input
             type="text"
             inputMode="numeric"
             value={displayValue}
             onChange={e => handleAmountChange(sub.id, e.target.value, type, setOutcomeAmounts, setIncomeAmounts)}
-            placeholder={placeholderText}
-            className="w-40 pl-9 pr-3 py-2 rounded-xl border border-slate-800 text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-blue-500/40 text-slate-200 placeholder:text-slate-500"
+            placeholder="0"
+            className="w-44 sm:w-48 pl-9 pr-3 py-2 rounded-xl border border-slate-800 text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-blue-500/40 text-slate-200 placeholder:text-slate-600"
           />
-          {prevAmount > 0 && !displayValue && (
-            <span className="absolute -top-2 right-2 px-1.5 py-0.2 bg-slate-800 text-[9px] text-slate-400 rounded border border-slate-700 pointer-events-none">
-              Bulan lalu: {formatToRupiah(prevAmount)}
-            </span>
-          )}
         </div>
+
         <button
           onClick={() => onSave(sub.id, type)}
           className={`px-3.5 py-2 text-xs rounded-xl transition-all font-bold whitespace-nowrap flex items-center gap-1 cursor-pointer
@@ -115,9 +135,11 @@ export default function BudgetPage() {
   const [outcomeAmounts, setOutcomeAmounts] = useState<Record<string, string>>({})
   const [incomeAmounts, setIncomeAmounts] = useState<Record<string, string>>({})
   
-  // Previous month budget records for placeholder display
+  // Previous month budget & actual spent records
   const [prevOutcomeBudgets, setPrevOutcomeBudgets] = useState<Record<string, number>>({})
   const [prevIncomeBudgets, setPrevIncomeBudgets] = useState<Record<string, number>>({})
+  const [prevOutcomeSpent, setPrevOutcomeSpent] = useState<Record<string, number>>({})
+  const [prevIncomeSpent, setPrevIncomeSpent] = useState<Record<string, number>>({})
 
   const [savedId, setSavedId] = useState<string | null>(null)
   const [errorId, setErrorId] = useState<string | null>(null)
@@ -130,10 +152,16 @@ export default function BudgetPage() {
     const prevMonth = month === 1 ? 12 : month - 1
     const prevYear = month === 1 ? year - 1 : year
 
-    const [{ data: subs }, { data: buds }, { data: prevBuds }] = await Promise.all([
+    const prevLastDay = new Date(prevYear, prevMonth, 0).getDate()
+    const prevStart = `${prevYear}-${String(prevMonth).padStart(2, '0')}-01T00:00:00+07:00`
+    const prevEnd = `${prevYear}-${String(prevMonth).padStart(2, '0')}-${prevLastDay}T23:59:59+07:00`
+
+    const [{ data: subs }, { data: buds }, { data: prevBuds }, { data: prevTxs }] = await Promise.all([
       supabase.from('subcategories').select('*, categories(name, type)').eq('user_id', user.id),
       supabase.from('budgets').select('*').eq('user_id', user.id).eq('month', month).eq('year', year),
-      supabase.from('budgets').select('*').eq('user_id', user.id).eq('month', prevMonth).eq('year', prevYear)
+      supabase.from('budgets').select('*').eq('user_id', user.id).eq('month', prevMonth).eq('year', prevYear),
+      supabase.from('transactions').select('subcategory_id, amount, type')
+        .eq('user_id', user.id).gte('date', prevStart).lte('date', prevEnd)
     ])
 
     setSubcategories(subs || [])
@@ -150,14 +178,29 @@ export default function BudgetPage() {
     setIncomeAmounts(initIncome)
 
     // Process previous month budgets
+    const prevOutcomeBudMap: Record<string, number> = {}
+    const prevIncomeBudMap: Record<string, number> = {}
+    ;(prevBuds || []).forEach((b: Budget) => {
+      if (b.type === 'outcome') prevOutcomeBudMap[b.subcategory_id] = b.amount
+      if (b.type === 'income') prevIncomeBudMap[b.subcategory_id] = b.amount
+    })
+    setPrevOutcomeBudgets(prevOutcomeBudMap)
+    setPrevIncomeBudgets(prevIncomeBudMap)
+
+    // Process previous month actual transactions
     const prevOutcomeMap: Record<string, number> = {}
     const prevIncomeMap: Record<string, number> = {}
-    ;(prevBuds || []).forEach((b: Budget) => {
-      if (b.type === 'outcome') prevOutcomeMap[b.subcategory_id] = b.amount
-      if (b.type === 'income') prevIncomeMap[b.subcategory_id] = b.amount
+    ;(prevTxs || []).forEach((tx: any) => {
+      if (tx.subcategory_id) {
+        if (tx.type === 'outcome') {
+          prevOutcomeMap[tx.subcategory_id] = (prevOutcomeMap[tx.subcategory_id] || 0) + tx.amount
+        } else if (tx.type === 'income') {
+          prevIncomeMap[tx.subcategory_id] = (prevIncomeMap[tx.subcategory_id] || 0) + tx.amount
+        }
+      }
     })
-    setPrevOutcomeBudgets(prevOutcomeMap)
-    setPrevIncomeBudgets(prevIncomeMap)
+    setPrevOutcomeSpent(prevOutcomeMap)
+    setPrevIncomeSpent(prevIncomeMap)
   }
 
   useEffect(() => { load() }, [month, year])
@@ -187,6 +230,7 @@ export default function BudgetPage() {
   const rowProps = { 
     outcomeAmounts, incomeAmounts, 
     prevOutcomeBudgets, prevIncomeBudgets,
+    prevOutcomeSpent, prevIncomeSpent,
     setOutcomeAmounts, setIncomeAmounts, 
     savedId, errorId, 
     onSave: saveBudget 
@@ -219,7 +263,7 @@ export default function BudgetPage() {
 
       <div className="p-3.5 rounded-xl bg-blue-500/10 border border-blue-500/20 text-xs text-blue-300 flex items-center gap-2">
         <Info size={16} className="shrink-0 text-blue-400" />
-        <span>Jika nilai budget bulan ini belum diisi (0), nilai budget bulan sebelumnya akan muncul secara otomatis sebagai petunjuk (placeholder).</span>
+        <span>Di atas setiap kolom input, informasi <strong>Budget Bulan Lalu</strong> dan <strong>Realisasi Bulan Lalu</strong> akan muncul otomatis jika datanya ada.</span>
       </div>
 
       {/* Outcome Budget */}
@@ -231,7 +275,7 @@ export default function BudgetPage() {
           <div className="hidden sm:grid sm:grid-cols-3 text-xs font-semibold text-slate-400 uppercase tracking-wider px-5 py-3 bg-slate-900/80 border-b border-slate-800">
             <span>Kategori</span>
             <span>Subkategori</span>
-            <span className="text-right">Budget (Rp)</span>
+            <span className="text-right">Info Bulan Lalu & Budget (Rp)</span>
           </div>
           {outcomeSubs.length === 0
             ? <p className="px-5 py-8 text-sm text-slate-500 text-center">Belum ada subkategori outcome.</p>
@@ -249,7 +293,7 @@ export default function BudgetPage() {
           <div className="hidden sm:grid sm:grid-cols-3 text-xs font-semibold text-slate-400 uppercase tracking-wider px-5 py-3 bg-slate-900/80 border-b border-slate-800">
             <span>Kategori</span>
             <span>Subkategori</span>
-            <span className="text-right">Target (Rp)</span>
+            <span className="text-right">Info Bulan Lalu & Target (Rp)</span>
           </div>
           {incomeSubs.length === 0
             ? <p className="px-5 py-8 text-sm text-slate-500 text-center">Belum ada subkategori income.</p>

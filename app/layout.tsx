@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
+import { ThemeProvider } from "@/components/ThemeProvider";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -8,10 +9,15 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "FinTrack | Premium DashboardKeuangan",
+  title: "FinTrack | Premium Dashboard Keuangan",
   description: "Budgeting & Financial Tracking Dashboard",
   icons: {
-    icon: '/dollar.png',
+    icon: [
+      { url: '/icon.svg', type: 'image/svg+xml' },
+      { url: '/dollar.png', type: 'image/png' },
+    ],
+    shortcut: '/icon.svg',
+    apple: '/icon.svg',
   },
 };
 
@@ -24,9 +30,12 @@ export default function RootLayout({
     <html
       lang="id"
       className={`${inter.variable} h-full dark antialiased`}
+      suppressHydrationWarning
     >
-      <body className="min-h-full flex flex-col bg-[#090d16] text-slate-100 selection:bg-blue-500 selection:text-white">
-        {children}
+      <body className="min-h-full flex flex-col selection:bg-blue-500 selection:text-white">
+        <ThemeProvider>
+          {children}
+        </ThemeProvider>
       </body>
     </html>
   );
