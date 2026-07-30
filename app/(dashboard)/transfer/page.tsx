@@ -157,11 +157,11 @@ export default function TransferPage() {
               value={fromId}
               onChange={e => setFromId(e.target.value)}
               required
-              className="w-full px-4 py-3 rounded-xl border border-slate-800 text-sm font-semibold outline-none cursor-pointer"
+              className="w-full px-4 py-3 rounded-xl border border-slate-800 bg-slate-900 text-slate-100 text-sm font-semibold outline-none cursor-pointer"
             >
-              <option value="">-- Pilih Asal --</option>
+              <option value="" className="bg-slate-900 text-slate-100">-- Pilih Asal --</option>
               {sources.map(s => (
-                <option key={s.id} value={s.id}>
+                <option key={s.id} value={s.id} className="bg-slate-900 text-slate-100">
                   {s.icon} {s.name} ({s.type})
                 </option>
               ))}
@@ -174,11 +174,11 @@ export default function TransferPage() {
               value={toId}
               onChange={e => setToId(e.target.value)}
               required
-              className="w-full px-4 py-3 rounded-xl border border-slate-800 text-sm font-semibold outline-none cursor-pointer"
+              className="w-full px-4 py-3 rounded-xl border border-slate-800 bg-slate-900 text-slate-100 text-sm font-semibold outline-none cursor-pointer"
             >
-              <option value="">-- Pilih Tujuan --</option>
+              <option value="" className="bg-slate-900 text-slate-100">-- Pilih Tujuan --</option>
               {sources.filter(s => s.id !== fromId).map(s => (
-                <option key={s.id} value={s.id}>
+                <option key={s.id} value={s.id} className="bg-slate-900 text-slate-100">
                   {s.icon} {s.name} ({s.type})
                 </option>
               ))}

@@ -485,11 +485,11 @@ export default function InputPage() {
           <select 
             value={fundSourceId} 
             onChange={e => setFundSourceId(e.target.value)}
-            className="w-full px-4 py-3 rounded-xl border border-slate-800 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/30 text-sm outline-none cursor-pointer"
+            className="w-full px-4 py-3 rounded-xl border border-slate-800 bg-slate-900 text-slate-100 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/30 text-sm outline-none cursor-pointer"
           >
-            <option value="">-- Tanpa Sumber Dana --</option>
+            <option value="" className="bg-slate-900 text-slate-100">-- Tanpa Sumber Dana --</option>
             {fundSources.map(fs => (
-              <option key={fs.id} value={fs.id}>
+              <option key={fs.id} value={fs.id} className="bg-slate-900 text-slate-100">
                 {fs.icon} {fs.name} ({fs.type})
               </option>
             ))}
@@ -503,9 +503,9 @@ export default function InputPage() {
             <button 
               type="button" 
               onClick={() => setDropdownOpen(prev => !prev)}
-              className={`w-full px-4 py-3 rounded-xl border text-sm text-left flex items-center justify-between transition-all outline-none cursor-pointer
-                ${dropdownOpen ? 'border-blue-500 ring-2 ring-blue-500/30' : 'border-slate-800 bg-slate-900/60'}
-                ${subcategoryId ? 'text-slate-200 font-medium' : 'text-slate-500'}`}>
+              className={`w-full px-4 py-3 rounded-xl border text-sm text-left flex items-center justify-between transition-all outline-none cursor-pointer bg-slate-900
+                ${dropdownOpen ? 'border-blue-500 ring-2 ring-blue-500/30' : 'border-slate-800'}
+                ${subcategoryId ? 'text-slate-100 font-medium' : 'text-slate-400'}`}>
               <span>{subcategoryId ? subcategoryName : '-- Pilih Subkategori --'}</span>
               <ChevronDown size={16} className={`text-slate-400 transition-transform ${dropdownOpen ? 'rotate-180' : ''}`}/>
             </button>
@@ -520,7 +520,7 @@ export default function InputPage() {
                     onChange={e => setSearch(e.target.value)}
                     onKeyDown={handleSearchKeyDown}
                     placeholder="Cari subkategori..."
-                    className="w-full px-3 py-2 rounded-lg border border-slate-700 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 rounded-lg border border-slate-700 bg-slate-950 text-slate-100 placeholder:text-slate-400 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
                 <ul className="max-h-56 overflow-y-auto divide-y divide-slate-800/40">
@@ -537,10 +537,10 @@ export default function InputPage() {
                         <button
                           type="button"
                           onClick={() => selectSubcategory(sub)}
-                          className={`w-full px-4 py-2.5 text-sm text-left flex items-center justify-between hover:bg-slate-800 transition-colors cursor-pointer
+                          className={`w-full px-4 py-2.5 text-sm text-left flex items-center justify-between transition-colors cursor-pointer hover:bg-blue-600 hover:text-white group
                             ${subcategoryId === sub.id ? 'text-blue-400 font-semibold bg-blue-500/10' : 'text-slate-300'}`}>
                           <span>{sub.name}</span>
-                          {subcategoryId === sub.id && <Check size={14} className="text-blue-400"/>}
+                          {subcategoryId === sub.id && <Check size={14} className="text-blue-400 group-hover:text-white"/>}
                         </button>
                       </li>
                     ))
@@ -730,11 +730,11 @@ export default function InputPage() {
                 <select 
                   value={editFundSourceId} 
                   onChange={e => setEditFundSourceId(e.target.value)}
-                  className="w-full px-4 py-3 rounded-xl border border-slate-800 text-sm outline-none cursor-pointer"
+                  className="w-full px-4 py-3 rounded-xl border border-slate-800 bg-slate-900 text-slate-100 text-sm outline-none cursor-pointer"
                 >
-                  <option value="">-- Tanpa Sumber Dana --</option>
+                  <option value="" className="bg-slate-900 text-slate-100">-- Tanpa Sumber Dana --</option>
                   {fundSources.map(fs => (
-                    <option key={fs.id} value={fs.id}>
+                    <option key={fs.id} value={fs.id} className="bg-slate-900 text-slate-100">
                       {fs.icon} {fs.name} ({fs.type})
                     </option>
                   ))}
@@ -747,7 +747,7 @@ export default function InputPage() {
                   <button
                     type="button"
                     onClick={() => setEditDropdownOpen(prev => !prev)}
-                    className="w-full px-4 py-3 rounded-xl border border-slate-800 text-sm text-left flex items-center justify-between text-slate-200 outline-none"
+                    className={`w-full px-4 py-3 rounded-xl border border-slate-800 bg-slate-900 text-sm text-left flex items-center justify-between outline-none cursor-pointer ${editSubcategoryId ? 'text-slate-100 font-medium' : 'text-slate-400'}`}
                   >
                     <span>{editSubcategoryId ? editSubcategoryName : '-- Pilih Subkategori --'}</span>
                     <ChevronDown size={16} className={`text-slate-400 transition-transform ${editDropdownOpen ? 'rotate-180' : ''}`}/>
@@ -763,7 +763,7 @@ export default function InputPage() {
                           onChange={e => setEditSearch(e.target.value)}
                           onKeyDown={handleEditSearchKeyDown}
                           placeholder="Cari subkategori..."
-                          className="w-full px-3 py-2 rounded-lg border border-slate-700 text-sm focus:outline-none"
+                          className="w-full px-3 py-2 rounded-lg border border-slate-700 bg-slate-950 text-slate-100 placeholder:text-slate-400 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                         />
                       </div>
                       <ul className="max-h-56 overflow-y-auto">
@@ -772,11 +772,11 @@ export default function InputPage() {
                             <button
                               type="button"
                               onClick={() => selectEditSubcategory(sub)}
-                              className={`w-full px-4 py-2.5 text-sm text-left flex items-center justify-between hover:bg-slate-800
-                                ${editSubcategoryId === sub.id ? 'text-blue-400 font-semibold' : 'text-slate-300'}`}
+                              className={`w-full px-4 py-2.5 text-sm text-left flex items-center justify-between transition-colors cursor-pointer hover:bg-blue-600 hover:text-white group
+                                ${editSubcategoryId === sub.id ? 'text-blue-400 font-semibold bg-blue-500/10' : 'text-slate-300'}`}
                             >
                               <span>{sub.name}</span>
-                              {editSubcategoryId === sub.id && <Check size={14} className="text-blue-400"/>}
+                              {editSubcategoryId === sub.id && <Check size={14} className="text-blue-400 group-hover:text-white"/>}
                             </button>
                           </li>
                         ))}
