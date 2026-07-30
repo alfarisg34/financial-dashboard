@@ -1,7 +1,7 @@
 'use client'
 import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
-import { Trash2, Plus, ChevronDown, ChevronRight } from 'lucide-react'
+import { Trash2, Plus, ChevronDown, ChevronRight, FolderPlus, Tag } from 'lucide-react'
 
 type Category = { id: string; name: string; type: string }
 type Subcategory = { id: string; name: string; category_id: string }
@@ -37,6 +37,7 @@ export default function CategoriesPage() {
   }
 
   async function deleteCategory(id: string) {
+    if (!confirm('Hapus kategori ini beserta seluruh subkategorinya?')) return
     await supabase.from('categories').delete().eq('id', id)
     load()
   }
@@ -57,17 +58,23 @@ export default function CategoriesPage() {
     setExpanded(prev => prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id])
 
   return (
-    <div className="max-w-2xl w-full">
-      <h1 className="text-xl font-semibold text-gray-800 mb-6">Manage Kategori & Subkategori</h1>
+    <div className="max-w-2xl w-full mx-auto space-y-6">
+      <div className="glass-card p-6 rounded-2xl border border-slate-800">
+        <h1 className="text-xl font-bold text-white mb-1">Kategori & Subkategori</h1>
+        <p className="text-xs text-slate-400">Kelola hirarki kategori transaksi finansial Anda</p>
+      </div>
 
       {/* Add Category */}
-      <div className="bg-white rounded-2xl border border-gray-100 p-5 mb-4">
-        <h2 className="text-sm font-semibold text-gray-700 mb-3">Tambah Kategori Baru</h2>
-        <div className="flex flex-wrap gap-2">
+      <div className="glass-card rounded-2xl border border-slate-800 p-5">
+        <h2 className="text-xs font-bold uppercase tracking-wider text-slate-300 mb-3 flex items-center gap-2">
+          <FolderPlus size={16} className="text-blue-400" />
+          Tambah Kategori Baru
+        </h2>
+        <div className="flex flex-wrap gap-2.5">
           <select
             value={newCatType}
             onChange={e => setNewCatType(e.target.value as any)}
-            className="px-3 py-2.5 rounded-xl border border-gray-200 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+            className="px-3.5 py-2.5 rounded-xl border border-slate-800 text-sm font-semibold text-slate-200 outline-none cursor-pointer">
             <option value="income">Income</option>
             <option value="outcome">Outcome</option>
           </select>
@@ -75,28 +82,31 @@ export default function CategoriesPage() {
             type="text"
             value={newCatName}
             onChange={e => setNewCatName(e.target.value)}
-            placeholder="Nama kategori..."
+            placeholder="Nama kategori baru..."
             onKeyDown={e => e.key === 'Enter' && addCategory()}
-            className="flex-1 min-w-0 px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"/>
+            className="flex-1 min-w-0 px-4 py-2.5 rounded-xl border border-slate-800 text-sm outline-none"/>
           <button
             onClick={addCategory}
-            className="px-4 py-2.5 bg-blue-600 text-white rounded-xl text-sm hover:bg-blue-700 transition-colors flex items-center gap-1 whitespace-nowrap">
+            className="px-4 py-2.5 bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-sm font-bold transition-all flex items-center gap-1.5 whitespace-nowrap cursor-pointer">
             <Plus size={16}/> Tambah
           </button>
         </div>
       </div>
 
       {/* Add Subcategory */}
-      <div className="bg-white rounded-2xl border border-gray-100 p-5 mb-6">
-        <h2 className="text-sm font-semibold text-gray-700 mb-3">Tambah Subkategori Baru</h2>
-        <div className="flex flex-wrap gap-2">
+      <div className="glass-card rounded-2xl border border-slate-800 p-5">
+        <h2 className="text-xs font-bold uppercase tracking-wider text-slate-300 mb-3 flex items-center gap-2">
+          <Tag size={16} className="text-indigo-400" />
+          Tambah Subkategori Baru
+        </h2>
+        <div className="flex flex-wrap gap-2.5">
           <select
             value={selectedCatId}
             onChange={e => setSelectedCatId(e.target.value)}
-            className="w-full sm:flex-1 px-3 py-2.5 rounded-xl border border-gray-200 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+            className="w-full sm:flex-1 px-3.5 py-2.5 rounded-xl border border-slate-800 text-sm font-semibold text-slate-200 outline-none cursor-pointer">
             <option value="">-- Pilih Kategori Parent --</option>
             {categories.map(c => (
-              <option key={c.id} value={c.id}>[{c.type}] {c.name}</option>
+              <option key={c.id} value={c.id}>[{c.type === 'income' ? 'Income' : 'Outcome'}] {c.name}</option>
             ))}
           </select>
           <input
@@ -105,58 +115,68 @@ export default function CategoriesPage() {
             onChange={e => setNewSubName(e.target.value)}
             placeholder="Nama subkategori..."
             onKeyDown={e => e.key === 'Enter' && addSubcategory()}
-            className="flex-1 min-w-0 px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"/>
+            className="flex-1 min-w-0 px-4 py-2.5 rounded-xl border border-slate-800 text-sm outline-none"/>
           <button
             onClick={addSubcategory}
-            className="px-4 py-2.5 bg-blue-600 text-white rounded-xl text-sm hover:bg-blue-700 transition-colors flex items-center gap-1 whitespace-nowrap">
+            className="px-4 py-2.5 bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-sm font-bold transition-all flex items-center gap-1.5 whitespace-nowrap cursor-pointer">
             <Plus size={16}/> Tambah
           </button>
         </div>
       </div>
 
       {/* Category Tree */}
-      <div className="space-y-4">
+      <div className="space-y-6">
         {['income', 'outcome'].map(typeLabel => (
           <div key={typeLabel}>
-            <h2 className={`text-xs font-semibold uppercase tracking-wider mb-2 ${typeLabel === 'income' ? 'text-green-600' : 'text-red-600'}`}>
-              {typeLabel === 'income' ? '📈 Income' : '📉 Outcome'}
+            <h2 className={`text-xs font-bold uppercase tracking-wider mb-3 ${typeLabel === 'income' ? 'text-emerald-400' : 'text-rose-400'}`}>
+              {typeLabel === 'income' ? '📈 Kategori Income (Pemasukan)' : '📉 Kategori Outcome (Pengeluaran)'}
             </h2>
-            {categories.filter(c => c.type === typeLabel).map(cat => {
-              const subs = subcategories.filter(s => s.category_id === cat.id)
-              const isOpen = expanded.includes(cat.id)
-              return (
-                <div key={cat.id} className="bg-white rounded-xl border border-gray-100 overflow-hidden mb-2">
-                  <div className="flex items-center justify-between px-4 py-3">
-                    <button
-                      onClick={() => toggleExpand(cat.id)}
-                      className="flex items-center gap-2 text-sm font-medium text-gray-700 flex-1 text-left min-w-0">
-                      {isOpen ? <ChevronDown size={16} className="shrink-0"/> : <ChevronRight size={16} className="shrink-0"/>}
-                      <span className="truncate">{cat.name}</span>
-                      <span className="text-xs text-gray-400 font-normal ml-1 shrink-0">({subs.length} sub)</span>
-                    </button>
-                    <button
-                      onClick={() => deleteCategory(cat.id)}
-                      className="p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors shrink-0 ml-2">
-                      <Trash2 size={14}/>
-                    </button>
-                  </div>
-                  {isOpen && subs.length > 0 && (
-                    <div className="border-t border-gray-50 divide-y divide-gray-50">
-                      {subs.map(sub => (
-                        <div key={sub.id} className="flex items-center justify-between px-6 py-2.5">
-                          <span className="text-sm text-gray-600 truncate min-w-0 mr-2">↳ {sub.name}</span>
-                          <button
-                            onClick={() => deleteSubcategory(sub.id)}
-                            className="p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors shrink-0">
-                            <Trash2 size={13}/>
-                          </button>
+            <div className="space-y-2">
+              {categories.filter(c => c.type === typeLabel).length === 0 ? (
+                <p className="text-xs text-slate-500 py-2">Belum ada kategori {typeLabel}</p>
+              ) : (
+                categories.filter(c => c.type === typeLabel).map(cat => {
+                  const subs = subcategories.filter(s => s.category_id === cat.id)
+                  const isOpen = expanded.includes(cat.id)
+                  return (
+                    <div key={cat.id} className="glass-card rounded-xl border border-slate-800 overflow-hidden">
+                      <div className="flex items-center justify-between px-4 py-3 hover:bg-slate-800/40 transition-colors">
+                        <button
+                          onClick={() => toggleExpand(cat.id)}
+                          className="flex items-center gap-2.5 text-sm font-semibold text-slate-200 flex-1 text-left min-w-0 cursor-pointer">
+                          {isOpen ? <ChevronDown size={17} className="shrink-0 text-blue-400"/> : <ChevronRight size={17} className="shrink-0 text-slate-400"/>}
+                          <span className="truncate">{cat.name}</span>
+                          <span className="text-xs text-slate-500 font-normal ml-1 shrink-0">({subs.length} sub)</span>
+                        </button>
+                        <button
+                          onClick={() => deleteCategory(cat.id)}
+                          className="p-1.5 text-slate-500 hover:text-rose-400 hover:bg-rose-500/10 rounded-lg transition-colors shrink-0 ml-2 cursor-pointer">
+                          <Trash2 size={15}/>
+                        </button>
+                      </div>
+                      {isOpen && (
+                        <div className="bg-slate-950/60 border-t border-slate-800/80 divide-y divide-slate-800/40">
+                          {subs.length === 0 ? (
+                            <p className="text-xs text-slate-600 px-6 py-3 italic">Belum ada subkategori</p>
+                          ) : (
+                            subs.map(sub => (
+                              <div key={sub.id} className="flex items-center justify-between px-6 py-2.5 hover:bg-slate-900/60 transition-colors">
+                                <span className="text-xs text-slate-300 truncate min-w-0 mr-2 font-medium">↳ {sub.name}</span>
+                                <button
+                                  onClick={() => deleteSubcategory(sub.id)}
+                                  className="p-1 text-slate-500 hover:text-rose-400 hover:bg-rose-500/10 rounded-lg transition-colors shrink-0 cursor-pointer">
+                                  <Trash2 size={13}/>
+                                </button>
+                              </div>
+                            ))
+                          )}
                         </div>
-                      ))}
+                      )}
                     </div>
-                  )}
-                </div>
-              )
-            })}
+                  )
+                })
+              )}
+            </div>
           </div>
         ))}
       </div>
