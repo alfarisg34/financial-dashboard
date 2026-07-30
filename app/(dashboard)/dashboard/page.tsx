@@ -232,7 +232,7 @@ export default function DashboardPage() {
           <p className="text-slate-400 text-xs mt-1">Ringkasan realisasi dan proyeksi anggaran Anda</p>
         </div>
         <div className="flex items-center gap-2.5 bg-slate-900/80 p-1.5 rounded-xl border border-slate-800 self-start sm:self-auto">
-          <Calendar size={15} className="text-slate-400 ml-2" />
+          <Calendar size={15} className="text-slate-300 ml-2 shrink-0" />
           <input 
             type="date" 
             value={startDate} 

@@ -1,6 +1,6 @@
 @import "tailwindcss";
 
-@custom-variant dark (&:where(.dark, .dark *));
+@variant dark (&:where(.dark, .dark *));
 
 :root {
   --background: #f8fafc;
@@ -10,6 +10,41 @@
 .dark {
   --background: #090d16;
   --foreground: #f1f5f9;
+  color-scheme: dark;
+}
+
+/* Date & Datetime picker dark mode support */
+.dark input[type="date"],
+.dark input[type="datetime-local"] {
+  color-scheme: dark !important;
+}
+
+.light input[type="date"],
+.light input[type="datetime-local"] {
+  color-scheme: light !important;
+}
+
+.dark input[type="date"]::-webkit-calendar-picker-indicator,
+.dark input[type="datetime-local"]::-webkit-calendar-picker-indicator {
+  filter: brightness(0) invert(1) !important;
+  opacity: 0.9;
+  cursor: pointer;
+}
+
+.dark input[type="date"]::-webkit-calendar-picker-indicator:hover,
+.dark input[type="datetime-local"]::-webkit-calendar-picker-indicator:hover {
+  opacity: 1;
+}
+
+.dark select {
+  background-color: #0f172a !important;
+  color: #f1f5f9 !important;
+  color-scheme: dark !important;
+}
+
+.dark select option {
+  background-color: #0f172a !important;
+  color: #f1f5f9 !important;
 }
 
 @theme inline {
@@ -123,13 +158,22 @@ body {
   color: #64748b !important;
 }
 
-.light .bg-slate-900\/80,
+.light .bg-slate-900\/95,
 .light .bg-slate-900\/90,
+.light .bg-slate-900\/80,
+.light .bg-slate-900\/70,
+.light .bg-slate-900\/60,
+.light .bg-slate-900\/50,
+.light .bg-slate-900\/40,
+.light .bg-slate-900\/30,
+.light .bg-slate-900\/20,
+.light .bg-slate-900\/10,
 .light .bg-slate-900,
-.light .bg-slate-950\/40,
-.light .bg-slate-950\/50,
+.light .bg-slate-950\/80,
+.light .bg-slate-950\/70,
 .light .bg-slate-950\/60,
-.light .bg-slate-950\/80 {
+.light .bg-slate-950\/50,
+.light .bg-slate-950\/40 {
   background-color: #f1f5f9 !important;
 }
 
@@ -140,6 +184,18 @@ body {
 .light .bg-slate-800\/40,
 .light .bg-slate-800\/30 {
   background-color: #e2e8f0 !important;
+}
+
+/* Light mode table & row hover background overrides */
+.light tr:hover,
+.light .hover\:bg-slate-800\/60:hover,
+.light .hover\:bg-slate-800\/50:hover,
+.light .hover\:bg-slate-800\/40:hover,
+.light .hover\:bg-slate-800\/30:hover,
+.light .hover\:bg-slate-800\/20:hover,
+.light .hover\:bg-slate-900\/60:hover,
+.light .hover\:bg-slate-900\/50:hover {
+  background-color: #cbd5e1 !important;
 }
 
 .light .border-slate-800,

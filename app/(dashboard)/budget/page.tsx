@@ -85,12 +85,12 @@ function BudgetRow({
           {hasAnyPrevInfo && (
             <div className="absolute -top-3.5 right-0 flex items-center gap-1 z-10 pointer-events-none whitespace-nowrap">
               {hasPrevBudget && (
-                <span className="px-1.5 py-0.2 bg-slate-900/95 text-[9px] font-semibold text-blue-400 rounded border border-blue-500/30 shadow-sm">
+                <span className="px-1.5 py-0.5 bg-blue-500/10 text-blue-600 dark:text-blue-400 text-[9px] font-bold rounded border border-blue-500/30 shadow-sm">
                   Budget Lalu: {formatToRupiah(prevBudget)}
                 </span>
               )}
               {hasPrevActual && (
-                <span className="px-1.5 py-0.2 bg-slate-900/95 text-[9px] font-semibold text-indigo-300 rounded border border-indigo-500/30 shadow-sm">
+                <span className="px-1.5 py-0.5 bg-indigo-500/10 text-indigo-600 dark:text-indigo-300 text-[9px] font-bold rounded border border-indigo-500/30 shadow-sm">
                   Real Lalu: {formatToRupiah(prevActual)}
                 </span>
               )}
@@ -114,12 +114,12 @@ function BudgetRow({
             ${isSaved
               ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/30'
               : isError
-              ? 'bg-rose-500/20 text-rose-400 border border-rose-500/30'
-              : type === 'outcome'
-              ? 'bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20 border border-emerald-500/20'
-              : 'bg-blue-500/10 text-blue-400 hover:bg-blue-500/20 border border-blue-500/20'
+                ? 'bg-rose-500/20 text-rose-400 border border-rose-500/30'
+                : type === 'outcome'
+                  ? 'bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20 border border-emerald-500/20'
+                  : 'bg-blue-500/10 text-blue-400 hover:bg-blue-500/20 border border-blue-500/20'
             }`}>
-          {isSaved ? <><Check size={13}/> Tersimpan</> : isError ? 'Gagal!' : 'Simpan'}
+          {isSaved ? <><Check size={13} /> Tersimpan</> : isError ? 'Gagal!' : 'Simpan'}
         </button>
       </div>
     </div>
@@ -134,7 +134,7 @@ export default function BudgetPage() {
   const [subcategories, setSubcategories] = useState<any[]>([])
   const [outcomeAmounts, setOutcomeAmounts] = useState<Record<string, string>>({})
   const [incomeAmounts, setIncomeAmounts] = useState<Record<string, string>>({})
-  
+
   // Previous month budget & actual spent records
   const [prevOutcomeBudgets, setPrevOutcomeBudgets] = useState<Record<string, number>>({})
   const [prevIncomeBudgets, setPrevIncomeBudgets] = useState<Record<string, number>>({})
@@ -169,36 +169,36 @@ export default function BudgetPage() {
     // Process current budgets
     const initOutcome: Record<string, string> = {}
     const initIncome: Record<string, string> = {}
-    ;(buds || []).forEach((b: Budget) => {
-      const formatted = b.amount ? formatToRupiah(b.amount) : ''
-      if (b.type === 'outcome') initOutcome[b.subcategory_id] = formatted
-      if (b.type === 'income') initIncome[b.subcategory_id] = formatted
-    })
+      ; (buds || []).forEach((b: Budget) => {
+        const formatted = b.amount ? formatToRupiah(b.amount) : ''
+        if (b.type === 'outcome') initOutcome[b.subcategory_id] = formatted
+        if (b.type === 'income') initIncome[b.subcategory_id] = formatted
+      })
     setOutcomeAmounts(initOutcome)
     setIncomeAmounts(initIncome)
 
     // Process previous month budgets
     const prevOutcomeBudMap: Record<string, number> = {}
     const prevIncomeBudMap: Record<string, number> = {}
-    ;(prevBuds || []).forEach((b: Budget) => {
-      if (b.type === 'outcome') prevOutcomeBudMap[b.subcategory_id] = b.amount
-      if (b.type === 'income') prevIncomeBudMap[b.subcategory_id] = b.amount
-    })
+      ; (prevBuds || []).forEach((b: Budget) => {
+        if (b.type === 'outcome') prevOutcomeBudMap[b.subcategory_id] = b.amount
+        if (b.type === 'income') prevIncomeBudMap[b.subcategory_id] = b.amount
+      })
     setPrevOutcomeBudgets(prevOutcomeBudMap)
     setPrevIncomeBudgets(prevIncomeBudMap)
 
     // Process previous month actual transactions
     const prevOutcomeMap: Record<string, number> = {}
     const prevIncomeMap: Record<string, number> = {}
-    ;(prevTxs || []).forEach((tx: any) => {
-      if (tx.subcategory_id) {
-        if (tx.type === 'outcome') {
-          prevOutcomeMap[tx.subcategory_id] = (prevOutcomeMap[tx.subcategory_id] || 0) + tx.amount
-        } else if (tx.type === 'income') {
-          prevIncomeMap[tx.subcategory_id] = (prevIncomeMap[tx.subcategory_id] || 0) + tx.amount
+      ; (prevTxs || []).forEach((tx: any) => {
+        if (tx.subcategory_id) {
+          if (tx.type === 'outcome') {
+            prevOutcomeMap[tx.subcategory_id] = (prevOutcomeMap[tx.subcategory_id] || 0) + tx.amount
+          } else if (tx.type === 'income') {
+            prevIncomeMap[tx.subcategory_id] = (prevIncomeMap[tx.subcategory_id] || 0) + tx.amount
+          }
         }
-      }
-    })
+      })
     setPrevOutcomeSpent(prevOutcomeMap)
     setPrevIncomeSpent(prevIncomeMap)
   }
@@ -223,17 +223,17 @@ export default function BudgetPage() {
     }
   }
 
-  const months = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember']
+  const months = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember']
   const outcomeSubs = subcategories.filter(s => s.categories?.type === 'outcome')
   const incomeSubs = subcategories.filter(s => s.categories?.type === 'income')
 
-  const rowProps = { 
-    outcomeAmounts, incomeAmounts, 
+  const rowProps = {
+    outcomeAmounts, incomeAmounts,
     prevOutcomeBudgets, prevIncomeBudgets,
     prevOutcomeSpent, prevIncomeSpent,
-    setOutcomeAmounts, setIncomeAmounts, 
-    savedId, errorId, 
-    onSave: saveBudget 
+    setOutcomeAmounts, setIncomeAmounts,
+    savedId, errorId,
+    onSave: saveBudget
   }
 
   return (
@@ -257,13 +257,13 @@ export default function BudgetPage() {
           </select>
         </div>
         <span className="text-xs font-semibold text-slate-400 bg-slate-900/80 px-3 py-1.5 rounded-lg border border-slate-800">
-          Periode: <span className="text-blue-400">{months[month-1]} {year}</span>
+          Periode: <span className="text-blue-400">{months[month - 1]} {year}</span>
         </span>
       </div>
 
-      <div className="p-3.5 rounded-xl bg-blue-500/10 border border-blue-500/20 text-xs text-blue-300 flex items-center gap-2">
-        <Info size={16} className="shrink-0 text-blue-400" />
-        <span>Di atas setiap kolom input, informasi <strong>Budget Bulan Lalu</strong> dan <strong>Realisasi Bulan Lalu</strong> akan muncul otomatis jika datanya ada.</span>
+      <div className="p-3.5 rounded-xl bg-blue-500/10 border border-blue-500/30 text-xs text-blue-700 dark:text-blue-300 flex items-center gap-2">
+        <Info size={16} className="shrink-0 text-blue-600 dark:text-blue-400" />
+        <span>Di atas setiap kolom input, informasi <strong className="text-blue-900 dark:text-blue-200">Budget Bulan Lalu</strong> dan <strong className="text-blue-900 dark:text-blue-200">Realisasi Bulan Lalu</strong> akan muncul otomatis jika datanya ada.</span>
       </div>
 
       {/* Outcome Budget */}
@@ -279,7 +279,7 @@ export default function BudgetPage() {
           </div>
           {outcomeSubs.length === 0
             ? <p className="px-5 py-8 text-sm text-slate-500 text-center">Belum ada subkategori outcome.</p>
-            : outcomeSubs.map(sub => <BudgetRow key={sub.id} sub={sub} type="outcome" {...rowProps}/>)
+            : outcomeSubs.map(sub => <BudgetRow key={sub.id} sub={sub} type="outcome" {...rowProps} />)
           }
         </div>
       </div>
@@ -297,7 +297,7 @@ export default function BudgetPage() {
           </div>
           {incomeSubs.length === 0
             ? <p className="px-5 py-8 text-sm text-slate-500 text-center">Belum ada subkategori income.</p>
-            : incomeSubs.map(sub => <BudgetRow key={sub.id} sub={sub} type="income" {...rowProps}/>)
+            : incomeSubs.map(sub => <BudgetRow key={sub.id} sub={sub} type="income" {...rowProps} />)
           }
         </div>
       </div>

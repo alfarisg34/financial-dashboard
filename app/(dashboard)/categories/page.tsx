@@ -74,9 +74,9 @@ export default function CategoriesPage() {
           <select
             value={newCatType}
             onChange={e => setNewCatType(e.target.value as any)}
-            className="px-3.5 py-2.5 rounded-xl border border-slate-800 text-sm font-semibold text-slate-200 outline-none cursor-pointer">
-            <option value="income">Income</option>
-            <option value="outcome">Outcome</option>
+            className="bg-slate-900/80 px-3.5 py-2.5 rounded-xl border border-slate-800 text-sm font-semibold text-slate-200 outline-none cursor-pointer">
+            <option value="income" className="bg-slate-900 text-slate-200">Income</option>
+            <option value="outcome" className="bg-slate-900 text-slate-200">Outcome</option>
           </select>
           <input
             type="text"
@@ -84,7 +84,7 @@ export default function CategoriesPage() {
             onChange={e => setNewCatName(e.target.value)}
             placeholder="Nama kategori baru..."
             onKeyDown={e => e.key === 'Enter' && addCategory()}
-            className="flex-1 min-w-0 px-4 py-2.5 rounded-xl border border-slate-800 text-sm outline-none"/>
+            className="flex-1 min-w-0 bg-slate-900/80 px-4 py-2.5 rounded-xl border border-slate-800 text-sm text-slate-200 outline-none"/>
           <button
             onClick={addCategory}
             className="px-4 py-2.5 bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-sm font-bold transition-all flex items-center gap-1.5 whitespace-nowrap cursor-pointer">
@@ -103,10 +103,10 @@ export default function CategoriesPage() {
           <select
             value={selectedCatId}
             onChange={e => setSelectedCatId(e.target.value)}
-            className="w-full sm:flex-1 px-3.5 py-2.5 rounded-xl border border-slate-800 text-sm font-semibold text-slate-200 outline-none cursor-pointer">
-            <option value="">-- Pilih Kategori Parent --</option>
+            className="w-full sm:flex-1 bg-slate-900/80 px-3.5 py-2.5 rounded-xl border border-slate-800 text-sm font-semibold text-slate-200 outline-none cursor-pointer">
+            <option value="" className="bg-slate-900 text-slate-400">-- Pilih Kategori Parent --</option>
             {categories.map(c => (
-              <option key={c.id} value={c.id}>[{c.type === 'income' ? 'Income' : 'Outcome'}] {c.name}</option>
+              <option key={c.id} value={c.id} className="bg-slate-900 text-slate-200">[{c.type === 'income' ? 'Income' : 'Outcome'}] {c.name}</option>
             ))}
           </select>
           <input
@@ -115,7 +115,7 @@ export default function CategoriesPage() {
             onChange={e => setNewSubName(e.target.value)}
             placeholder="Nama subkategori..."
             onKeyDown={e => e.key === 'Enter' && addSubcategory()}
-            className="flex-1 min-w-0 px-4 py-2.5 rounded-xl border border-slate-800 text-sm outline-none"/>
+            className="flex-1 min-w-0 bg-slate-900/80 px-4 py-2.5 rounded-xl border border-slate-800 text-sm text-slate-200 outline-none"/>
           <button
             onClick={addSubcategory}
             className="px-4 py-2.5 bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-sm font-bold transition-all flex items-center gap-1.5 whitespace-nowrap cursor-pointer">
