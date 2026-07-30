@@ -2,13 +2,26 @@
 
 import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
-import { ArrowLeftRight, ArrowRight, Trash2, Calendar } from 'lucide-react'
+import { ArrowLeftRight, ArrowRight, Trash2, Calendar, Wallet } from 'lucide-react'
 
 type FundSource = {
   id: string
   name: string
   icon: string
   type: string
+  initial_balance?: number
+}
+
+type TransactionSummary = {
+  fund_source_id: string
+  type: string
+  amount: number
+}
+
+type TransferSummary = {
+  from_fund_source_id: string
+  to_fund_source_id: string
+  amount: number
 }
 
 type Transfer = {
@@ -39,6 +52,8 @@ function parseNumber(formattedStr: string): number {
 export default function TransferPage() {
   const supabase = createClient()
   const [sources, setSources] = useState<FundSource[]>([])
+  const [transactions, setTransactions] = useState<TransactionSummary[]>([])
+  const [allTransfers, setAllTransfers] = useState<TransferSummary[]>([])
   const [transfers, setTransfers] = useState<Transfer[]>([])
   const [loading, setLoading] = useState(true)
   const [success, setSuccess] = useState('')
@@ -61,8 +76,10 @@ export default function TransferPage() {
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) return
 
-    const [{ data: sourcesData }, { data: transfersData }] = await Promise.all([
+    const [{ data: sourcesData }, { data: txData }, { data: allTrData }, { data: transfersData }] = await Promise.all([
       supabase.from('fund_sources').select('*').eq('user_id', user.id).order('name'),
+      supabase.from('transactions').select('fund_source_id, type, amount').eq('user_id', user.id),
+      supabase.from('transfers').select('from_fund_source_id, to_fund_source_id, amount').eq('user_id', user.id),
       supabase.from('transfers')
         .select('*, from_source:fund_sources!from_fund_source_id(name, icon), to_source:fund_sources!to_fund_source_id(name, icon)')
         .eq('user_id', user.id)
@@ -71,6 +88,8 @@ export default function TransferPage() {
     ])
 
     setSources(sourcesData || [])
+    setTransactions(txData || [])
+    setAllTransfers(allTrData || [])
     setTransfers(transfersData || [])
 
     if (sourcesData && sourcesData.length >= 2) {
@@ -84,6 +103,29 @@ export default function TransferPage() {
   useEffect(() => {
     loadData()
   }, [])
+
+  // Compute real-time balance per fund source
+  const sourcesWithBalance = sources.map(fs => {
+    const initial = fs.initial_balance || 0
+    const income = transactions
+      .filter(t => t.fund_source_id === fs.id && t.type === 'income')
+      .reduce((sum, t) => sum + t.amount, 0)
+    const outcome = transactions
+      .filter(t => t.fund_source_id === fs.id && t.type === 'outcome')
+      .reduce((sum, t) => sum + t.amount, 0)
+    const transferIn = allTransfers
+      .filter(tr => tr.to_fund_source_id === fs.id)
+      .reduce((sum, tr) => sum + tr.amount, 0)
+    const transferOut = allTransfers
+      .filter(tr => tr.from_fund_source_id === fs.id)
+      .reduce((sum, tr) => sum + tr.amount, 0)
+
+    const balance = initial + income - outcome + transferIn - transferOut
+    return { ...fs, balance }
+  })
+
+  const selectedFromSource = sourcesWithBalance.find(s => s.id === fromId)
+  const selectedToSource = sourcesWithBalance.find(s => s.id === toId)
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -127,21 +169,26 @@ export default function TransferPage() {
       setSuccess('Transfer berhasil dihapus!')
       loadData()
       setTimeout(() => setSuccess(''), 3000)
+    } else {
+      alert('Gagal menghapus transfer')
     }
   }
 
   return (
-    <div className="max-w-3xl w-full mx-auto space-y-6">
-      <div className="glass-card p-6 rounded-2xl border border-slate-800">
-        <h1 className="text-xl font-bold text-white mb-1 flex items-center gap-2">
-          <ArrowLeftRight size={20} className="text-indigo-400" />
-          Transfer Saldo Antar Sumber Dana
-        </h1>
-        <p className="text-xs text-slate-400">Catat perpindahan saldo (misalnya dari Rekening Bank ke Dompet Tunai / E-Wallet)</p>
+    <div className="max-w-4xl w-full mx-auto space-y-6">
+      {/* Header */}
+      <div className="glass-card p-6 rounded-2xl border border-slate-800 flex items-center justify-between">
+        <div>
+          <h1 className="text-xl font-bold text-white mb-1 flex items-center gap-2">
+            <ArrowLeftRight size={20} className="text-blue-400" />
+            Transfer Saldo
+          </h1>
+          <p className="text-xs text-slate-400">Transfer saldo antar akun bank, e-wallet, atau dompet fisik Anda</p>
+        </div>
       </div>
 
       {success && (
-        <div className="bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 px-4 py-3 rounded-xl text-sm">
+        <div className="bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 px-4 py-3 rounded-xl text-sm font-medium">
           {success}
         </div>
       )}
@@ -152,7 +199,14 @@ export default function TransferPage() {
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
-            <label className="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2 block">Dari (Asal Saldo)</label>
+            <div className="flex justify-between items-center mb-2">
+              <label className="text-xs font-semibold uppercase tracking-wider text-slate-400">Dari (Asal Saldo)</label>
+              {selectedFromSource && (
+                <span className={`text-xs font-bold ${selectedFromSource.balance >= 0 ? 'text-emerald-400' : 'text-rose-400'}`}>
+                  Saldo: {fmt(selectedFromSource.balance)}
+                </span>
+              )}
+            </div>
             <select
               value={fromId}
               onChange={e => setFromId(e.target.value)}
@@ -160,16 +214,23 @@ export default function TransferPage() {
               className="w-full px-4 py-3 rounded-xl border border-slate-800 bg-slate-900 text-slate-100 text-sm font-semibold outline-none cursor-pointer"
             >
               <option value="" className="bg-slate-900 text-slate-100">-- Pilih Asal --</option>
-              {sources.map(s => (
+              {sourcesWithBalance.map(s => (
                 <option key={s.id} value={s.id} className="bg-slate-900 text-slate-100">
-                  {s.icon} {s.name} ({s.type})
+                  {s.icon} {s.name} ({s.type}) — Saldo: {fmt(s.balance)}
                 </option>
               ))}
             </select>
           </div>
 
           <div>
-            <label className="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2 block">Ke (Tujuan Saldo)</label>
+            <div className="flex justify-between items-center mb-2">
+              <label className="text-xs font-semibold uppercase tracking-wider text-slate-400">Ke (Tujuan Saldo)</label>
+              {selectedToSource && (
+                <span className={`text-xs font-bold ${selectedToSource.balance >= 0 ? 'text-blue-400' : 'text-rose-400'}`}>
+                  Saldo: {fmt(selectedToSource.balance)}
+                </span>
+              )}
+            </div>
             <select
               value={toId}
               onChange={e => setToId(e.target.value)}
@@ -177,9 +238,9 @@ export default function TransferPage() {
               className="w-full px-4 py-3 rounded-xl border border-slate-800 bg-slate-900 text-slate-100 text-sm font-semibold outline-none cursor-pointer"
             >
               <option value="" className="bg-slate-900 text-slate-100">-- Pilih Tujuan --</option>
-              {sources.filter(s => s.id !== fromId).map(s => (
+              {sourcesWithBalance.filter(s => s.id !== fromId).map(s => (
                 <option key={s.id} value={s.id} className="bg-slate-900 text-slate-100">
-                  {s.icon} {s.name} ({s.type})
+                  {s.icon} {s.name} ({s.type}) — Saldo: {fmt(s.balance)}
                 </option>
               ))}
             </select>
@@ -198,7 +259,7 @@ export default function TransferPage() {
               onChange={e => setDisplayAmount(formatThousands(e.target.value))}
               placeholder="0"
               required
-              className="w-full pl-11 pr-4 py-3 rounded-xl border border-slate-800 text-sm font-semibold outline-none"
+              className="w-full pl-11 pr-4 py-3 rounded-xl border border-slate-800 bg-slate-900 text-slate-100 text-sm font-semibold outline-none"
             />
           </div>
         </div>
@@ -211,82 +272,75 @@ export default function TransferPage() {
             value={date}
             onChange={e => setDate(e.target.value)}
             required
-            className="w-full px-4 py-3 rounded-xl border border-slate-800 text-sm outline-none"
+            className="w-full px-4 py-3 rounded-xl border border-slate-800 bg-slate-900 text-slate-100 text-sm outline-none"
           />
         </div>
 
         {/* Description */}
         <div>
-          <label className="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2 block">Deskripsi / Catatan</label>
-          <textarea
+          <label className="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2 block">Deskripsi / Catatan (Opsional)</label>
+          <input
+            type="text"
             value={description}
             onChange={e => setDescription(e.target.value)}
-            placeholder="Misal: Tarik tunai dari ATM, Topup GoPay..."
-            rows={2}
-            className="w-full px-4 py-3 rounded-xl border border-slate-800 text-sm resize-none outline-none"
+            placeholder="Contoh: Tarik tunai dari BCA / Top up GoPay"
+            className="w-full px-4 py-3 rounded-xl border border-slate-800 bg-slate-900 text-slate-100 text-sm outline-none"
           />
         </div>
 
         <button
           type="submit"
-          className="w-full bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-500 hover:to-blue-500 text-white py-3.5 rounded-xl font-bold text-sm shadow-lg shadow-indigo-600/30 transition-all cursor-pointer"
+          className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white py-3.5 rounded-xl font-bold text-sm shadow-lg shadow-blue-600/30 hover:shadow-blue-500/50 transition-all cursor-pointer"
         >
-          Proses Transfer
+          Proses Transfer Saldo
         </button>
       </form>
 
-      {/* History Transfer */}
-      <div className="space-y-4">
-        <h2 className="text-xs font-bold uppercase tracking-wider text-slate-400">Riwayat Transfer Terakhir</h2>
+      {/* History List */}
+      <div>
+        <h2 className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-3">Riwayat Transfer Terakhir ({transfers.length})</h2>
 
         {loading ? (
           <div className="text-center py-8 text-slate-500">Memuat riwayat transfer...</div>
         ) : transfers.length === 0 ? (
           <div className="text-center py-8 text-slate-500 glass-card rounded-2xl border border-slate-800">
-            Belum ada transaksi transfer recorded.
+            Belum ada riwayat transfer.
           </div>
         ) : (
-          <div className="space-y-3">
-            {transfers.map((tr) => (
-              <div key={tr.id} className="glass-card glass-card-hover rounded-xl border border-slate-800 p-4">
-                <div className="flex justify-between items-center">
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 mb-1 text-sm font-semibold text-slate-200 flex-wrap">
-                      <span className="flex items-center gap-1 bg-slate-800 px-2.5 py-1 rounded-md border border-slate-700/60">
-                        <span>{tr.from_source?.icon || '💰'}</span>
-                        <span>{tr.from_source?.name || 'Unknown'}</span>
-                      </span>
-                      <ArrowRight size={14} className="text-indigo-400" />
-                      <span className="flex items-center gap-1 bg-slate-800 px-2.5 py-1 rounded-md border border-slate-700/60">
-                        <span>{tr.to_source?.icon || '💰'}</span>
-                        <span>{tr.to_source?.name || 'Unknown'}</span>
-                      </span>
-                    </div>
-
-                    <div className="text-base font-bold text-indigo-400 mt-1">
-                      {fmt(tr.amount)}
-                    </div>
-
-                    <div className="text-xs text-slate-400 mt-1 flex items-center gap-3">
-                      <span className="flex items-center gap-1">
-                        <Calendar size={12}/>
-                        {(() => {
-                          const [d, t] = tr.date.slice(0, 16).split('T');
-                          const [year, month, day] = d.split('-');
-                          return `${day}-${month}-${year} ${t}`;
-                        })()}
-                      </span>
-                      {tr.description && (
-                        <span className="text-slate-500">| {tr.description}</span>
-                      )}
-                    </div>
+          <div className="space-y-2.5">
+            {transfers.map(t => (
+              <div key={t.id} className="glass-card rounded-xl border border-slate-800 p-4 flex items-center justify-between gap-3">
+                <div className="flex items-center gap-3 min-w-0">
+                  <div className="w-10 h-10 rounded-xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-blue-400 shrink-0">
+                    <ArrowLeftRight size={18} />
                   </div>
 
+                  <div className="min-w-0">
+                    <div className="flex items-center gap-1.5 text-sm font-bold text-slate-200">
+                      <span>{t.from_source?.icon || '💰'} {t.from_source?.name || 'Asal'}</span>
+                      <ArrowRight size={14} className="text-slate-400 shrink-0" />
+                      <span>{t.to_source?.icon || '💰'} {t.to_source?.name || 'Tujuan'}</span>
+                    </div>
+
+                    <div className="flex items-center gap-3 text-xs text-slate-400 mt-1">
+                      <span className="flex items-center gap-1">
+                        <Calendar size={12} className="text-slate-500" />
+                        {new Date(t.date).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                      </span>
+                      {t.description && <span className="truncate max-w-[200px] text-slate-400">— {t.description}</span>}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-3 shrink-0">
+                  <span className="text-sm font-extrabold text-blue-400">
+                    {fmt(t.amount)}
+                  </span>
                   <button
-                    onClick={() => setDeleteId(tr.id)}
-                    className="p-2 text-rose-400 hover:bg-rose-500/10 rounded-lg transition-colors cursor-pointer ml-3"
+                    onClick={() => setDeleteId(t.id)}
+                    className="p-1.5 text-rose-400 hover:bg-rose-500/10 rounded-lg transition-colors cursor-pointer"
                   >
-                    <Trash2 size={16} />
+                    <Trash2 size={15} />
                   </button>
                 </div>
               </div>
@@ -295,7 +349,7 @@ export default function TransferPage() {
         )}
       </div>
 
-      {/* Delete confirm */}
+      {/* Delete Modal */}
       {deleteId && (
         <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
           <div className="glass-card rounded-2xl max-w-sm w-full border border-slate-800">
@@ -304,7 +358,7 @@ export default function TransferPage() {
                 <Trash2 size={24} className="text-rose-400" />
               </div>
               <h3 className="text-lg font-bold text-white mb-2">Hapus Riwayat Transfer?</h3>
-              <p className="text-xs text-slate-400">Apakah anda yakin ingin menghapus catatan transfer ini?</p>
+              <p className="text-xs text-slate-400">Apakah anda yakin ingin menghapus data transfer ini?</p>
             </div>
             <div className="flex gap-3 p-5 border-t border-slate-800">
               <button

@@ -1,12 +1,12 @@
 'use client'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { useTheme } from '@/components/ThemeProvider'
 import {
   LayoutDashboard, PlusCircle, Tag, Wallet, Landmark, ArrowLeftRight,
-  ChevronLeft, ChevronRight, LogOut, Menu, X, Sparkles, Sun, Moon
+  ChevronLeft, ChevronRight, LogOut, Menu, X, Sparkles, Sun, Moon, User
 } from 'lucide-react'
 
 const navItems = [
@@ -21,10 +21,38 @@ const navItems = [
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const [collapsed, setCollapsed] = useState(false)
   const [mobileOpen, setMobileOpen] = useState(false)
+  const [userName, setUserName] = useState<string>('')
   const { theme, toggleTheme } = useTheme()
   const pathname = usePathname()
   const router = useRouter()
   const supabase = createClient()
+
+  useEffect(() => {
+    async function loadUser() {
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) return
+
+      let name = user.user_metadata?.display_name || user.user_metadata?.full_name
+
+      if (!name) {
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('display_name')
+          .eq('id', user.id)
+          .maybeSingle()
+        if (profile?.display_name) {
+          name = profile.display_name
+        }
+      }
+
+      if (!name && user.email) {
+        name = user.email.split('@')[0]
+      }
+
+      setUserName(name || 'User')
+    }
+    loadUser()
+  }, [])
 
   async function handleLogout() {
     await supabase.auth.signOut()
@@ -33,6 +61,38 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
   const NavLinks = () => (
     <>
+      {/* User Greeting Card */}
+      <div 
+        style={{
+          backgroundColor: theme === 'dark' ? 'rgba(15, 23, 42, 0.7)' : '#ffffff',
+          borderColor: theme === 'dark' ? 'rgba(30, 41, 59, 0.8)' : '#e2e8f0'
+        }}
+        className={`mx-3 my-2.5 p-2.5 rounded-xl border flex items-center gap-3 shadow-sm transition-all ${collapsed && !mobileOpen ? 'justify-center p-2' : ''}`}
+      >
+        <div className="w-8 h-8 rounded-lg bg-gradient-to-tr from-blue-600 to-indigo-600 flex items-center justify-center font-bold text-xs shrink-0 shadow-md shadow-blue-500/20 uppercase">
+          <span style={{ color: '#ffffff' }}>
+            {userName ? userName.charAt(0) : <User size={16} style={{ color: '#ffffff' }} />}
+          </span>
+        </div>
+        {(!collapsed || mobileOpen) && (
+          <div className="flex flex-col min-w-0 overflow-hidden">
+            <span 
+              style={{ color: theme === 'dark' ? '#60a5fa' : '#2563eb' }}
+              className="text-[10px] uppercase font-bold tracking-wider leading-none mb-0.5"
+            >
+              Hai 👋
+            </span>
+            <span 
+              style={{ color: theme === 'dark' ? '#ffffff' : '#0f172a' }}
+              className="text-xs font-extrabold truncate leading-tight" 
+              title={userName}
+            >
+              {userName || 'Memuat...'}
+            </span>
+          </div>
+        )}
+      </div>
+
       <nav className="flex-1 p-3 space-y-1.5 overflow-y-auto">
         {navItems.map(({ href, icon: Icon, label }) => {
           const active = pathname === href
@@ -85,9 +145,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       )}
 
       {/* Mobile sidebar (drawer) */}
-      <aside className={`fixed top-0 left-0 h-full w-64 bg-[#0f172a]/95 dark:bg-[#0f172a]/95 backdrop-blur-xl border-r border-slate-800/80 flex flex-col z-50 transition-transform duration-300 lg:hidden
+      <aside className={`fixed top-0 left-0 h-full w-64 bg-white/95 dark:bg-[#0f172a]/95 backdrop-blur-xl border-r border-slate-200 dark:border-slate-800/80 flex flex-col z-50 transition-transform duration-300 lg:hidden
         ${mobileOpen ? 'translate-x-0' : '-translate-x-full'}`}>
-        <div className="flex items-center justify-between p-4 border-b border-slate-800/80">
+        <div className="flex items-center justify-between p-4 border-b border-slate-200 dark:border-slate-800/80">
           <div className="flex items-center gap-2.5">
             <div className="w-8 h-8 rounded-lg bg-gradient-to-tr from-blue-600 to-indigo-500 flex items-center justify-center shadow-md shadow-blue-500/30">
               <Sparkles size={18} className="text-white" />

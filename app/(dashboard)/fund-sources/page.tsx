@@ -2,31 +2,60 @@
 
 import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
-import { Plus, Pencil, Trash2, Landmark, Check, X, Sparkles } from 'lucide-react'
+import { Plus, Pencil, Trash2, Landmark, Sparkles, X, Wallet, TrendingUp, TrendingDown, ArrowLeftRight } from 'lucide-react'
 
 type FundSource = {
   id: string
   name: string
   icon: string
   type: string
+  initial_balance?: number
   created_at: string
+}
+
+type TransactionSummary = {
+  fund_source_id: string
+  type: string
+  amount: number
+}
+
+type TransferSummary = {
+  from_fund_source_id: string
+  to_fund_source_id: string
+  amount: number
 }
 
 const PRESET_ICONS = ['💵', '💳', '🏦', '📱', '💰', '🪙', '💎', '📲', '🛍️', '💼']
 
 const DEFAULT_SEEDS = [
-  { name: 'Dompet Tunai', icon: '💵', type: 'cash' },
-  { name: 'Bank BCA', icon: '🏦', type: 'bank' },
-  { name: 'Bank BNI', icon: '🏦', type: 'bank' },
-  { name: 'GoPay', icon: '📱', type: 'e-wallet' },
-  { name: 'OVO', icon: '📱', type: 'e-wallet' },
-  { name: 'DANA', icon: '📱', type: 'e-wallet' },
-  { name: 'ShopeePay', icon: '📱', type: 'e-wallet' },
+  { name: 'Dompet Tunai', icon: '💵', type: 'cash', initial_balance: 0 },
+  { name: 'Bank BCA', icon: '🏦', type: 'bank', initial_balance: 0 },
+  { name: 'Bank BNI', icon: '🏦', type: 'bank', initial_balance: 0 },
+  { name: 'GoPay', icon: '📱', type: 'e-wallet', initial_balance: 0 },
+  { name: 'OVO', icon: '📱', type: 'e-wallet', initial_balance: 0 },
+  { name: 'DANA', icon: '📱', type: 'e-wallet', initial_balance: 0 },
+  { name: 'ShopeePay', icon: '📱', type: 'e-wallet', initial_balance: 0 },
 ]
+
+function fmt(n: number) {
+  return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(n)
+}
+
+function parseFormattedNumber(val: string): number {
+  return Number(val.replace(/\D/g, '')) || 0
+}
+
+function formatNumberWithDots(val: number | string): string {
+  const num = typeof val === 'number' ? val : parseFormattedNumber(val)
+  if (!num) return ''
+  return new Intl.NumberFormat('id-ID').format(num)
+}
 
 export default function FundSourcesPage() {
   const supabase = createClient()
   const [sources, setSources] = useState<FundSource[]>([])
+  const [transactions, setTransactions] = useState<TransactionSummary[]>([])
+  const [transfers, setTransfers] = useState<TransferSummary[]>([])
   const [loading, setLoading] = useState(true)
   const [success, setSuccess] = useState('')
 
@@ -34,12 +63,14 @@ export default function FundSourcesPage() {
   const [name, setName] = useState('')
   const [icon, setIcon] = useState('💰')
   const [type, setType] = useState('cash')
+  const [displayInitialBalance, setDisplayInitialBalance] = useState('')
 
   // Edit modal
   const [editingSource, setEditingSource] = useState<FundSource | null>(null)
   const [editName, setEditName] = useState('')
   const [editIcon, setEditIcon] = useState('💰')
   const [editType, setEditType] = useState('cash')
+  const [editDisplayInitialBalance, setEditDisplayInitialBalance] = useState('')
 
   // Delete confirm
   const [deleteId, setDeleteId] = useState<string | null>(null)
@@ -49,11 +80,11 @@ export default function FundSourcesPage() {
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) return
 
-    const { data, error } = await supabase
-      .from('fund_sources')
-      .select('*')
-      .eq('user_id', user.id)
-      .order('name')
+    const [{ data: fsData, error }, { data: txData }, { data: trData }] = await Promise.all([
+      supabase.from('fund_sources').select('*').eq('user_id', user.id).order('name'),
+      supabase.from('transactions').select('fund_source_id, type, amount').eq('user_id', user.id),
+      supabase.from('transfers').select('from_fund_source_id, to_fund_source_id, amount').eq('user_id', user.id)
+    ])
 
     if (error) {
       console.error('Error loading fund sources:', error)
@@ -62,13 +93,15 @@ export default function FundSourcesPage() {
     }
 
     // Auto-seed default fund sources if none exists
-    if (!data || data.length === 0) {
+    if (!fsData || fsData.length === 0) {
       await seedDefaults(user.id)
       setLoading(false)
       return
     }
 
-    setSources(data)
+    setSources(fsData || [])
+    setTransactions(txData || [])
+    setTransfers(trData || [])
     setLoading(false)
   }
 
@@ -77,15 +110,15 @@ export default function FundSourcesPage() {
       user_id: userId,
       name: s.name,
       icon: s.icon,
-      type: s.type
+      type: s.type,
+      initial_balance: s.initial_balance
     }))
 
     const { error } = await supabase.from('fund_sources').insert(toInsert)
     if (!error) {
       setSuccess('Sumber dana awal berhasil di-seed otomatis!')
       setTimeout(() => setSuccess(''), 3000)
-      const { data: freshData } = await supabase.from('fund_sources').select('*').eq('user_id', userId).order('name')
-      setSources(freshData || [])
+      loadSources()
     }
   }
 
@@ -100,17 +133,21 @@ export default function FundSourcesPage() {
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) return
 
+    const initial_balance = parseFormattedNumber(displayInitialBalance)
+
     const { error } = await supabase.from('fund_sources').insert({
       user_id: user.id,
       name: name.trim(),
       icon,
-      type
+      type,
+      initial_balance
     })
 
     if (!error) {
       setName('')
       setIcon('💰')
       setType('cash')
+      setDisplayInitialBalance('')
       setSuccess('Sumber dana berhasil ditambahkan!')
       loadSources()
       setTimeout(() => setSuccess(''), 3000)
@@ -120,12 +157,15 @@ export default function FundSourcesPage() {
   async function handleEditSubmit() {
     if (!editingSource || !editName.trim()) return
 
+    const initial_balance = parseFormattedNumber(editDisplayInitialBalance)
+
     const { error } = await supabase
       .from('fund_sources')
       .update({
         name: editName.trim(),
         icon: editIcon,
-        type: editType
+        type: editType,
+        initial_balance
       })
       .eq('id', editingSource.id)
 
@@ -156,17 +196,52 @@ export default function FundSourcesPage() {
     setEditName(fs.name)
     setEditIcon(fs.icon)
     setEditType(fs.type)
+    setEditDisplayInitialBalance(fs.initial_balance ? formatNumberWithDots(fs.initial_balance) : '')
   }
+
+  // Calculate metrics per source
+  const sourceMetrics = sources.map(fs => {
+    const initial = fs.initial_balance || 0
+    const income = transactions
+      .filter(t => t.fund_source_id === fs.id && t.type === 'income')
+      .reduce((sum, t) => sum + t.amount, 0)
+    const outcome = transactions
+      .filter(t => t.fund_source_id === fs.id && t.type === 'outcome')
+      .reduce((sum, t) => sum + t.amount, 0)
+
+    const transferIn = transfers
+      .filter(tr => tr.to_fund_source_id === fs.id)
+      .reduce((sum, tr) => sum + tr.amount, 0)
+    const transferOut = transfers
+      .filter(tr => tr.from_fund_source_id === fs.id)
+      .reduce((sum, tr) => sum + tr.amount, 0)
+
+    const transferNet = transferIn - transferOut
+    const currentBalance = initial + income - outcome + transferNet
+
+    return {
+      ...fs,
+      initial,
+      income,
+      outcome,
+      transferNet,
+      currentBalance
+    }
+  })
+
+  const totalCurrentBalance = sourceMetrics.reduce((sum, s) => sum + s.currentBalance, 0)
+  const totalInitialBalance = sourceMetrics.reduce((sum, s) => sum + s.initial, 0)
 
   return (
     <div className="max-w-4xl w-full mx-auto space-y-6">
+      {/* Header */}
       <div className="glass-card p-6 rounded-2xl border border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-xl font-bold text-white mb-1 flex items-center gap-2">
             <Landmark size={20} className="text-blue-400" />
             Kelola Sumber Dana
           </h1>
-          <p className="text-xs text-slate-400">Atur akun bank, dompet fisik, dan e-wallet tempat uang Anda disimpan</p>
+          <p className="text-xs text-slate-400">Atur akun bank, dompet fisik, e-wallet, serta Saldo Awal dan Realisasinya</p>
         </div>
         <button 
           onClick={async () => {
@@ -181,25 +256,52 @@ export default function FundSourcesPage() {
       </div>
 
       {success && (
-        <div className="bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 px-4 py-3 rounded-xl text-sm">
+        <div className="bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 px-4 py-3 rounded-xl text-sm font-medium">
           {success}
         </div>
       )}
+
+      {/* Summary Card */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div className="glass-card p-5 rounded-2xl border border-slate-800 flex items-center gap-4">
+          <div className="w-12 h-12 rounded-xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-blue-400 shrink-0">
+            <Wallet size={24} />
+          </div>
+          <div>
+            <span className="text-xs text-slate-400 font-semibold uppercase tracking-wider block">Total Saldo saat ini</span>
+            <span className={`text-xl font-extrabold ${totalCurrentBalance >= 0 ? 'text-emerald-400' : 'text-rose-400'}`}>
+              {fmt(totalCurrentBalance)}
+            </span>
+          </div>
+        </div>
+
+        <div className="glass-card p-5 rounded-2xl border border-slate-800 flex items-center gap-4">
+          <div className="w-12 h-12 rounded-xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-indigo-400 shrink-0">
+            <Landmark size={24} />
+          </div>
+          <div>
+            <span className="text-xs text-slate-400 font-semibold uppercase tracking-wider block">Total Saldo Awal</span>
+            <span className="text-xl font-extrabold text-slate-200">
+              {fmt(totalInitialBalance)}
+            </span>
+          </div>
+        </div>
+      </div>
 
       {/* Add form */}
       <form onSubmit={handleAdd} className="glass-card rounded-2xl border border-slate-800 p-5 space-y-4">
         <h2 className="text-xs font-bold uppercase tracking-wider text-slate-300">Tambah Sumber Dana</h2>
         
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
           <div>
-            <label className="text-[11px] font-semibold text-slate-400 block mb-1">Nama Account/Bank</label>
+            <label className="text-[11px] font-semibold text-slate-400 block mb-1">Nama Account / Bank</label>
             <input 
               type="text"
               placeholder="Contoh: Bank Mandiri"
               value={name}
               onChange={e => setName(e.target.value)}
               required
-              className="w-full px-3.5 py-2.5 rounded-xl border border-slate-800 text-sm outline-none"
+              className="w-full px-3.5 py-2.5 rounded-xl border border-slate-800 bg-slate-900 text-slate-100 text-sm outline-none"
             />
           </div>
 
@@ -208,13 +310,25 @@ export default function FundSourcesPage() {
             <select
               value={type}
               onChange={e => setType(e.target.value)}
-              className="w-full px-3.5 py-2.5 rounded-xl border border-slate-800 text-sm font-medium text-slate-200 outline-none cursor-pointer"
+              className="w-full px-3.5 py-2.5 rounded-xl border border-slate-800 bg-slate-900 text-slate-100 text-sm font-medium outline-none cursor-pointer"
             >
-              <option value="cash">Tunai / Dompet</option>
-              <option value="bank">Bank</option>
-              <option value="e-wallet">E-Wallet</option>
-              <option value="other">Lainnya</option>
+              <option value="cash" className="bg-slate-900 text-slate-100">Tunai / Dompet</option>
+              <option value="bank" className="bg-slate-900 text-slate-100">Bank</option>
+              <option value="e-wallet" className="bg-slate-900 text-slate-100">E-Wallet</option>
+              <option value="other" className="bg-slate-900 text-slate-100">Lainnya</option>
             </select>
+          </div>
+
+          <div>
+            <label className="text-[11px] font-semibold text-slate-400 block mb-1">Saldo Awal (Rp)</label>
+            <input 
+              type="text"
+              inputMode="numeric"
+              placeholder="0"
+              value={displayInitialBalance}
+              onChange={e => setDisplayInitialBalance(formatNumberWithDots(e.target.value))}
+              className="w-full px-3.5 py-2.5 rounded-xl border border-slate-800 bg-slate-900 text-slate-100 text-sm outline-none font-semibold"
+            />
           </div>
 
           <div>
@@ -225,7 +339,7 @@ export default function FundSourcesPage() {
                 value={icon}
                 onChange={e => setIcon(e.target.value)}
                 maxLength={4}
-                className="w-16 px-3 py-2.5 rounded-xl border border-slate-800 text-center text-base outline-none"
+                className="w-14 px-2 py-2.5 rounded-xl border border-slate-800 bg-slate-900 text-slate-100 text-center text-base outline-none shrink-0"
               />
               <button
                 type="submit"
@@ -267,33 +381,68 @@ export default function FundSourcesPage() {
             Belum ada sumber dana. Silakan tambah di atas atau gunakan button Seed Default.
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {sources.map(fs => (
-              <div key={fs.id} className="glass-card glass-card-hover rounded-2xl border border-slate-800 p-4.5 flex items-center justify-between">
-                <div className="flex items-center gap-3 min-w-0">
-                  <div className="w-11 h-11 rounded-xl bg-slate-900 border border-slate-800 flex items-center justify-center text-xl shrink-0">
-                    {fs.icon}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {sourceMetrics.map(fs => (
+              <div key={fs.id} className="glass-card rounded-2xl border border-slate-800 p-5 space-y-3">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3 min-w-0">
+                    <div className="w-11 h-11 rounded-xl bg-slate-900 border border-slate-800 flex items-center justify-center text-xl shrink-0">
+                      {fs.icon}
+                    </div>
+                    <div className="min-w-0">
+                      <h3 className="font-bold text-base text-slate-100 truncate">{fs.name}</h3>
+                      <span className="text-[10px] font-semibold uppercase px-2 py-0.5 rounded bg-slate-800 text-slate-400 border border-slate-700/50 mt-0.5 inline-block">
+                        {fs.type}
+                      </span>
+                    </div>
                   </div>
-                  <div className="min-w-0">
-                    <h3 className="font-bold text-sm text-slate-200 truncate">{fs.name}</h3>
-                    <span className="text-[11px] font-semibold uppercase px-2 py-0.5 rounded bg-slate-800 text-slate-400 border border-slate-700/50 mt-1 inline-block">
-                      {fs.type}
-                    </span>
+
+                  <div className="flex items-center gap-1 shrink-0 ml-2">
+                    <button
+                      onClick={() => openEdit(fs)}
+                      className="p-2 text-blue-400 hover:bg-blue-500/10 rounded-lg transition-colors cursor-pointer"
+                    >
+                      <Pencil size={15} />
+                    </button>
+                    <button
+                      onClick={() => setDeleteId(fs.id)}
+                      className="p-2 text-rose-400 hover:bg-rose-500/10 rounded-lg transition-colors cursor-pointer"
+                    >
+                      <Trash2 size={15} />
+                    </button>
                   </div>
                 </div>
-                <div className="flex items-center gap-1 shrink-0 ml-2">
-                  <button
-                    onClick={() => openEdit(fs)}
-                    className="p-2 text-blue-400 hover:bg-blue-500/10 rounded-lg transition-colors cursor-pointer"
-                  >
-                    <Pencil size={15} />
-                  </button>
-                  <button
-                    onClick={() => setDeleteId(fs.id)}
-                    className="p-2 text-rose-400 hover:bg-rose-500/10 rounded-lg transition-colors cursor-pointer"
-                  >
-                    <Trash2 size={15} />
-                  </button>
+
+                {/* Balance Info */}
+                <div className="pt-2 border-t border-slate-800/80 space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs text-slate-400 font-medium">Saldo Saat Ini</span>
+                    <span className={`text-base font-extrabold ${fs.currentBalance >= 0 ? 'text-emerald-400' : 'text-rose-400'}`}>
+                      {fmt(fs.currentBalance)}
+                    </span>
+                  </div>
+
+                  {/* Breakdown Badges */}
+                  <div className="grid grid-cols-2 gap-2 text-[11px] pt-1">
+                    <div className="bg-slate-900/80 px-2.5 py-1.5 rounded-lg border border-slate-800 flex justify-between">
+                      <span className="text-slate-400">Saldo Awal:</span>
+                      <span className="font-semibold text-slate-200">{fmt(fs.initial)}</span>
+                    </div>
+                    <div className="bg-slate-900/80 px-2.5 py-1.5 rounded-lg border border-slate-800 flex justify-between">
+                      <span className="text-emerald-400 flex items-center gap-0.5"><TrendingUp size={11}/> In:</span>
+                      <span className="font-semibold text-emerald-400">+{fmt(fs.income)}</span>
+                    </div>
+                    <div className="bg-slate-900/80 px-2.5 py-1.5 rounded-lg border border-slate-800 flex justify-between">
+                      <span className="text-rose-400 flex items-center gap-0.5"><TrendingDown size={11}/> Out:</span>
+                      <span className="font-semibold text-rose-400">-{fmt(fs.outcome)}</span>
+                    </div>
+                    <div className="bg-slate-900/80 px-2.5 py-1.5 rounded-lg border border-slate-800 flex justify-between">
+                      <span className="text-blue-400 flex items-center gap-0.5"><ArrowLeftRight size={11}/> Transfer:</span>
+                      <span className={`font-semibold ${fs.transferNet >= 0 ? 'text-blue-400' : 'text-amber-400'}`}>
+                        {fs.transferNet >= 0 ? `+${fmt(fs.transferNet)}` : fmt(fs.transferNet)}
+                      </span>
+                    </div>
+                  </div>
                 </div>
               </div>
             ))}
@@ -318,7 +467,7 @@ export default function FundSourcesPage() {
                   type="text"
                   value={editName}
                   onChange={e => setEditName(e.target.value)}
-                  className="w-full px-4 py-3 rounded-xl border border-slate-800 text-sm font-semibold outline-none"
+                  className="w-full px-4 py-3 rounded-xl border border-slate-800 bg-slate-900 text-slate-100 text-sm font-semibold outline-none"
                 />
               </div>
 
@@ -327,13 +476,25 @@ export default function FundSourcesPage() {
                 <select
                   value={editType}
                   onChange={e => setEditType(e.target.value)}
-                  className="w-full px-4 py-3 rounded-xl border border-slate-800 text-sm outline-none cursor-pointer"
+                  className="w-full px-4 py-3 rounded-xl border border-slate-800 bg-slate-900 text-slate-100 text-sm outline-none cursor-pointer"
                 >
-                  <option value="cash">Tunai / Dompet</option>
-                  <option value="bank">Bank</option>
-                  <option value="e-wallet">E-Wallet</option>
-                  <option value="other">Lainnya</option>
+                  <option value="cash" className="bg-slate-900 text-slate-100">Tunai / Dompet</option>
+                  <option value="bank" className="bg-slate-900 text-slate-100">Bank</option>
+                  <option value="e-wallet" className="bg-slate-900 text-slate-100">E-Wallet</option>
+                  <option value="other" className="bg-slate-900 text-slate-100">Lainnya</option>
                 </select>
+              </div>
+
+              <div>
+                <label className="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2 block">Saldo Awal (Rp)</label>
+                <input
+                  type="text"
+                  inputMode="numeric"
+                  placeholder="0"
+                  value={editDisplayInitialBalance}
+                  onChange={e => setEditDisplayInitialBalance(formatNumberWithDots(e.target.value))}
+                  className="w-full px-4 py-3 rounded-xl border border-slate-800 bg-slate-900 text-slate-100 text-sm font-semibold outline-none"
+                />
               </div>
 
               <div>
@@ -344,7 +505,7 @@ export default function FundSourcesPage() {
                     value={editIcon}
                     onChange={e => setEditIcon(e.target.value)}
                     maxLength={4}
-                    className="w-20 px-3 py-2.5 rounded-xl border border-slate-800 text-center text-lg outline-none"
+                    className="w-20 px-3 py-2.5 rounded-xl border border-slate-800 bg-slate-900 text-slate-100 text-center text-lg outline-none"
                   />
                   <div className="flex flex-wrap gap-1.5">
                     {PRESET_ICONS.map(ic => (
@@ -352,7 +513,7 @@ export default function FundSourcesPage() {
                         key={ic}
                         type="button"
                         onClick={() => setEditIcon(ic)}
-                        className="w-7 h-7 rounded-lg text-sm flex items-center justify-center bg-slate-900 border border-slate-800 hover:bg-slate-800"
+                        className="w-7 h-7 rounded-lg text-sm flex items-center justify-center bg-slate-900 border border-slate-800 hover:bg-slate-800 cursor-pointer"
                       >
                         {ic}
                       </button>
