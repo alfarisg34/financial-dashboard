@@ -44,7 +44,7 @@ export default function DashboardPage() {
   const supabase = createClient()
   const now = new Date()
   const [startDate, setStartDate] = useState(getFirstDay(now))
-  const [endDate, setEndDate] = useState(getLastDay(now))
+  const [endDate, setEndDate] = useState(toLocalDate(now))
   const [transactions, setTransactions] = useState<Transaction[]>([])
   const [projectedCost, setProjectedCost] = useState(0)
   const [projectedIncome, setProjectedIncome] = useState(0)
@@ -75,7 +75,7 @@ export default function DashboardPage() {
   useEffect(() => {
     supabase.from('transactions')
       .select('*, categories(name), subcategories(name), fund_sources(name, icon, type)')
-      .gte('date', startDate).lte('date', endDate + 'T23:59:59')
+      .gte('date', startDate + 'T00:00:00').lte('date', endDate + 'T23:59:59')
       .order('date', { ascending: false })
       .then(({ data }) => setTransactions(data || []))
   }, [startDate, endDate])
