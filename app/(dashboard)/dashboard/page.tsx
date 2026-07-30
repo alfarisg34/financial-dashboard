@@ -53,6 +53,24 @@ export default function DashboardPage() {
   const [sortKey, setSortKey] = useState<'date' | 'type' | 'subcategory' | 'fund_source' | 'description' | 'amount'>('date')
   const [sortDir, setSortDir] = useState<'asc' | 'desc'>('desc')
 
+  type RekapSortKey = 'categoryName' | 'subcategoryName' | 'budget' | 'actual' | 'sisa' | 'statusText'
+  const [rekapSortKey, setRekapSortKey] = useState<RekapSortKey>('categoryName')
+  const [rekapSortDir, setRekapSortDir] = useState<'asc' | 'desc'>('asc')
+
+  const handleRekapSort = (key: RekapSortKey) => {
+    if (rekapSortKey === key) {
+      setRekapSortDir(prev => (prev === 'asc' ? 'desc' : 'asc'))
+    } else {
+      setRekapSortKey(key)
+      setRekapSortDir('asc')
+    }
+  }
+
+  function RekapSortIcon({ col }: { col: RekapSortKey }) {
+    if (rekapSortKey !== col) return <ArrowUpDown size={12} className="inline ml-1 opacity-40" />
+    return rekapSortDir === 'asc' ? <ArrowUp size={12} className="inline ml-1 text-blue-400" /> : <ArrowDown size={12} className="inline ml-1 text-blue-400" />
+  }
+
   // Fetch transactions with categories, subcategories, and fund_sources
   useEffect(() => {
     supabase.from('transactions')
@@ -126,12 +144,14 @@ export default function DashboardPage() {
     // Subcategories with budget or transactions
     const outcomeSubs = subcategories.filter(s => s.categories?.type === 'outcome')
 
-    return outcomeSubs.map(sub => {
+    const list = outcomeSubs.map(sub => {
       const bObj = budgets.find(b => b.subcategory_id === sub.id && b.type === 'outcome')
       const budgetAmt = bObj?.amount || 0
       const actualAmt = actualSpentMap[sub.id] || 0
       const sisa = budgetAmt - actualAmt
       const percentage = budgetAmt > 0 ? (actualAmt / budgetAmt) * 100 : actualAmt > 0 ? 100 : 0
+      const isOver = sisa < 0
+      const statusText = isOver ? 'Over Budget' : budgetAmt > 0 ? 'On Track' : 'No Budget'
 
       return {
         id: sub.id,
@@ -140,11 +160,25 @@ export default function DashboardPage() {
         budget: budgetAmt,
         actual: actualAmt,
         sisa,
-        percentage
+        percentage,
+        statusText
       }
     }).filter(item => item.budget > 0 || item.actual > 0)
-      .sort((a, b) => a.categoryName.localeCompare(b.categoryName))
-  }, [subcategories, budgets, outcome])
+
+    return list.sort((a, b) => {
+      const valA = a[rekapSortKey]
+      const valB = b[rekapSortKey]
+
+      if (typeof valA === 'string' && typeof valB === 'string') {
+        const comp = valA.localeCompare(valB, 'id', { sensitivity: 'base' })
+        return rekapSortDir === 'asc' ? comp : -comp
+      } else {
+        const numA = Number(valA) || 0
+        const numB = Number(valB) || 0
+        return rekapSortDir === 'asc' ? numA - numB : numB - numA
+      }
+    })
+  }, [subcategories, budgets, outcome, rekapSortKey, rekapSortDir])
 
   function SortIcon({ col }: { col: typeof sortKey }) {
     if (sortKey !== col) return <ArrowUpDown size={13} className="text-slate-600 ml-1 inline"/>
@@ -374,12 +408,24 @@ export default function DashboardPage() {
             <table className="w-full text-xs text-left text-slate-300 min-w-[650px]">
               <thead className="bg-slate-900/80 uppercase font-semibold text-slate-400 border-b border-slate-800">
                 <tr>
-                  <th className="px-4 py-3">Kategori</th>
-                  <th className="px-4 py-3">Subkategori</th>
-                  <th className="px-4 py-3 text-right">Budget</th>
-                  <th className="px-4 py-3 text-right">Actual Realisasi</th>
-                  <th className="px-4 py-3 text-right">Sisa Budget</th>
-                  <th className="px-4 py-3 text-center">Status</th>
+                  <th className="px-4 py-3 cursor-pointer hover:text-blue-400 select-none transition-colors" onClick={() => handleRekapSort('categoryName')}>
+                    Kategori <RekapSortIcon col="categoryName"/>
+                  </th>
+                  <th className="px-4 py-3 cursor-pointer hover:text-blue-400 select-none transition-colors" onClick={() => handleRekapSort('subcategoryName')}>
+                    Subkategori <RekapSortIcon col="subcategoryName"/>
+                  </th>
+                  <th className="px-4 py-3 text-right cursor-pointer hover:text-blue-400 select-none transition-colors" onClick={() => handleRekapSort('budget')}>
+                    Budget <RekapSortIcon col="budget"/>
+                  </th>
+                  <th className="px-4 py-3 text-right cursor-pointer hover:text-blue-400 select-none transition-colors" onClick={() => handleRekapSort('actual')}>
+                    Actual Realisasi <RekapSortIcon col="actual"/>
+                  </th>
+                  <th className="px-4 py-3 text-right cursor-pointer hover:text-blue-400 select-none transition-colors" onClick={() => handleRekapSort('sisa')}>
+                    Sisa Budget <RekapSortIcon col="sisa"/>
+                  </th>
+                  <th className="px-4 py-3 text-center cursor-pointer hover:text-blue-400 select-none transition-colors" onClick={() => handleRekapSort('statusText')}>
+                    Status <RekapSortIcon col="statusText"/>
+                  </th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-800/60">
