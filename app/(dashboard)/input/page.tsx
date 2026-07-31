@@ -37,6 +37,21 @@ function parseNumber(formattedStr: string): number {
   return parseInt(formattedStr.replace(/[^0-9]/g, ''), 10) || 0
 }
 
+function getNowLocalISO() {
+  const d = new Date()
+  const pad = (n: number) => String(n).padStart(2, '0')
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`
+}
+
+function formatDateForDb(dateStr: string) {
+  if (!dateStr) return dateStr
+  if (dateStr.includes('+') || dateStr.endsWith('Z')) return dateStr
+  if (dateStr.length === 16) return `${dateStr}:00+07:00`
+  if (dateStr.length === 19) return `${dateStr}+07:00`
+  if (dateStr.length === 10) return `${dateStr}T00:00:00+07:00`
+  return dateStr
+}
+
 export default function InputPage() {
   const supabase = createClient()
   const [type, setType] = useState<'income' | 'outcome'>('outcome')
@@ -47,11 +62,7 @@ export default function InputPage() {
   const [fundSourceId, setFundSourceId] = useState('')
   const [displayAmount, setDisplayAmount] = useState('') // Formatted amount for UI (e.g., 120.000)
   const [description, setDescription] = useState('')
-  const [date, setDate] = useState(() => {
-    const now = new Date()
-    const wib = new Date(now.getTime() + 7 * 60 * 60 * 1000)
-    return wib.toISOString().slice(0, 16)
-  })
+  const [date, setDate] = useState(getNowLocalISO)
 
   const [search, setSearch] = useState('')
   const [dropdownOpen, setDropdownOpen] = useState(false)
@@ -130,9 +141,9 @@ export default function InputPage() {
       const selectedDate = new Date(date)
       const month = selectedDate.getMonth() + 1
       const year = selectedDate.getFullYear()
-      const startOfMonth = `${year}-${String(month).padStart(2, '0')}-01T00:00:00+07:00`
+      const startOfMonth = `${year}-${String(month).padStart(2, '0')}-01`
       const lastDay = new Date(year, month, 0).getDate()
-      const endOfMonth = `${year}-${String(month).padStart(2, '0')}-${lastDay}T23:59:59+07:00`
+      const endOfMonth = `${year}-${String(month).padStart(2, '0')}-${lastDay}T23:59:59.999Z`
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) return
 
@@ -324,7 +335,7 @@ export default function InputPage() {
       fund_source_id: fundSourceId || null,
       amount: numericAmount,
       description,
-      date
+      date: formatDateForDb(date)
     })
 
     if (!error) {
@@ -353,7 +364,7 @@ export default function InputPage() {
     const updateData: any = {
       amount: numericAmount,
       description: editDescription,
-      date: editDate,
+      date: formatDateForDb(editDate),
       fund_source_id: editFundSourceId || null
     }
 

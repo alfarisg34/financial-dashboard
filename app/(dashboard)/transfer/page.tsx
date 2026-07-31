@@ -49,6 +49,21 @@ function parseNumber(formattedStr: string): number {
   return parseInt(formattedStr.replace(/[^0-9]/g, ''), 10) || 0
 }
 
+function getNowLocalISO() {
+  const d = new Date()
+  const pad = (n: number) => String(n).padStart(2, '0')
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`
+}
+
+function formatDateForDb(dateStr: string) {
+  if (!dateStr) return dateStr
+  if (dateStr.includes('+') || dateStr.endsWith('Z')) return dateStr
+  if (dateStr.length === 16) return `${dateStr}:00+07:00`
+  if (dateStr.length === 19) return `${dateStr}+07:00`
+  if (dateStr.length === 10) return `${dateStr}T00:00:00+07:00`
+  return dateStr
+}
+
 export default function TransferPage() {
   const supabase = createClient()
   const [sources, setSources] = useState<FundSource[]>([])
@@ -63,11 +78,7 @@ export default function TransferPage() {
   const [toId, setToId] = useState('')
   const [displayAmount, setDisplayAmount] = useState('')
   const [description, setDescription] = useState('')
-  const [date, setDate] = useState(() => {
-    const now = new Date()
-    const wib = new Date(now.getTime() + 7 * 60 * 60 * 1000)
-    return wib.toISOString().slice(0, 16)
-  })
+  const [date, setDate] = useState(getNowLocalISO)
 
   const [deleteId, setDeleteId] = useState<string | null>(null)
 
@@ -146,7 +157,7 @@ export default function TransferPage() {
       to_fund_source_id: toId,
       amount: numericAmount,
       description,
-      date
+      date: formatDateForDb(date)
     })
 
     if (!error) {

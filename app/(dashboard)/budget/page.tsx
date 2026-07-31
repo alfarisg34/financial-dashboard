@@ -153,8 +153,8 @@ export default function BudgetPage() {
     const prevYear = month === 1 ? year - 1 : year
 
     const prevLastDay = new Date(prevYear, prevMonth, 0).getDate()
-    const prevStart = `${prevYear}-${String(prevMonth).padStart(2, '0')}-01T00:00:00+07:00`
-    const prevEnd = `${prevYear}-${String(prevMonth).padStart(2, '0')}-${prevLastDay}T23:59:59+07:00`
+    const prevStart = `${prevYear}-${String(prevMonth).padStart(2, '0')}-01`
+    const prevEnd = `${prevYear}-${String(prevMonth).padStart(2, '0')}-${prevLastDay}T23:59:59.999Z`
 
     const [{ data: subs }, { data: buds }, { data: prevBuds }, { data: prevTxs }] = await Promise.all([
       supabase.from('subcategories').select('*, categories(name, type)').eq('user_id', user.id),

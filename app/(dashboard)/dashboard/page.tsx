@@ -75,7 +75,7 @@ export default function DashboardPage() {
   useEffect(() => {
     supabase.from('transactions')
       .select('*, categories(name), subcategories(name), fund_sources(name, icon, type)')
-      .gte('date', startDate + 'T00:00:00').lte('date', endDate + 'T23:59:59')
+      .gte('date', startDate).lte('date', endDate + 'T23:59:59.999Z')
       .order('date', { ascending: false })
       .then(({ data }) => setTransactions(data || []))
   }, [startDate, endDate])
