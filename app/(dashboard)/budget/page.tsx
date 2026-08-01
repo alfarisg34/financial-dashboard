@@ -152,16 +152,15 @@ export default function BudgetPage() {
     const prevMonth = month === 1 ? 12 : month - 1
     const prevYear = month === 1 ? year - 1 : year
 
-    const prevLastDay = new Date(prevYear, prevMonth, 0).getDate()
-    const prevStart = `${prevYear}-${String(prevMonth).padStart(2, '0')}-01`
-    const prevEnd = `${prevYear}-${String(prevMonth).padStart(2, '0')}-${prevLastDay}T23:59:59.999Z`
+    const prevStartUtc = new Date(prevYear, prevMonth - 1, 1, 0, 0, 0, 0).toISOString()
+    const prevEndUtc = new Date(prevYear, prevMonth, 0, 23, 59, 59, 999).toISOString()
 
     const [{ data: subs }, { data: buds }, { data: prevBuds }, { data: prevTxs }] = await Promise.all([
       supabase.from('subcategories').select('*, categories(name, type)').eq('user_id', user.id),
       supabase.from('budgets').select('*').eq('user_id', user.id).eq('month', month).eq('year', year),
       supabase.from('budgets').select('*').eq('user_id', user.id).eq('month', prevMonth).eq('year', prevYear),
       supabase.from('transactions').select('subcategory_id, amount, type')
-        .eq('user_id', user.id).gte('date', prevStart).lte('date', prevEnd)
+        .eq('user_id', user.id).gte('date', prevStartUtc).lte('date', prevEndUtc)
     ])
 
     setSubcategories(subs || [])

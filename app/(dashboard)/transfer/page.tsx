@@ -55,13 +55,19 @@ function getNowLocalISO() {
   return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`
 }
 
+function formatDisplayDate(dateStr: string) {
+  if (!dateStr) return '-'
+  const d = new Date(dateStr)
+  if (isNaN(d.getTime())) return dateStr
+  const pad = (n: number) => String(n).padStart(2, '0')
+  return `${pad(d.getDate())}-${pad(d.getMonth() + 1)}-${d.getFullYear()} ${pad(d.getHours())}:${pad(d.getMinutes())}`
+}
+
 function formatDateForDb(dateStr: string) {
   if (!dateStr) return dateStr
-  if (dateStr.includes('+') || dateStr.endsWith('Z')) return dateStr
-  if (dateStr.length === 16) return `${dateStr}:00+07:00`
-  if (dateStr.length === 19) return `${dateStr}+07:00`
-  if (dateStr.length === 10) return `${dateStr}T00:00:00+07:00`
-  return dateStr
+  const d = new Date(dateStr)
+  if (isNaN(d.getTime())) return dateStr
+  return d.toISOString()
 }
 
 export default function TransferPage() {
@@ -336,7 +342,7 @@ export default function TransferPage() {
                     <div className="flex items-center gap-3 text-xs text-slate-400 mt-1">
                       <span className="flex items-center gap-1">
                         <Calendar size={12} className="text-slate-500" />
-                        {new Date(t.date).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                        {formatDisplayDate(t.date)}
                       </span>
                       {t.description && <span className="truncate max-w-[200px] text-slate-400">— {t.description}</span>}
                     </div>

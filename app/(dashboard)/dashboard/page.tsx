@@ -40,6 +40,14 @@ function fmt(n: number) {
   return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(n)
 }
 
+function formatDisplayDate(dateStr: string) {
+  if (!dateStr) return '-'
+  const d = new Date(dateStr)
+  if (isNaN(d.getTime())) return dateStr
+  const pad = (n: number) => String(n).padStart(2, '0')
+  return `${pad(d.getDate())}-${pad(d.getMonth() + 1)}-${d.getFullYear()} ${pad(d.getHours())}:${pad(d.getMinutes())}`
+}
+
 export default function DashboardPage() {
   const supabase = createClient()
   const now = new Date()
@@ -73,9 +81,15 @@ export default function DashboardPage() {
 
   // Fetch transactions with categories, subcategories, and fund_sources
   useEffect(() => {
+    if (!startDate || !endDate) return
+    const [sYear, sMonth, sDay] = startDate.split('-').map(Number)
+    const [eYear, eMonth, eDay] = endDate.split('-').map(Number)
+    const startUtc = new Date(sYear, sMonth - 1, sDay, 0, 0, 0, 0).toISOString()
+    const endUtc = new Date(eYear, eMonth - 1, eDay, 23, 59, 59, 999).toISOString()
+
     supabase.from('transactions')
       .select('*, categories(name), subcategories(name), fund_sources(name, icon, type)')
-      .gte('date', startDate).lte('date', endDate + 'T23:59:59.999Z')
+      .gte('date', startUtc).lte('date', endUtc)
       .order('date', { ascending: false })
       .then(({ data }) => setTransactions(data || []))
   }, [startDate, endDate])
@@ -495,12 +509,7 @@ export default function DashboardPage() {
                 sortedTransactions.map(t => (
                   <tr key={t.id} className="hover:bg-slate-800/50 transition-colors">
                     <td className="px-5 py-3.5 text-slate-400 whitespace-nowrap">
-                      {(() => {
-                        const [datePart, timePart] = t.date.split('T');
-                        const timeWithoutSeconds = (timePart || '00:00').slice(0, 5);
-                        const [year, month, day] = datePart.split('-');
-                        return `${day}-${month}-${year} ${timeWithoutSeconds}`;
-                      })()}
+                      {formatDisplayDate(t.date)}
                     </td>
                     <td className="px-5 py-3.5 whitespace-nowrap">
                       <span className={`px-2.5 py-1 rounded-md text-[11px] font-semibold ${t.type === 'income' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-rose-500/10 text-rose-400 border border-rose-500/20'}`}>

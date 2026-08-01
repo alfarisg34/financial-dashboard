@@ -43,14 +43,29 @@ function getNowLocalISO() {
   return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`
 }
 
+function toLocalDateTimeLocal(dateStr: string) {
+  if (!dateStr) return ''
+  const d = new Date(dateStr)
+  if (isNaN(d.getTime())) return dateStr
+  const pad = (n: number) => String(n).padStart(2, '0')
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`
+}
+
+function formatDisplayDate(dateStr: string) {
+  if (!dateStr) return '-'
+  const d = new Date(dateStr)
+  if (isNaN(d.getTime())) return dateStr
+  const pad = (n: number) => String(n).padStart(2, '0')
+  return `${pad(d.getDate())}-${pad(d.getMonth() + 1)}-${d.getFullYear()} ${pad(d.getHours())}:${pad(d.getMinutes())}`
+}
+
 function formatDateForDb(dateStr: string) {
   if (!dateStr) return dateStr
-  if (dateStr.includes('+') || dateStr.endsWith('Z')) return dateStr
-  if (dateStr.length === 16) return `${dateStr}:00+07:00`
-  if (dateStr.length === 19) return `${dateStr}+07:00`
-  if (dateStr.length === 10) return `${dateStr}T00:00:00+07:00`
-  return dateStr
+  const d = new Date(dateStr)
+  if (isNaN(d.getTime())) return dateStr
+  return d.toISOString()
 }
+
 
 export default function InputPage() {
   const supabase = createClient()
@@ -114,10 +129,7 @@ export default function InputPage() {
       setAllSubcategories(subs || [])
       setFundSources(sources || [])
 
-      // Auto-select first fund source if available
-      if (sources && sources.length > 0) {
-        setFundSourceId(sources[0].id)
-      }
+
     }
     loadAll()
   }, [])
@@ -141,9 +153,9 @@ export default function InputPage() {
       const selectedDate = new Date(date)
       const month = selectedDate.getMonth() + 1
       const year = selectedDate.getFullYear()
-      const startOfMonth = `${year}-${String(month).padStart(2, '0')}-01`
-      const lastDay = new Date(year, month, 0).getDate()
-      const endOfMonth = `${year}-${String(month).padStart(2, '0')}-${lastDay}T23:59:59.999Z`
+      const startOfMonth = new Date(year, month - 1, 1, 0, 0, 0, 0).toISOString()
+      const endOfMonth = new Date(year, month, 0, 23, 59, 59, 999).toISOString()
+
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) return
 
@@ -415,7 +427,7 @@ export default function InputPage() {
     setEditingTransaction(transaction)
     setEditDisplayAmount(formatThousands(transaction.amount))
     setEditDescription(transaction.description || '')
-    setEditDate(transaction.date.slice(0, 16))
+    setEditDate(toLocalDateTimeLocal(transaction.date))
     setEditSubcategoryId(transaction.subcategory_id || '')
     setEditSubcategoryName(transaction.subcategory_name || '')
     setEditCategoryId(transaction.category_id || '')
@@ -642,11 +654,7 @@ export default function InputPage() {
                         {tx.type === 'income' ? 'Income' : 'Outcome'}
                       </span>
                       <span className="text-xs text-slate-400">
-                        {(() => {
-                          const [date, time] = tx.date.slice(0, 16).split('T');
-                          const [year, month, day] = date.split('-');
-                          return `${day}-${month}-${year} ${time}`;
-                        })()}
+                        {formatDisplayDate(tx.date)}
                       </span>
                       {tx.fund_source_name && (
                         <span className="text-[11px] bg-slate-800 text-slate-300 border border-slate-700/60 px-2 py-0.5 rounded-md flex items-center gap-1">
