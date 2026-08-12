@@ -69,58 +69,64 @@ function BudgetRow({
   const hasAnyPrevInfo = hasPrevBudget || hasPrevActual
 
   return (
-    <div className={`flex flex-wrap items-center gap-3 px-5 border-b border-slate-800/60 last:border-0 hover:bg-slate-800/30 transition-colors ${hasAnyPrevInfo ? 'pt-5 pb-3.5' : 'py-3.5'}`}>
-      <div className="hidden sm:block flex-1 min-w-0">
-        <span className="text-xs font-semibold text-slate-400 block">{sub.categories?.name}</span>
-        <span className="text-sm font-semibold text-slate-200 block truncate">{sub.name}</span>
+    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 px-4 sm:px-5 py-4 border-b border-slate-800/60 last:border-0 hover:bg-slate-800/30 transition-colors">
+      {/* Category & Subcategory Info */}
+      <div className="flex flex-col min-w-0 pr-2">
+        <span className="text-[11px] font-bold uppercase tracking-wide text-blue-400/90 flex items-center gap-1.5">
+          <span className="w-1.5 h-1.5 rounded-full bg-blue-400 shrink-0"></span>
+          {sub.categories?.name}
+        </span>
+        <span className="text-sm font-semibold text-slate-100 mt-0.5 break-words">
+          {sub.name}
+        </span>
       </div>
-      <div className="sm:hidden flex flex-col flex-1 min-w-0">
-        <span className="text-xs font-semibold text-slate-400">{sub.categories?.name}</span>
-        <span className="text-sm font-semibold text-slate-200 truncate">{sub.name}</span>
-      </div>
 
-      <div className="flex gap-2.5 ml-auto items-center">
-        <div className="relative">
-          {/* Top badges for previous month budget and actual spent */}
-          {hasAnyPrevInfo && (
-            <div className="absolute -top-3.5 right-0 flex items-center gap-1 z-10 pointer-events-none whitespace-nowrap">
-              {hasPrevBudget && (
-                <span className="px-1.5 py-0.5 bg-blue-500/10 text-blue-600 dark:text-blue-400 text-[9px] font-bold rounded border border-blue-500/30 shadow-sm">
-                  Budget Lalu: {formatToRupiah(prevBudget)}
-                </span>
-              )}
-              {hasPrevActual && (
-                <span className="px-1.5 py-0.5 bg-indigo-500/10 text-indigo-600 dark:text-indigo-300 text-[9px] font-bold rounded border border-indigo-500/30 shadow-sm">
-                  Real Lalu: {formatToRupiah(prevActual)}
-                </span>
-              )}
-            </div>
-          )}
+      {/* Input & Previous Month Info */}
+      <div className="flex flex-col sm:items-end gap-2 w-full sm:w-auto shrink-0">
+        {/* Top / Inline Badges for Previous Month Info */}
+        {hasAnyPrevInfo && (
+          <div className="flex items-center gap-1.5 flex-wrap sm:justify-end">
+            {hasPrevBudget && (
+              <span className="px-2 py-0.5 bg-blue-500/10 text-blue-400 text-[10px] font-bold rounded-md border border-blue-500/20 shadow-sm whitespace-nowrap">
+                Budget Lalu: Rp {formatToRupiah(prevBudget)}
+              </span>
+            )}
+            {hasPrevActual && (
+              <span className="px-2 py-0.5 bg-indigo-500/10 text-indigo-300 text-[10px] font-bold rounded-md border border-indigo-500/20 shadow-sm whitespace-nowrap">
+                Real Lalu: Rp {formatToRupiah(prevActual)}
+              </span>
+            )}
+          </div>
+        )}
 
-          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs font-semibold pointer-events-none">Rp</span>
-          <input
-            type="text"
-            inputMode="numeric"
-            value={displayValue}
-            onChange={e => handleAmountChange(sub.id, e.target.value, type, setOutcomeAmounts, setIncomeAmounts)}
-            placeholder="0"
-            className="w-44 sm:w-48 pl-9 pr-3 py-2 rounded-xl border border-slate-800 text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-blue-500/40 text-slate-200 placeholder:text-slate-600"
-          />
-        </div>
+        {/* Input Field + Simpan Button */}
+        <div className="flex items-center gap-2 w-full sm:w-auto">
+          <div className="relative flex-1 sm:flex-initial">
+            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs font-semibold pointer-events-none">Rp</span>
+            <input
+              type="text"
+              inputMode="numeric"
+              value={displayValue}
+              onChange={e => handleAmountChange(sub.id, e.target.value, type, setOutcomeAmounts, setIncomeAmounts)}
+              placeholder="0"
+              className="w-full sm:w-44 pl-9 pr-3 py-2 rounded-xl border border-slate-800 text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-blue-500/40 text-slate-200 placeholder:text-slate-600 bg-slate-900/60"
+            />
+          </div>
 
-        <button
-          onClick={() => onSave(sub.id, type)}
-          className={`px-3.5 py-2 text-xs rounded-xl transition-all font-bold whitespace-nowrap flex items-center gap-1 cursor-pointer
-            ${isSaved
-              ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/30'
-              : isError
-                ? 'bg-rose-500/20 text-rose-400 border border-rose-500/30'
-                : type === 'outcome'
-                  ? 'bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20 border border-emerald-500/20'
-                  : 'bg-blue-500/10 text-blue-400 hover:bg-blue-500/20 border border-blue-500/20'
+          <button
+            onClick={() => onSave(sub.id, type)}
+            className={`px-4 py-2 text-xs rounded-xl transition-all font-bold whitespace-nowrap flex items-center justify-center gap-1 cursor-pointer shrink-0 ${
+              isSaved
+                ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/30'
+                : isError
+                  ? 'bg-rose-500/20 text-rose-400 border border-rose-500/30'
+                  : type === 'outcome'
+                    ? 'bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20 border border-emerald-500/20'
+                    : 'bg-blue-500/10 text-blue-400 hover:bg-blue-500/20 border border-blue-500/20'
             }`}>
-          {isSaved ? <><Check size={13} /> Tersimpan</> : isError ? 'Gagal!' : 'Simpan'}
-        </button>
+            {isSaved ? <><Check size={13} /> Tersimpan</> : isError ? 'Gagal!' : 'Simpan'}
+          </button>
+        </div>
       </div>
     </div>
   )
