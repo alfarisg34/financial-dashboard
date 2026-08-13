@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { ChevronDown, Check, Pencil, Trash2, X, Landmark, Plus } from 'lucide-react'
+import AmountCalculatorInput from '@/components/AmountCalculatorInput'
 
 type Category = { id: string; name: string; type: string }
 type Subcategory = { id: string; name: string; category_id: string }
@@ -473,18 +474,12 @@ export default function InputPage() {
         {/* Amount */}
         <div>
           <label className="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2 block">Nominal (Rp)</label>
-          <div className="relative">
-            <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-sm font-semibold pointer-events-none">Rp</span>
-            <input 
-              type="text" 
-              inputMode="numeric"
-              value={displayAmount} 
-              onChange={e => handleAmountInputChange(e.target.value)}
-              placeholder="0"
-              required
-              className="w-full pl-11 pr-4 py-3 rounded-xl border border-slate-800 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/30 text-sm font-semibold outline-none"
-            />
-          </div>
+          <AmountCalculatorInput
+            value={displayAmount}
+            onChange={setDisplayAmount}
+            placeholder="0 (misal: 50.000 + 20.000 * 2)"
+            required
+          />
         </div>
 
         {/* Date */}
@@ -725,12 +720,11 @@ export default function InputPage() {
 
               <div>
                 <label className="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2 block">Jumlah (Rp)</label>
-                <input
-                  type="text"
-                  inputMode="numeric"
+                <AmountCalculatorInput
                   value={editDisplayAmount}
-                  onChange={e => handleEditAmountInputChange(e.target.value)}
-                  className="w-full px-4 py-3 rounded-xl border border-slate-800 text-sm font-bold outline-none"
+                  onChange={setEditDisplayAmount}
+                  placeholder="0"
+                  required
                 />
               </div>
 
