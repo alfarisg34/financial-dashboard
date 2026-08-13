@@ -66,11 +66,11 @@ export default function FundSourcesPage() {
   const [displayInitialBalance, setDisplayInitialBalance] = useState('')
 
   // Edit modal
-  const [editingSource, setEditingSource] = useState<FundSource | null>(null)
+  const [editingSource, setEditingSource] = useState<(FundSource & { income?: number; outcome?: number; transferNet?: number; currentBalance?: number }) | null>(null)
   const [editName, setEditName] = useState('')
   const [editIcon, setEditIcon] = useState('💰')
   const [editType, setEditType] = useState('cash')
-  const [editDisplayInitialBalance, setEditDisplayInitialBalance] = useState('')
+  const [editDisplayCurrentBalance, setEditDisplayCurrentBalance] = useState('')
 
   // Delete confirm
   const [deleteId, setDeleteId] = useState<string | null>(null)
@@ -157,7 +157,9 @@ export default function FundSourcesPage() {
   async function handleEditSubmit() {
     if (!editingSource || !editName.trim()) return
 
-    const initial_balance = parseFormattedNumber(editDisplayInitialBalance)
+    const targetCurrentBalance = parseFormattedNumber(editDisplayCurrentBalance)
+    const netTransactions = (editingSource.income || 0) - (editingSource.outcome || 0) + (editingSource.transferNet || 0)
+    const newInitialBalance = targetCurrentBalance - netTransactions
 
     const { error } = await supabase
       .from('fund_sources')
@@ -165,7 +167,7 @@ export default function FundSourcesPage() {
         name: editName.trim(),
         icon: editIcon,
         type: editType,
-        initial_balance
+        initial_balance: newInitialBalance
       })
       .eq('id', editingSource.id)
 
@@ -191,12 +193,13 @@ export default function FundSourcesPage() {
     }
   }
 
-  function openEdit(fs: FundSource) {
+  function openEdit(fs: FundSource & { currentBalance?: number; income?: number; outcome?: number; transferNet?: number }) {
     setEditingSource(fs)
     setEditName(fs.name)
     setEditIcon(fs.icon)
     setEditType(fs.type)
-    setEditDisplayInitialBalance(fs.initial_balance ? formatNumberWithDots(fs.initial_balance) : '')
+    const currentVal = fs.currentBalance ?? fs.initial_balance ?? 0
+    setEditDisplayCurrentBalance(currentVal ? formatNumberWithDots(currentVal) : '')
   }
 
   // Calculate metrics per source
@@ -486,13 +489,13 @@ export default function FundSourcesPage() {
               </div>
 
               <div>
-                <label className="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2 block">Saldo Awal (Rp)</label>
+                <label className="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2 block">Saldo Terkini (Rp)</label>
                 <input
                   type="text"
                   inputMode="numeric"
                   placeholder="0"
-                  value={editDisplayInitialBalance}
-                  onChange={e => setEditDisplayInitialBalance(formatNumberWithDots(e.target.value))}
+                  value={editDisplayCurrentBalance}
+                  onChange={e => setEditDisplayCurrentBalance(formatNumberWithDots(e.target.value))}
                   className="w-full px-4 py-3 rounded-xl border border-slate-800 bg-slate-900 text-slate-100 text-sm font-semibold outline-none"
                 />
               </div>
