@@ -1,7 +1,7 @@
 'use client'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { createClient } from '@/lib/supabase/client'
-import { Check, Calendar, Info } from 'lucide-react'
+import { Check, Calendar, Info, ChevronDown, ChevronRight, Layers, DollarSign } from 'lucide-react'
 
 type Budget = { id: string; subcategory_id: string; month: number; year: number; amount: number; type: string }
 
@@ -69,30 +69,27 @@ function BudgetRow({
   const hasAnyPrevInfo = hasPrevBudget || hasPrevActual
 
   return (
-    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 px-4 sm:px-5 py-4 border-b border-slate-800/60 last:border-0 hover:bg-slate-800/30 transition-colors">
-      {/* Category & Subcategory Info */}
-      <div className="flex flex-col min-w-0 pr-2">
-        <span className="text-[11px] font-bold uppercase tracking-wide text-blue-400/90 flex items-center gap-1.5">
-          <span className="w-1.5 h-1.5 rounded-full bg-blue-400 shrink-0"></span>
-          {sub.categories?.name}
-        </span>
-        <span className="text-sm font-semibold text-slate-100 mt-0.5 break-words">
+    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 px-4 sm:px-6 py-3.5 border-b border-slate-800/40 last:border-0 hover:bg-slate-900/40 transition-colors">
+      {/* Subcategory Name & indicator */}
+      <div className="flex items-center gap-2.5 min-w-0 pr-2">
+        <span className="text-xs text-slate-400 dark:text-slate-500 font-bold shrink-0">↳</span>
+        <span className="text-sm font-medium text-slate-800 dark:text-slate-200 break-words">
           {sub.name}
         </span>
       </div>
 
       {/* Input & Previous Month Info */}
-      <div className="flex flex-col sm:items-end gap-2 w-full sm:w-auto shrink-0">
-        {/* Top / Inline Badges for Previous Month Info */}
+      <div className="flex flex-col sm:flex-row sm:items-center gap-2.5 shrink-0 w-full sm:w-auto">
+        {/* Previous Month Info Badges */}
         {hasAnyPrevInfo && (
           <div className="flex items-center gap-1.5 flex-wrap sm:justify-end">
             {hasPrevBudget && (
-              <span className="px-2 py-0.5 bg-blue-500/10 text-blue-400 text-[10px] font-bold rounded-md border border-blue-500/20 shadow-sm whitespace-nowrap">
+              <span className="px-2 py-0.5 bg-blue-500/10 text-blue-700 dark:text-blue-400 text-[10px] font-bold rounded-md border border-blue-500/30 shadow-sm whitespace-nowrap">
                 Budget Lalu: Rp {formatToRupiah(prevBudget)}
               </span>
             )}
             {hasPrevActual && (
-              <span className="px-2 py-0.5 bg-indigo-500/10 text-indigo-300 text-[10px] font-bold rounded-md border border-indigo-500/20 shadow-sm whitespace-nowrap">
+              <span className="px-2 py-0.5 bg-indigo-500/10 text-indigo-700 dark:text-indigo-300 text-[10px] font-bold rounded-md border border-indigo-500/30 shadow-sm whitespace-nowrap">
                 Real Lalu: Rp {formatToRupiah(prevActual)}
               </span>
             )}
@@ -109,21 +106,20 @@ function BudgetRow({
               value={displayValue}
               onChange={e => handleAmountChange(sub.id, e.target.value, type, setOutcomeAmounts, setIncomeAmounts)}
               placeholder="0"
-              className="w-full sm:w-44 pl-9 pr-3 py-2 rounded-xl border border-slate-800 text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-blue-500/40 text-slate-200 placeholder:text-slate-600 bg-slate-900/60"
+              className="w-full sm:w-40 pl-9 pr-3 py-1.5 rounded-xl border border-slate-800 text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-blue-500/40 text-slate-200 placeholder:text-slate-600 bg-slate-900/90"
             />
           </div>
 
           <button
             onClick={() => onSave(sub.id, type)}
-            className={`px-4 py-2 text-xs rounded-xl transition-all font-bold whitespace-nowrap flex items-center justify-center gap-1 cursor-pointer shrink-0 ${
-              isSaved
+            className={`px-3.5 py-1.5 text-xs rounded-xl transition-all font-bold whitespace-nowrap flex items-center justify-center gap-1 cursor-pointer shrink-0 ${isSaved
                 ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/30'
                 : isError
                   ? 'bg-rose-500/20 text-rose-400 border border-rose-500/30'
                   : type === 'outcome'
-                    ? 'bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20 border border-emerald-500/20'
-                    : 'bg-blue-500/10 text-blue-400 hover:bg-blue-500/20 border border-blue-500/20'
-            }`}>
+                    ? 'bg-rose-500/10 text-rose-400 hover:bg-rose-500/20 border border-rose-500/20'
+                    : 'bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20 border border-emerald-500/20'
+              }`}>
             {isSaved ? <><Check size={13} /> Tersimpan</> : isError ? 'Gagal!' : 'Simpan'}
           </button>
         </div>
@@ -137,9 +133,17 @@ export default function BudgetPage() {
   const now = new Date()
   const [month, setMonth] = useState(now.getMonth() + 1)
   const [year, setYear] = useState(now.getFullYear())
+  const [categories, setCategories] = useState<any[]>([])
   const [subcategories, setSubcategories] = useState<any[]>([])
   const [outcomeAmounts, setOutcomeAmounts] = useState<Record<string, string>>({})
   const [incomeAmounts, setIncomeAmounts] = useState<Record<string, string>>({})
+
+  // Dropdown / Accordion expand state
+  const [expandedTypes, setExpandedTypes] = useState<Record<string, boolean>>({
+    outcome: true,
+    income: true
+  })
+  const [expandedCategories, setExpandedCategories] = useState<string[]>([])
 
   // Previous month budget & actual spent records
   const [prevOutcomeBudgets, setPrevOutcomeBudgets] = useState<Record<string, number>>({})
@@ -161,14 +165,16 @@ export default function BudgetPage() {
     const prevStartUtc = new Date(prevYear, prevMonth - 1, 1, 0, 0, 0, 0).toISOString()
     const prevEndUtc = new Date(prevYear, prevMonth, 0, 23, 59, 59, 999).toISOString()
 
-    const [{ data: subs }, { data: buds }, { data: prevBuds }, { data: prevTxs }] = await Promise.all([
-      supabase.from('subcategories').select('*, categories(name, type)').eq('user_id', user.id),
+    const [{ data: cats }, { data: subs }, { data: buds }, { data: prevBuds }, { data: prevTxs }] = await Promise.all([
+      supabase.from('categories').select('*').eq('user_id', user.id).order('name'),
+      supabase.from('subcategories').select('*, categories(name, type)').eq('user_id', user.id).order('name'),
       supabase.from('budgets').select('*').eq('user_id', user.id).eq('month', month).eq('year', year),
       supabase.from('budgets').select('*').eq('user_id', user.id).eq('month', prevMonth).eq('year', prevYear),
       supabase.from('transactions').select('subcategory_id, amount, type')
         .eq('user_id', user.id).gte('date', prevStartUtc).lte('date', prevEndUtc)
     ])
 
+    setCategories(cats || [])
     setSubcategories(subs || [])
 
     // Process current budgets
@@ -229,8 +235,30 @@ export default function BudgetPage() {
   }
 
   const months = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember']
-  const outcomeSubs = subcategories.filter(s => s.categories?.type === 'outcome')
-  const incomeSubs = subcategories.filter(s => s.categories?.type === 'income')
+
+  const toggleTypeExpand = (type: 'income' | 'outcome') => {
+    setExpandedTypes(prev => ({ ...prev, [type]: !prev[type] }))
+  }
+
+  const toggleCategoryExpand = (catId: string) => {
+    setExpandedCategories(prev =>
+      prev.includes(catId) ? prev.filter(id => id !== catId) : [...prev, catId]
+    )
+  }
+
+  // Calculate totals per category
+  const getCategoryTotal = (catId: string, type: 'income' | 'outcome') => {
+    const subs = subcategories.filter(s => s.category_id === catId)
+    const amounts = type === 'outcome' ? outcomeAmounts : incomeAmounts
+    return subs.reduce((sum, s) => sum + parseRupiahToNumber(amounts[s.id] || '0'), 0)
+  }
+
+  // Calculate grand total per type
+  const getTotalPerType = (type: 'income' | 'outcome') => {
+    const filteredSubs = subcategories.filter(s => s.categories?.type === type)
+    const amounts = type === 'outcome' ? outcomeAmounts : incomeAmounts
+    return filteredSubs.reduce((sum, s) => sum + parseRupiahToNumber(amounts[s.id] || '0'), 0)
+  }
 
   const rowProps = {
     outcomeAmounts, incomeAmounts,
@@ -245,7 +273,7 @@ export default function BudgetPage() {
     <div className="max-w-3xl w-full mx-auto space-y-6">
       <div className="glass-card p-6 rounded-2xl border border-slate-800">
         <h1 className="text-xl font-bold text-white mb-1">Manajemen Budget & Target</h1>
-        <p className="text-xs text-slate-400">Atur batasan pengeluaran dan target pemasukan bulanan Anda</p>
+        <p className="text-xs text-slate-400">Atur batasan pengeluaran dan target pemasukan bulanan per kategori & subkategori</p>
       </div>
 
       {/* Month/Year picker */}
@@ -253,11 +281,11 @@ export default function BudgetPage() {
         <div className="flex items-center gap-3">
           <Calendar size={18} className="text-blue-400 ml-1" />
           <select value={month} onChange={e => setMonth(Number(e.target.value))}
-            className="px-4 py-2 rounded-xl border border-slate-800 text-sm font-semibold text-slate-200 outline-none cursor-pointer">
+            className="px-4 py-2 rounded-xl border border-slate-800 text-sm font-semibold text-slate-200 outline-none cursor-pointer bg-slate-900">
             {months.map((m, i) => <option key={i} value={i + 1}>{m}</option>)}
           </select>
           <select value={year} onChange={e => setYear(Number(e.target.value))}
-            className="px-4 py-2 rounded-xl border border-slate-800 text-sm font-semibold text-slate-200 outline-none cursor-pointer">
+            className="px-4 py-2 rounded-xl border border-slate-800 text-sm font-semibold text-slate-200 outline-none cursor-pointer bg-slate-900">
             {[2024, 2025, 2026, 2027].map(y => <option key={y} value={y}>{y}</option>)}
           </select>
         </div>
@@ -268,43 +296,139 @@ export default function BudgetPage() {
 
       <div className="p-3.5 rounded-xl bg-blue-500/10 border border-blue-500/30 text-xs text-blue-700 dark:text-blue-300 flex items-center gap-2">
         <Info size={16} className="shrink-0 text-blue-600 dark:text-blue-400" />
-        <span>Di atas setiap kolom input, informasi <strong className="text-blue-900 dark:text-blue-200">Budget Bulan Lalu</strong> dan <strong className="text-blue-900 dark:text-blue-200">Realisasi Bulan Lalu</strong> akan muncul otomatis jika datanya ada.</span>
+        <span>Klik kategori untuk membuka daftar subkategori. Info <strong className="text-blue-900 dark:text-blue-200">Budget Bulan Lalu</strong> & <strong className="text-blue-900 dark:text-blue-200">Realisasi Bulan Lalu</strong> akan muncul otomatis jika ada.</span>
       </div>
 
-      {/* Outcome Budget */}
-      <div>
-        <h2 className="text-xs font-bold uppercase tracking-wider text-rose-400 mb-3 flex items-center gap-1.5">
-          <span>📉 Budget Pengeluaran</span>
-        </h2>
-        <div className="glass-card rounded-2xl border border-slate-800 overflow-hidden">
-          <div className="hidden sm:grid sm:grid-cols-3 text-xs font-semibold text-slate-400 uppercase tracking-wider px-5 py-3 bg-slate-900/80 border-b border-slate-800">
-            <span>Kategori</span>
-            <span>Subkategori</span>
-            <span className="text-right">Info Bulan Lalu & Budget (Rp)</span>
-          </div>
-          {outcomeSubs.length === 0
-            ? <p className="px-5 py-8 text-sm text-slate-500 text-center">Belum ada subkategori outcome.</p>
-            : outcomeSubs.map(sub => <BudgetRow key={sub.id} sub={sub} type="outcome" {...rowProps} />)
-          }
-        </div>
-      </div>
+      {/* Accordion / Dropdown Level 1: Outcome and Income */}
+      <div className="space-y-6">
+        {(['outcome', 'income'] as const).map(typeKey => {
+          const isOutcome = typeKey === 'outcome'
+          const isTypeExpanded = !!expandedTypes[typeKey]
+          const typeCats = categories.filter(c => c.type === typeKey)
+          const totalAmount = getTotalPerType(typeKey)
 
-      {/* Income Target */}
-      <div>
-        <h2 className="text-xs font-bold uppercase tracking-wider text-emerald-400 mb-3 flex items-center gap-1.5">
-          <span>📈 Target Pemasukan</span>
-        </h2>
-        <div className="glass-card rounded-2xl border border-slate-800 overflow-hidden">
-          <div className="hidden sm:grid sm:grid-cols-3 text-xs font-semibold text-slate-400 uppercase tracking-wider px-5 py-3 bg-slate-900/80 border-b border-slate-800">
-            <span>Kategori</span>
-            <span>Subkategori</span>
-            <span className="text-right">Info Bulan Lalu & Target (Rp)</span>
-          </div>
-          {incomeSubs.length === 0
-            ? <p className="px-5 py-8 text-sm text-slate-500 text-center">Belum ada subkategori income.</p>
-            : incomeSubs.map(sub => <BudgetRow key={sub.id} sub={sub} type="income" {...rowProps} />)
-          }
-        </div>
+          return (
+            <div key={typeKey} className="glass-card rounded-2xl border border-slate-800 overflow-hidden shadow-lg shadow-black/20">
+              {/* Level 1: Header Dropdown */}
+              <button
+                type="button"
+                onClick={() => toggleTypeExpand(typeKey)}
+                className={`w-full flex items-center justify-between px-5 py-4 cursor-pointer transition-colors select-none ${isOutcome ? 'bg-rose-500/10 hover:bg-rose-500/15' : 'bg-emerald-500/10 hover:bg-emerald-500/15'
+                  }`}>
+                <div className="flex items-center gap-3">
+                  <div className={`p-2 rounded-xl border ${
+                    isOutcome 
+                      ? 'bg-rose-500/20 text-rose-600 dark:text-rose-400 border-rose-500/30' 
+                      : 'bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border-emerald-500/30'
+                  }`}>
+                    {isTypeExpanded ? <ChevronDown size={18} /> : <ChevronRight size={18} />}
+                  </div>
+                  <div className="text-left">
+                    <h2 className={`text-base font-bold flex items-center gap-2 ${
+                      isOutcome ? 'text-rose-600 dark:text-rose-400' : 'text-emerald-600 dark:text-emerald-400'
+                    }`}>
+                      <span>{isOutcome ? '📉 Budget Pengeluaran' : '📈 Target Pemasukan'}</span>
+                    </h2>
+                    <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5 font-medium">
+                      {typeCats.length} Kategori
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-3">
+                  <div className="text-right hidden sm:block">
+                    <span className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider block">Total Alokasi</span>
+                    <span className={`text-sm font-bold ${isOutcome ? 'text-rose-600 dark:text-rose-400' : 'text-emerald-600 dark:text-emerald-400'}`}>
+                      {totalAmount > 0 ? `Rp ${formatToRupiah(totalAmount)}` : 'Rp 0'}
+                    </span>
+                  </div>
+                  <div className={`text-xs px-3 py-1 rounded-lg border font-bold shadow-sm ${
+                    isOutcome 
+                      ? 'bg-rose-500/20 text-rose-700 dark:text-rose-300 border-rose-500/40' 
+                      : 'bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 border-emerald-500/40'
+                  }`}>
+                    {isTypeExpanded ? 'Tutup' : 'Buka'}
+                  </div>
+                </div>
+              </button>
+
+              {/* Level 1 Content */}
+              {isTypeExpanded && (
+                <div className="p-4 space-y-3 bg-slate-950/40 border-t border-slate-800">
+                  {typeCats.length === 0 ? (
+                    <p className="text-xs text-slate-500 py-6 text-center">
+                      Belum ada kategori {isOutcome ? 'pengeluaran (outcome)' : 'pemasukan (income)'}. Tambahkan di halaman Kategori.
+                    </p>
+                  ) : (
+                    typeCats.map(cat => {
+                      const catSubs = subcategories.filter(s => s.category_id === cat.id)
+                      const isCatExpanded = expandedCategories.includes(cat.id)
+                      const catTotal = getCategoryTotal(cat.id, typeKey)
+
+                      return (
+                        <div key={cat.id} className="glass-card rounded-xl border border-slate-800/80 overflow-hidden bg-slate-900/60">
+                          {/* Level 2: Kategori Dropdown Header */}
+                          <button
+                            type="button"
+                            onClick={() => toggleCategoryExpand(cat.id)}
+                            className="w-full flex items-center justify-between px-4 py-3 hover:bg-slate-800/50 transition-colors cursor-pointer select-none">
+                            <div className="flex items-center gap-2.5 min-w-0 pr-2">
+                              {isCatExpanded ? (
+                                <ChevronDown size={17} className="text-blue-400 shrink-0" />
+                              ) : (
+                                <ChevronRight size={17} className="text-slate-400 shrink-0" />
+                              )}
+                              <span className="text-sm font-semibold text-slate-800 dark:text-slate-100 truncate">
+                                {cat.name}
+                              </span>
+                              <span className="text-xs text-slate-500 dark:text-slate-400 bg-slate-200/70 dark:bg-slate-800/80 px-2 py-0.5 rounded-md border border-slate-300 dark:border-slate-700/50 shrink-0 font-medium">
+                                {catSubs.length} sub
+                              </span>
+                            </div>
+
+                            <div className="flex items-center gap-2 shrink-0">
+                              {catTotal > 0 && (
+                                <span className={`text-xs font-bold px-2.5 py-1 rounded-lg border shadow-sm ${
+                                  isOutcome 
+                                    ? 'bg-rose-500/15 text-rose-700 dark:text-rose-300 border-rose-500/30' 
+                                    : 'bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border-emerald-500/30'
+                                }`}>
+                                  Rp {formatToRupiah(catTotal)}
+                                </span>
+                              )}
+                            </div>
+                          </button>
+
+                          {/* Level 3: List Subkategori */}
+                          {isCatExpanded && (
+                            <div className="bg-slate-950/70 border-t border-slate-800/80">
+                              {catSubs.length === 0 ? (
+                                <p className="text-xs text-slate-500 px-6 py-4 italic text-center">
+                                  Belum ada subkategori pada kategori ini.
+                                </p>
+                              ) : (
+                                <div className="divide-y divide-slate-800/40">
+                                  {catSubs.map(sub => (
+                                    <BudgetRow
+                                      key={sub.id}
+                                      sub={sub}
+                                      type={typeKey}
+                                      {...rowProps}
+                                    />
+                                  ))}
+                                </div>
+                              )}
+                            </div>
+                          )}
+                        </div>
+                      )
+                    })
+                  )}
+                </div>
+              )}
+            </div>
+          )
+        })}
       </div>
     </div>
   )
