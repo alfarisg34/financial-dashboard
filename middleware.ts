@@ -31,8 +31,9 @@ export async function middleware(request: NextRequest) {
   }
 
   const { pathname } = request.nextUrl
+  const isAuthRoute = pathname === '/login' || pathname === '/reset-password' || pathname.startsWith('/auth')
 
-  if (!user && pathname !== '/login' && process.env.NEXT_PUBLIC_SUPABASE_URL) {
+  if (!user && !isAuthRoute && process.env.NEXT_PUBLIC_SUPABASE_URL) {
     return NextResponse.redirect(new URL('/login', request.url))
   }
   if (user && pathname === '/login') {
