@@ -16,6 +16,7 @@ const navItems = [
   { href: '/transfer', icon: ArrowLeftRight, label: 'Transfer' },
   { href: '/categories', icon: Tag, label: 'Kategori' },
   { href: '/budget', icon: Wallet, label: 'Budgeting' },
+  { href: '/profile', icon: User, label: 'Profil Akun' },
 ]
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
@@ -61,15 +62,17 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
   const NavLinks = () => (
     <>
-      {/* User Greeting Card */}
-      <div 
+      {/* User Greeting Card (Clickable to /profile) */}
+      <Link
+        href="/profile"
+        onClick={() => setMobileOpen(false)}
         style={{
           backgroundColor: theme === 'dark' ? 'rgba(15, 23, 42, 0.7)' : '#ffffff',
           borderColor: theme === 'dark' ? 'rgba(30, 41, 59, 0.8)' : '#e2e8f0'
         }}
-        className={`mx-3 my-2.5 p-2.5 rounded-xl border flex items-center gap-3 shadow-sm transition-all ${collapsed && !mobileOpen ? 'justify-center p-2' : ''}`}
+        className={`mx-3 my-2.5 p-2.5 rounded-xl border flex items-center gap-3 shadow-sm hover:border-blue-500/50 hover:shadow-blue-500/10 transition-all group cursor-pointer ${collapsed && !mobileOpen ? 'justify-center p-2' : ''}`}
       >
-        <div className="w-8 h-8 rounded-lg bg-gradient-to-tr from-blue-600 to-indigo-600 flex items-center justify-center font-bold text-xs shrink-0 shadow-md shadow-blue-500/20 uppercase">
+        <div className="w-8 h-8 rounded-lg bg-gradient-to-tr from-blue-600 to-indigo-600 flex items-center justify-center font-bold text-xs shrink-0 shadow-md shadow-blue-500/20 uppercase transition-transform group-hover:scale-105">
           <span style={{ color: '#ffffff' }}>
             {userName ? userName.charAt(0) : <User size={16} style={{ color: '#ffffff' }} />}
           </span>
@@ -84,14 +87,14 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             </span>
             <span 
               style={{ color: theme === 'dark' ? '#ffffff' : '#0f172a' }}
-              className="text-xs font-extrabold truncate leading-tight" 
+              className="text-xs font-extrabold truncate leading-tight group-hover:text-blue-400 transition-colors" 
               title={userName}
             >
               {userName || 'Memuat...'}
             </span>
           </div>
         )}
-      </div>
+      </Link>
 
       <nav className="flex-1 p-3 space-y-1.5 overflow-y-auto">
         {navItems.map(({ href, icon: Icon, label }) => {
