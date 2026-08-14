@@ -51,8 +51,11 @@ function formatNumberWithDots(val: number | string): string {
   return new Intl.NumberFormat('id-ID').format(num)
 }
 
+import { FALLBACK_FUND_SOURCES } from '@/lib/seedUser'
+
 export default function FundSourcesPage() {
   const supabase = createClient()
+  const [isAdmin, setIsAdmin] = useState(false)
   const [sources, setSources] = useState<FundSource[]>([])
   const [transactions, setTransactions] = useState<TransactionSummary[]>([])
   const [transfers, setTransfers] = useState<TransferSummary[]>([])
@@ -80,33 +83,73 @@ export default function FundSourcesPage() {
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) return
 
-    const [{ data: fsData, error }, { data: txData }, { data: trData }] = await Promise.all([
-      supabase.from('fund_sources').select('*').eq('user_id', user.id).order('name'),
-      supabase.from('transactions').select('fund_source_id, type, amount').eq('user_id', user.id),
-      supabase.from('transfers').select('from_fund_source_id, to_fund_source_id, amount').eq('user_id', user.id)
-    ])
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('role')
+      .eq('id', user.id)
+      .maybeSingle()
 
-    if (error) {
-      console.error('Error loading fund sources:', error)
+    const adminCheck = user.email === 'admin@fintrack.com' || profile?.role === 'admin'
+    setIsAdmin(adminCheck)
+
+    if (adminCheck) {
+      // Load default fund sources from default_seeds table
+      const { data: seedRow } = await supabase
+        .from('default_seeds')
+        .select('data')
+        .eq('id', 'fund_sources')
+        .maybeSingle()
+
+      const rawList = seedRow?.data && Array.isArray(seedRow.data) ? seedRow.data : FALLBACK_FUND_SOURCES
+      
+      const fsList: FundSource[] = rawList.map((fs: any, idx: number) => ({
+        id: `def-fs-${idx}`,
+        name: fs.name,
+        icon: fs.icon,
+        type: fs.type,
+        initial_balance: fs.initial_balance || 0,
+        created_at: new Date().toISOString()
+      }))
+
+      setSources(fsList)
+      setTransactions([])
+      setTransfers([])
       setLoading(false)
-      return
-    }
+    } else {
+      const [{ data: fsData, error }, { data: txData }, { data: trData }] = await Promise.all([
+        supabase.from('fund_sources').select('*').eq('user_id', user.id).order('name'),
+        supabase.from('transactions').select('fund_source_id, type, amount').eq('user_id', user.id),
+        supabase.from('transfers').select('from_fund_source_id, to_fund_source_id, amount').eq('user_id', user.id)
+      ])
 
-    // Auto-seed default fund sources if none exists
-    if (!fsData || fsData.length === 0) {
-      await seedDefaults(user.id)
+      if (error) {
+        console.error('Error loading fund sources:', error)
+        setLoading(false)
+        return
+      }
+
+      setSources(fsData || [])
+      setTransactions(txData || [])
+      setTransfers(trData || [])
       setLoading(false)
-      return
     }
+  }
 
-    setSources(fsData || [])
-    setTransactions(txData || [])
-    setTransfers(trData || [])
-    setLoading(false)
+  async function syncAdminSeeds(newSources: FundSource[]) {
+    const dataToSave = newSources.map(s => ({
+      name: s.name,
+      icon: s.icon,
+      type: s.type,
+      initial_balance: s.initial_balance || 0
+    }))
+
+    await supabase
+      .from('default_seeds')
+      .upsert({ id: 'fund_sources', data: dataToSave, updated_at: new Date().toISOString() })
   }
 
   async function seedDefaults(userId: string) {
-    const toInsert = DEFAULT_SEEDS.map(s => ({
+    const toInsert = FALLBACK_FUND_SOURCES.map(s => ({
       user_id: userId,
       name: s.name,
       icon: s.icon,
@@ -130,67 +173,106 @@ export default function FundSourcesPage() {
     e.preventDefault()
     if (!name.trim()) return
 
-    const { data: { user } } = await supabase.auth.getUser()
-    if (!user) return
-
     const initial_balance = parseFormattedNumber(displayInitialBalance)
 
-    const { error } = await supabase.from('fund_sources').insert({
-      user_id: user.id,
-      name: name.trim(),
-      icon,
-      type,
-      initial_balance
-    })
+    if (isAdmin) {
+      const newFs: FundSource = {
+        id: `def-fs-${Date.now()}`,
+        name: name.trim(),
+        icon,
+        type,
+        initial_balance,
+        created_at: new Date().toISOString()
+      }
+      const updated = [...sources, newFs]
+      setSources(updated)
+      await syncAdminSeeds(updated)
+      setSuccess('Default sumber dana berhasil ditambahkan!')
+    } else {
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) return
 
-    if (!error) {
-      setName('')
-      setIcon('💰')
-      setType('cash')
-      setDisplayInitialBalance('')
-      setSuccess('Sumber dana berhasil ditambahkan!')
-      loadSources()
-      setTimeout(() => setSuccess(''), 3000)
+      const { error } = await supabase.from('fund_sources').insert({
+        user_id: user.id,
+        name: name.trim(),
+        icon,
+        type,
+        initial_balance
+      })
+
+      if (!error) {
+        setSuccess('Sumber dana berhasil ditambahkan!')
+        loadSources()
+      }
     }
+
+    setName('')
+    setIcon('💰')
+    setType('cash')
+    setDisplayInitialBalance('')
+    setTimeout(() => setSuccess(''), 3000)
   }
 
   async function handleEditSubmit() {
     if (!editingSource || !editName.trim()) return
 
     const targetCurrentBalance = parseFormattedNumber(editDisplayCurrentBalance)
-    const netTransactions = (editingSource.income || 0) - (editingSource.outcome || 0) + (editingSource.transferNet || 0)
-    const newInitialBalance = targetCurrentBalance - netTransactions
 
-    const { error } = await supabase
-      .from('fund_sources')
-      .update({
+    if (isAdmin) {
+      const updated = sources.map(s => s.id === editingSource.id ? {
+        ...s,
         name: editName.trim(),
         icon: editIcon,
         type: editType,
-        initial_balance: newInitialBalance
-      })
-      .eq('id', editingSource.id)
-
-    if (!error) {
+        initial_balance: targetCurrentBalance
+      } : s)
+      setSources(updated)
+      await syncAdminSeeds(updated)
       setEditingSource(null)
-      setSuccess('Sumber dana diperbarui!')
-      loadSources()
-      setTimeout(() => setSuccess(''), 3000)
+      setSuccess('Default sumber dana diperbarui!')
+    } else {
+      const netTransactions = (editingSource.income || 0) - (editingSource.outcome || 0) + (editingSource.transferNet || 0)
+      const newInitialBalance = targetCurrentBalance - netTransactions
+
+      const { error } = await supabase
+        .from('fund_sources')
+        .update({
+          name: editName.trim(),
+          icon: editIcon,
+          type: editType,
+          initial_balance: newInitialBalance
+        })
+        .eq('id', editingSource.id)
+
+      if (!error) {
+        setEditingSource(null)
+        setSuccess('Sumber dana diperbarui!')
+        loadSources()
+      }
     }
+    setTimeout(() => setSuccess(''), 3000)
   }
 
   async function handleDelete() {
     if (!deleteId) return
 
-    const { error } = await supabase.from('fund_sources').delete().eq('id', deleteId)
-    if (!error) {
+    if (isAdmin) {
+      const updated = sources.filter(s => s.id !== deleteId)
+      setSources(updated)
+      await syncAdminSeeds(updated)
       setDeleteId(null)
-      setSuccess('Sumber dana berhasil dihapus!')
-      loadSources()
-      setTimeout(() => setSuccess(''), 3000)
+      setSuccess('Default sumber dana berhasil dihapus!')
     } else {
-      alert('Gagal menghapus sumber dana')
+      const { error } = await supabase.from('fund_sources').delete().eq('id', deleteId)
+      if (!error) {
+        setDeleteId(null)
+        setSuccess('Sumber dana berhasil dihapus!')
+        loadSources()
+      } else {
+        alert('Gagal menghapus sumber dana')
+      }
     }
+    setTimeout(() => setSuccess(''), 3000)
   }
 
   function openEdit(fs: FundSource & { currentBalance?: number; income?: number; outcome?: number; transferNet?: number }) {
@@ -242,20 +324,31 @@ export default function FundSourcesPage() {
         <div>
           <h1 className="text-xl font-bold text-white mb-1 flex items-center gap-2">
             <Landmark size={20} className="text-blue-400" />
-            Kelola Sumber Dana
+            {isAdmin ? 'Default Sumber Dana' : 'Kelola Sumber Dana'}
+            {isAdmin && (
+              <span className="bg-rose-500/10 text-rose-400 border border-rose-500/20 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase">
+                Admin Seed Template
+              </span>
+            )}
           </h1>
-          <p className="text-xs text-slate-400">Atur akun bank, dompet fisik, e-wallet, serta Saldo Awal dan Realisasinya</p>
+          <p className="text-xs text-slate-400">
+            {isAdmin 
+              ? 'Kelola akun sumber dana default yang akan otomatis di-seed untuk akun pengguna baru.' 
+              : 'Atur akun bank, dompet fisik, e-wallet, serta Saldo Awal dan Realisasinya'}
+          </p>
         </div>
-        <button 
-          onClick={async () => {
-            const { data: { user } } = await supabase.auth.getUser()
-            if (user) seedDefaults(user.id)
-          }}
-          className="px-3.5 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold rounded-xl border border-slate-700 transition-all flex items-center gap-1.5 cursor-pointer self-start sm:self-auto"
-        >
-          <Sparkles size={14} className="text-amber-400" />
-          Seed Ulang Default
-        </button>
+        {!isAdmin && (
+          <button 
+            onClick={async () => {
+              const { data: { user } } = await supabase.auth.getUser()
+              if (user) seedDefaults(user.id)
+            }}
+            className="px-3.5 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold rounded-xl border border-slate-700 transition-all flex items-center gap-1.5 cursor-pointer self-start sm:self-auto"
+          >
+            <Sparkles size={14} className="text-amber-400" />
+            Seed Ulang Default
+          </button>
+        )}
       </div>
 
       {success && (
@@ -264,32 +357,34 @@ export default function FundSourcesPage() {
         </div>
       )}
 
-      {/* Summary Card */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <div className="glass-card p-5 rounded-2xl border border-slate-800 flex items-center gap-4">
-          <div className="w-12 h-12 rounded-xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-blue-400 shrink-0">
-            <Wallet size={24} />
+      {/* Summary Card (for regular users) */}
+      {!isAdmin && (
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="glass-card p-5 rounded-2xl border border-slate-800 flex items-center gap-4">
+            <div className="w-12 h-12 rounded-xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-blue-400 shrink-0">
+              <Wallet size={24} />
+            </div>
+            <div>
+              <span className="text-xs text-slate-400 font-semibold uppercase tracking-wider block">Total Saldo saat ini</span>
+              <span className={`text-xl font-extrabold ${totalCurrentBalance >= 0 ? 'text-emerald-400' : 'text-rose-400'}`}>
+                {fmt(totalCurrentBalance)}
+              </span>
+            </div>
           </div>
-          <div>
-            <span className="text-xs text-slate-400 font-semibold uppercase tracking-wider block">Total Saldo saat ini</span>
-            <span className={`text-xl font-extrabold ${totalCurrentBalance >= 0 ? 'text-emerald-400' : 'text-rose-400'}`}>
-              {fmt(totalCurrentBalance)}
-            </span>
-          </div>
-        </div>
 
-        <div className="glass-card p-5 rounded-2xl border border-slate-800 flex items-center gap-4">
-          <div className="w-12 h-12 rounded-xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-indigo-400 shrink-0">
-            <Landmark size={24} />
-          </div>
-          <div>
-            <span className="text-xs text-slate-400 font-semibold uppercase tracking-wider block">Total Saldo Awal</span>
-            <span className="text-xl font-extrabold text-slate-200">
-              {fmt(totalInitialBalance)}
-            </span>
+          <div className="glass-card p-5 rounded-2xl border border-slate-800 flex items-center gap-4">
+            <div className="w-12 h-12 rounded-xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-indigo-400 shrink-0">
+              <Landmark size={24} />
+            </div>
+            <div>
+              <span className="text-xs text-slate-400 font-semibold uppercase tracking-wider block">Total Saldo Awal</span>
+              <span className="text-xl font-extrabold text-slate-200">
+                {fmt(totalInitialBalance)}
+              </span>
+            </div>
           </div>
         </div>
-      </div>
+      )}
 
       {/* Add form */}
       <form onSubmit={handleAdd} className="glass-card rounded-2xl border border-slate-800 p-5 space-y-4">

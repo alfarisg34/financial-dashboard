@@ -1,13 +1,15 @@
 'use client'
 import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
-import { Trash2, Plus, ChevronDown, ChevronRight, Pencil, Check, X } from 'lucide-react'
+import { Trash2, Plus, ChevronDown, ChevronRight, Pencil, Check, X, ShieldAlert, Sparkles } from 'lucide-react'
+import { FALLBACK_CATEGORIES } from '@/lib/seedUser'
 
 type Category = { id: string; name: string; type: string }
 type Subcategory = { id: string; name: string; category_id: string }
 
 export default function CategoriesPage() {
   const supabase = createClient()
+  const [isAdmin, setIsAdmin] = useState(false)
   const [categories, setCategories] = useState<Category[]>([])
   const [subcategories, setSubcategories] = useState<Subcategory[]>([])
   const [expanded, setExpanded] = useState<string[]>([])
@@ -29,43 +31,126 @@ export default function CategoriesPage() {
   async function load() {
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) return
-    const [{ data: cats }, { data: subs }] = await Promise.all([
-      supabase.from('categories').select('*').eq('user_id', user.id).order('name'),
-      supabase.from('subcategories').select('*').eq('user_id', user.id).order('name')
-    ])
-    setCategories(cats || [])
-    setSubcategories(subs || [])
+
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('role')
+      .eq('id', user.id)
+      .maybeSingle()
+
+    const adminCheck = user.email === 'admin@fintrack.com' || profile?.role === 'admin'
+    setIsAdmin(adminCheck)
+
+    if (adminCheck) {
+      // Load default categories from default_seeds table
+      const { data: seedRow } = await supabase
+        .from('default_seeds')
+        .select('data')
+        .eq('id', 'categories')
+        .maybeSingle()
+
+      const rawList = seedRow?.data && Array.isArray(seedRow.data) ? seedRow.data : FALLBACK_CATEGORIES
+      
+      // Transform to flat Category[] and Subcategory[] format
+      const cats: Category[] = []
+      const subs: Subcategory[] = []
+
+      rawList.forEach((c: any, cIdx: number) => {
+        const catId = `def-cat-${cIdx}`
+        cats.push({ id: catId, name: c.name, type: c.type })
+        const subList = c.subcategories || []
+        subList.forEach((sName: string, sIdx: number) => {
+          subs.push({ id: `def-sub-${cIdx}-${sIdx}`, name: sName, category_id: catId })
+        })
+      })
+
+      setCategories(cats)
+      setSubcategories(subs)
+    } else {
+      const [{ data: cats }, { data: subs }] = await Promise.all([
+        supabase.from('categories').select('*').eq('user_id', user.id).order('name'),
+        supabase.from('subcategories').select('*').eq('user_id', user.id).order('name')
+      ])
+      setCategories(cats || [])
+      setSubcategories(subs || [])
+    }
   }
 
   useEffect(() => { load() }, [])
 
+  // Helper to persist admin seeds to default_seeds table
+  async function syncAdminSeeds(newCats: Category[], newSubs: Subcategory[]) {
+    const dataToSave = newCats.map(c => ({
+      name: c.name,
+      type: c.type,
+      subcategories: newSubs.filter(s => s.category_id === c.id).map(s => s.name)
+    }))
+
+    await supabase
+      .from('default_seeds')
+      .upsert({ id: 'categories', data: dataToSave, updated_at: new Date().toISOString() })
+  }
+
   async function handleAddCategory(type: 'income' | 'outcome') {
     if (!addingCatName.trim()) return
-    const { data: { user } } = await supabase.auth.getUser()
-    await supabase.from('categories').insert({ name: addingCatName.trim(), type, user_id: user?.id })
+    const name = addingCatName.trim()
+
+    if (isAdmin) {
+      const newCat: Category = { id: `def-cat-${Date.now()}`, name, type }
+      const updatedCats = [...categories, newCat]
+      setCategories(updatedCats)
+      await syncAdminSeeds(updatedCats, subcategories)
+    } else {
+      const { data: { user } } = await supabase.auth.getUser()
+      await supabase.from('categories').insert({ name, type, user_id: user?.id })
+      load()
+    }
     setAddingCatName('')
     setAddingCatType(null)
-    load()
   }
 
   async function deleteCategory(id: string) {
     if (!confirm('Hapus kategori ini beserta seluruh subkategorinya?')) return
-    await supabase.from('categories').delete().eq('id', id)
-    load()
+
+    if (isAdmin) {
+      const updatedCats = categories.filter(c => c.id !== id)
+      const updatedSubs = subcategories.filter(s => s.category_id !== id)
+      setCategories(updatedCats)
+      setSubcategories(updatedSubs)
+      await syncAdminSeeds(updatedCats, updatedSubs)
+    } else {
+      await supabase.from('categories').delete().eq('id', id)
+      load()
+    }
   }
 
   async function handleAddSubcategory(categoryId: string) {
     if (!addingSubName.trim()) return
-    const { data: { user } } = await supabase.auth.getUser()
-    await supabase.from('subcategories').insert({ name: addingSubName.trim(), category_id: categoryId, user_id: user?.id })
+    const name = addingSubName.trim()
+
+    if (isAdmin) {
+      const newSub: Subcategory = { id: `def-sub-${Date.now()}`, name, category_id: categoryId }
+      const updatedSubs = [...subcategories, newSub]
+      setSubcategories(updatedSubs)
+      await syncAdminSeeds(categories, updatedSubs)
+    } else {
+      const { data: { user } } = await supabase.auth.getUser()
+      await supabase.from('subcategories').insert({ name, category_id: categoryId, user_id: user?.id })
+      load()
+    }
     setAddingSubName('')
     setAddingSubCatId(null)
-    load()
   }
 
   async function deleteSubcategory(id: string) {
-    await supabase.from('subcategories').delete().eq('id', id)
-    load()
+    if (isAdmin) {
+      const updatedSubs = subcategories.filter(s => s.id !== id)
+      setSubcategories(updatedSubs)
+      await syncAdminSeeds(categories, updatedSubs)
+    } else {
+      await supabase.from('subcategories').delete().eq('id', id)
+      load()
+    }
   }
 
   // Category Edit Handlers
@@ -81,9 +166,17 @@ export default function CategoriesPage() {
 
   async function saveEditCat(id: string) {
     if (!editingCatName.trim()) return
-    await supabase.from('categories').update({ name: editingCatName.trim() }).eq('id', id)
+    const name = editingCatName.trim()
+
+    if (isAdmin) {
+      const updatedCats = categories.map(c => c.id === id ? { ...c, name } : c)
+      setCategories(updatedCats)
+      await syncAdminSeeds(updatedCats, subcategories)
+    } else {
+      await supabase.from('categories').update({ name }).eq('id', id)
+      load()
+    }
     setEditingCatId(null)
-    load()
   }
 
   // Subcategory Edit Handlers
@@ -99,9 +192,17 @@ export default function CategoriesPage() {
 
   async function saveEditSub(id: string) {
     if (!editingSubName.trim()) return
-    await supabase.from('subcategories').update({ name: editingSubName.trim() }).eq('id', id)
+    const name = editingSubName.trim()
+
+    if (isAdmin) {
+      const updatedSubs = subcategories.map(s => s.id === id ? { ...s, name } : s)
+      setSubcategories(updatedSubs)
+      await syncAdminSeeds(categories, updatedSubs)
+    } else {
+      await supabase.from('subcategories').update({ name }).eq('id', id)
+      load()
+    }
     setEditingSubId(null)
-    load()
   }
 
   const toggleExpand = (id: string) =>
@@ -110,8 +211,21 @@ export default function CategoriesPage() {
   return (
     <div className="max-w-2xl w-full mx-auto space-y-6">
       <div className="glass-card p-6 rounded-2xl border border-slate-800">
-        <h1 className="text-xl font-bold text-white mb-1">Kategori & Subkategori</h1>
-        <p className="text-xs text-slate-400">Kelola hirarki kategori transaksi finansial Anda</p>
+        <div className="flex items-center gap-2">
+          <h1 className="text-xl font-bold text-white mb-1">
+            {isAdmin ? 'Default Kategori & Subkategori' : 'Kategori & Subkategori'}
+          </h1>
+          {isAdmin && (
+            <span className="bg-rose-500/10 text-rose-400 border border-rose-500/20 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase">
+              Admin Seed Template
+            </span>
+          )}
+        </div>
+        <p className="text-xs text-slate-400">
+          {isAdmin 
+            ? 'Kelola daftar kategori dan subkategori default yang akan otomatis diberikan ke akun pengguna baru.'
+            : 'Kelola hirarki kategori transaksi finansial Anda'}
+        </p>
       </div>
 
       {/* Category Sections: Income and Outcome */}

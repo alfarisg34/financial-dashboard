@@ -55,13 +55,77 @@ export default function LoginPage() {
     e.preventDefault()
     setLoading(true)
     setError('')
-    const { error } = await supabase.auth.signInWithPassword({ email, password })
-    if (error) {
-      setError(error.message)
+    
+    const { data: authData, error: authError } = await supabase.auth.signInWithPassword({ 
+      email: email.trim(), 
+      password 
+    })
+
+    if (authError) {
+      setError(authError.message)
       setLoading(false)
-    } else {
-      window.location.href = '/dashboard'
+      return
     }
+
+    const user = authData?.user
+    if (!user) {
+      setError('Gagal memverifikasi akun.')
+      setLoading(false)
+      return
+    }
+
+    // Check if user is admin
+    const isAdmin = user.email === 'admin@fintrack.com' || user.user_metadata?.role === 'admin'
+
+    if (isAdmin) {
+      window.location.href = '/admin'
+      return
+    }
+
+    // Check expiration and soft delete status for regular users
+    const { data: profile, error: profileErr } = await supabase
+      .from('profiles')
+      .select('expires_at, role, is_deleted')
+      .eq('id', user.id)
+      .maybeSingle()
+
+    if (profile?.role === 'admin') {
+      window.location.href = '/admin'
+      return
+    }
+
+    // If profile does not exist (hard deleted) or is_deleted is true -> block login
+    if (!profile || profile.is_deleted) {
+      await supabase.auth.signOut()
+      setError('Akun ini tidak terdaftar atau telah dihapus oleh Administrator.')
+      setLoading(false)
+      return
+    }
+
+    let expiresAt = profile?.expires_at || user.user_metadata?.expires_at
+
+    if (expiresAt) {
+      const now = new Date().getTime()
+      const d = new Date(expiresAt)
+      const expTime = new Date(d.getFullYear(), d.getMonth(), d.getDate(), 23, 59, 59, 999).getTime()
+
+      if (now > expTime) {
+        // Account has expired -> log out immediately and show warning
+        await supabase.auth.signOut()
+        
+        const formattedDate = d.toLocaleDateString('id-ID', {
+          day: 'numeric',
+          month: 'long',
+          year: 'numeric'
+        })
+        
+        setError(`Akun sudah kadaluwarsa dari tanggal ${formattedDate}.`)
+        setLoading(false)
+        return
+      }
+    }
+
+    window.location.href = '/dashboard'
   }
 
   async function handleForgotPassword(e: React.FormEvent) {

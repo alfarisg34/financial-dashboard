@@ -31,14 +31,34 @@ export async function middleware(request: NextRequest) {
   }
 
   const { pathname } = request.nextUrl
-  const isAuthRoute = pathname === '/login' || pathname === '/reset-password' || pathname.startsWith('/auth')
+  const isAuthRoute = pathname === '/login' || pathname === '/reset-password' || pathname.startsWith('/auth') || pathname.startsWith('/api')
 
   if (!user && !isAuthRoute && process.env.NEXT_PUBLIC_SUPABASE_URL) {
     return NextResponse.redirect(new URL('/login', request.url))
   }
+  
   if (user && pathname === '/login') {
-    return NextResponse.redirect(new URL('/dashboard', request.url))
+    const isAdmin = user.email === 'admin@fintrack.com' || user.user_metadata?.role === 'admin'
+    return NextResponse.redirect(new URL(isAdmin ? '/admin' : '/dashboard', request.url))
   }
+
+  // Protect /admin route from regular users
+  if (user && pathname.startsWith('/admin')) {
+    const isAdmin = user.email === 'admin@fintrack.com' || user.user_metadata?.role === 'admin'
+    if (!isAdmin) {
+      return NextResponse.redirect(new URL('/dashboard', request.url))
+    }
+  }
+
+  // Redirect admin from regular-only routes to /admin
+  const userOnlyRoutes = ['/dashboard', '/input', '/transfer', '/budget']
+  if (user && userOnlyRoutes.includes(pathname)) {
+    const isAdmin = user.email === 'admin@fintrack.com' || user.user_metadata?.role === 'admin'
+    if (isAdmin) {
+      return NextResponse.redirect(new URL('/admin', request.url))
+    }
+  }
+
   return supabaseResponse
 }
 

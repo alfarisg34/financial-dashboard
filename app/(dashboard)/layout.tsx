@@ -6,10 +6,10 @@ import { createClient } from '@/lib/supabase/client'
 import { useTheme } from '@/components/ThemeProvider'
 import {
   LayoutDashboard, PlusCircle, Tag, Wallet, Landmark, ArrowLeftRight,
-  ChevronLeft, ChevronRight, LogOut, Menu, X, Sparkles, Sun, Moon, User
+  ChevronLeft, ChevronRight, LogOut, Menu, X, Sparkles, Sun, Moon, User, ShieldAlert
 } from 'lucide-react'
 
-const navItems = [
+const defaultUserNavItems = [
   { href: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
   { href: '/input', icon: PlusCircle, label: 'Input Transaksi' },
   { href: '/fund-sources', icon: Landmark, label: 'Sumber Dana' },
@@ -19,10 +19,18 @@ const navItems = [
   { href: '/profile', icon: User, label: 'Profil Akun' },
 ]
 
+const adminNavItems = [
+  { href: '/admin', icon: ShieldAlert, label: 'Admin Portal' },
+  { href: '/fund-sources', icon: Landmark, label: 'Default Sumber Dana' },
+  { href: '/categories', icon: Tag, label: 'Default Kategori' },
+  { href: '/profile', icon: User, label: 'Profil Admin' },
+]
+
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const [collapsed, setCollapsed] = useState(false)
   const [mobileOpen, setMobileOpen] = useState(false)
   const [userName, setUserName] = useState<string>('')
+  const [isAdmin, setIsAdmin] = useState(false)
   const { theme, toggleTheme } = useTheme()
   const pathname = usePathname()
   const router = useRouter()
@@ -34,16 +42,19 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       if (!user) return
 
       let name = user.user_metadata?.display_name || user.user_metadata?.full_name
+      let role = user.user_metadata?.role
 
-      if (!name) {
-        const { data: profile } = await supabase
-          .from('profiles')
-          .select('display_name')
-          .eq('id', user.id)
-          .maybeSingle()
-        if (profile?.display_name) {
-          name = profile.display_name
-        }
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('display_name, role')
+        .eq('id', user.id)
+        .maybeSingle()
+
+      if (profile?.display_name) name = profile.display_name
+      if (profile?.role) role = profile.role
+
+      if (user.email === 'admin@fintrack.com' || role === 'admin') {
+        setIsAdmin(true)
       }
 
       if (!name && user.email) {
@@ -60,6 +71,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     router.push('/login')
   }
 
+  const navItemsToRender = isAdmin ? adminNavItems : defaultUserNavItems
+
   const NavLinks = () => (
     <>
       {/* User Greeting Card (Clickable to /profile) */}
@@ -72,18 +85,18 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         }}
         className={`mx-3 my-2.5 p-2.5 rounded-xl border flex items-center gap-3 shadow-sm hover:border-blue-500/50 hover:shadow-blue-500/10 transition-all group cursor-pointer ${collapsed && !mobileOpen ? 'justify-center p-2' : ''}`}
       >
-        <div className="w-8 h-8 rounded-lg bg-gradient-to-tr from-blue-600 to-indigo-600 flex items-center justify-center font-bold text-xs shrink-0 shadow-md shadow-blue-500/20 uppercase transition-transform group-hover:scale-105">
+        <div className={`w-8 h-8 rounded-lg ${isAdmin ? 'bg-gradient-to-tr from-rose-600 to-amber-600' : 'bg-gradient-to-tr from-blue-600 to-indigo-600'} flex items-center justify-center font-bold text-xs shrink-0 shadow-md uppercase transition-transform group-hover:scale-105`}>
           <span style={{ color: '#ffffff' }}>
-            {userName ? userName.charAt(0) : <User size={16} style={{ color: '#ffffff' }} />}
+            {isAdmin ? <ShieldAlert size={16} style={{ color: '#ffffff' }} /> : (userName ? userName.charAt(0) : <User size={16} style={{ color: '#ffffff' }} />)}
           </span>
         </div>
         {(!collapsed || mobileOpen) && (
           <div className="flex flex-col min-w-0 overflow-hidden">
             <span 
-              style={{ color: theme === 'dark' ? '#60a5fa' : '#2563eb' }}
+              style={{ color: isAdmin ? '#f43f5e' : (theme === 'dark' ? '#60a5fa' : '#2563eb') }}
               className="text-[10px] uppercase font-bold tracking-wider leading-none mb-0.5"
             >
-              Hai 👋
+              {isAdmin ? 'Admin' : 'Hai 👋'}
             </span>
             <span 
               style={{ color: theme === 'dark' ? '#ffffff' : '#0f172a' }}
@@ -97,14 +110,16 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       </Link>
 
       <nav className="flex-1 p-3 space-y-1.5 overflow-y-auto">
-        {navItems.map(({ href, icon: Icon, label }) => {
+        {navItemsToRender.map(({ href, icon: Icon, label }) => {
           const active = pathname === href
           return (
             <Link key={href} href={href}
               onClick={() => setMobileOpen(false)}
               className={`flex items-center gap-3.5 px-3.5 py-3 rounded-xl text-sm font-medium transition-all duration-200 group
                 ${active 
-                  ? 'bg-gradient-to-r from-blue-600/90 to-indigo-600/90 text-white shadow-lg shadow-blue-500/25 border border-blue-400/30' 
+                  ? (isAdmin && href === '/admin'
+                      ? 'bg-gradient-to-r from-rose-600/90 to-amber-600/90 text-white shadow-lg shadow-rose-500/25 border border-rose-400/30'
+                      : 'bg-gradient-to-r from-blue-600/90 to-indigo-600/90 text-white shadow-lg shadow-blue-500/25 border border-blue-400/30')
                   : 'text-slate-400 hover:bg-slate-800/60 hover:text-slate-200'}`}>
               <Icon size={19} className={`shrink-0 transition-transform duration-200 group-hover:scale-110 ${active ? 'text-white' : 'text-slate-400 group-hover:text-blue-400'}`} />
               {(!collapsed || mobileOpen) && <span className="truncate">{label}</span>}

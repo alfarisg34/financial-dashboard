@@ -4,7 +4,8 @@ import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { 
   User, Mail, Lock, KeyRound, ShieldCheck, CheckCircle2, 
-  AlertCircle, Eye, EyeOff, Sparkles, RefreshCw, Save
+  AlertCircle, Eye, EyeOff, Sparkles, RefreshCw, Save,
+  Calendar, Clock, ShieldAlert, UserCheck
 } from 'lucide-react'
 
 export default function ProfilePage() {
@@ -15,6 +16,8 @@ export default function ProfilePage() {
   const [displayName, setDisplayName] = useState('')
   const [userId, setUserId] = useState('')
   const [createdAt, setCreatedAt] = useState('')
+  const [expiresAt, setExpiresAt] = useState<string | null>(null)
+  const [role, setRole] = useState('user')
 
   // Form states
   const [profileLoading, setProfileLoading] = useState(false)
@@ -45,21 +48,25 @@ export default function ProfilePage() {
         setCreatedAt(d.toLocaleDateString('id-ID', { year: 'numeric', month: 'long', day: 'numeric' }))
       }
 
-      // Try reading display_name from user_metadata first
-      let name = user.user_metadata?.display_name || user.user_metadata?.full_name
+      let userRole = user.user_metadata?.role || (user.email === 'admin@fintrack.com' ? 'admin' : 'user')
+      let exp = user.user_metadata?.expires_at || null
 
-      // Fallback: check profiles table if exists
-      if (!name) {
-        const { data: profile } = await supabase
-          .from('profiles')
-          .select('display_name')
-          .eq('id', user.id)
-          .maybeSingle()
-        if (profile?.display_name) {
-          name = profile.display_name
-        }
+      // Check profiles table
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('display_name, role, expires_at')
+        .eq('id', user.id)
+        .maybeSingle()
+
+      if (profile) {
+        if (profile.role) userRole = profile.role
+        if (profile.expires_at) exp = profile.expires_at
       }
 
+      setRole(userRole)
+      setExpiresAt(exp)
+
+      let name = user.user_metadata?.display_name || user.user_metadata?.full_name || profile?.display_name
       if (!name && user.email) {
         name = user.email.split('@')[0]
       }
@@ -172,29 +179,64 @@ export default function ProfilePage() {
       <div className="glass-card p-6 sm:p-8 rounded-3xl border border-slate-800 relative overflow-hidden">
         <div className="absolute top-0 right-0 w-80 h-80 bg-gradient-to-bl from-blue-600/15 via-indigo-600/10 to-transparent rounded-full blur-3xl pointer-events-none -mr-20 -mt-20" />
         
-        <div className="flex flex-col sm:flex-row sm:items-center gap-5 relative z-10">
-          <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-gradient-to-tr from-blue-600 to-indigo-600 flex items-center justify-center font-black text-2xl sm:text-3xl text-white shadow-xl shadow-blue-500/25 border border-white/20 shrink-0 uppercase">
-            {displayName ? displayName.charAt(0) : <User size={32} />}
-          </div>
-          <div>
-            <div className="flex items-center gap-2">
-              <h1 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
-                {displayName || 'Pengguna FinTrack'}
-              </h1>
-              <span className="bg-blue-500/10 text-blue-400 border border-blue-500/20 text-[11px] font-semibold px-2.5 py-0.5 rounded-full flex items-center gap-1">
-                <Sparkles size={11} /> Aktif
-              </span>
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-5 relative z-10">
+          <div className="flex flex-col sm:flex-row sm:items-center gap-5">
+            <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-gradient-to-tr from-blue-600 to-indigo-600 flex items-center justify-center font-black text-2xl sm:text-3xl text-white shadow-xl shadow-blue-500/25 border border-white/20 shrink-0 uppercase">
+              {displayName ? displayName.charAt(0) : <User size={32} />}
             </div>
-            <p className="text-slate-400 text-sm mt-1 flex items-center gap-1.5">
-              <Mail size={14} className="text-slate-500" />
-              {email || 'Memuat...'}
-            </p>
-            {createdAt && (
-              <p className="text-slate-500 text-xs mt-1">
-                Bergabung sejak {createdAt}
+            <div>
+              <div className="flex items-center gap-2">
+                <h1 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
+                  {displayName || 'Pengguna FinTrack'}
+                </h1>
+                <span className={`text-[11px] font-semibold px-2.5 py-0.5 rounded-full flex items-center gap-1 border ${
+                  role === 'admin' 
+                    ? 'bg-rose-500/10 text-rose-400 border-rose-500/20'
+                    : 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
+                }`}>
+                  <Sparkles size={11} /> {role === 'admin' ? 'Super Admin' : 'Akun Aktif'}
+                </span>
+              </div>
+              <p className="text-slate-400 text-sm mt-1 flex items-center gap-1.5">
+                <Mail size={14} className="text-slate-500" />
+                {email || 'Memuat...'}
               </p>
-            )}
+              {createdAt && (
+                <p className="text-slate-500 text-xs mt-1">
+                  Bergabung sejak {createdAt}
+                </p>
+              )}
+            </div>
           </div>
+
+          {/* Expiration Info Box on Header Banner */}
+          {role !== 'admin' && expiresAt && (() => {
+            const expDate = new Date(expiresAt)
+            const formattedExp = expDate.toLocaleDateString('id-ID', {
+              day: 'numeric',
+              month: 'long',
+              year: 'numeric'
+            })
+            const now = new Date().getTime()
+            const expTime = expDate.getTime()
+            const diffDays = Math.max(0, Math.ceil((expTime - now) / (1000 * 60 * 60 * 24)))
+            const isExp = now > expTime
+
+            return (
+              <div className="bg-slate-900/80 p-4 rounded-2xl border border-slate-800 sm:max-w-xs w-full">
+                <div className="flex items-center gap-2 mb-1">
+                  <Calendar size={14} className="text-amber-400" />
+                  <span className="text-xs font-bold text-slate-300 uppercase tracking-wide">Masa Aktif Akun</span>
+                </div>
+                <p className="text-sm font-extrabold text-white mt-1">
+                  {formattedExp}
+                </p>
+                <p className="text-[11px] text-slate-400 mt-0.5">
+                  Pukul 23:59 WIB {isExp ? '(Kadaluwarsa)' : `(Sisa ${diffDays} hari)`}
+                </p>
+              </div>
+            )
+          })()}
         </div>
       </div>
 
