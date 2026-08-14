@@ -303,6 +303,61 @@ export default function DashboardPage() {
         </div>
       </div>
 
+      {/* Proyeksi & Rekomendasi Pengeluaran Akhir Bulan */}
+      {(() => {
+        const startDateObj = new Date(startDate)
+        const totalDaysInMonth = new Date(startDateObj.getFullYear(), startDateObj.getMonth() + 1, 0).getDate()
+        const projectedMonthEndCost = avgPerDay * totalDaysInMonth
+        
+        const passedDays = Math.min(days, totalDaysInMonth)
+        const remainingDays = Math.max(1, totalDaysInMonth - passedDays)
+        const remainingAllowedForIncome = projectedIncome - totalOutcome
+        const recommendedDailyLimit = Math.max(0, remainingAllowedForIncome / remainingDays)
+
+        const isProjectedOverIncome = projectedIncome > 0 && projectedMonthEndCost > projectedIncome
+
+        return (
+          <div>
+            <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3.5 flex items-center gap-2">
+              <TrendingDown size={14} className="text-amber-400" />
+              Estimasi & Rekomendasi Pengeluaran
+            </p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="glass-card glass-card-hover p-5 rounded-2xl border border-slate-800/80 relative overflow-hidden">
+                <div className={`absolute top-0 right-0 w-24 h-24 ${isProjectedOverIncome ? 'bg-rose-500/10' : 'bg-amber-500/10'} rounded-full blur-2xl -mr-6 -mt-6 pointer-events-none`} />
+                <p className="text-xs font-medium text-amber-400 uppercase tracking-wide mb-1">Perkiraan Pengeluaran Akhir Bulan</p>
+                <p className={`text-2xl font-bold tracking-tight ${isProjectedOverIncome ? 'text-rose-400' : 'text-amber-300'}`}>
+                  {fmt(Math.round(projectedMonthEndCost))}
+                </p>
+                <p className="text-xs text-slate-400 mt-1">
+                  Berdasarkan rata-rata {fmt(Math.round(avgPerDay))}/hari ({totalDaysInMonth} hari)
+                </p>
+                {isProjectedOverIncome && (
+                  <p className="text-[11px] font-semibold text-rose-400 mt-1.5 flex items-center gap-1">
+                    ⚠️ Melebihi Projected Income ({fmt(projectedIncome)})
+                  </p>
+                )}
+              </div>
+
+              <div className="glass-card glass-card-hover p-5 rounded-2xl border border-slate-800/80 relative overflow-hidden">
+                <div className="absolute top-0 right-0 w-24 h-24 bg-cyan-500/10 rounded-full blur-2xl -mr-6 -mt-6 pointer-events-none" />
+                <p className="text-xs font-medium text-cyan-400 uppercase tracking-wide mb-1">Rekomendasi Maks. Rata-rata/Hari</p>
+                <p className="text-2xl font-bold text-cyan-300 tracking-tight">
+                  {fmt(Math.round(recommendedDailyLimit))}
+                </p>
+                <p className="text-xs text-slate-400 mt-1">
+                  {projectedIncome > 0 ? (
+                    <>Untuk sisa {remainingDays} hari agar tak melebihi Projected Income</>
+                  ) : (
+                    <>Set Projected Income di menu Budget terlebih dahulu</>
+                  )}
+                </p>
+              </div>
+            </div>
+          </div>
+        )
+      })()}
+
       {/* Projection Cards */}
       <div>
         <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3.5 flex items-center gap-2">
