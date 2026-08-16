@@ -170,10 +170,10 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             <div className="w-8 h-8 rounded-lg bg-gradient-to-tr from-blue-600 to-indigo-500 flex items-center justify-center shadow-md shadow-blue-500/30">
               <Sparkles size={18} className="text-white" />
             </div>
-            <span className="font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-indigo-300 text-base">FinTrack</span>
+            <span className="font-extrabold text-base tracking-tight text-blue-600 dark:text-transparent dark:bg-clip-text dark:bg-gradient-to-r dark:from-blue-400 dark:to-indigo-300">FinTrack</span>
           </div>
           <button onClick={() => setMobileOpen(false)}
-            className="p-1.5 rounded-lg hover:bg-slate-800 text-slate-400 hover:text-slate-200 cursor-pointer">
+            className="p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 cursor-pointer">
             <X size={18}/>
           </button>
         </div>
@@ -181,18 +181,18 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       </aside>
 
       {/* Desktop sidebar */}
-      <aside className={`hidden lg:flex ${collapsed ? 'w-20' : 'w-60'} glass-card border-r border-slate-800/70 flex-col transition-all duration-300 shrink-0`}>
-        <div className="flex items-center justify-between p-4.5 border-b border-slate-800/70">
+      <aside className={`hidden lg:flex ${collapsed ? 'w-20' : 'w-60'} glass-card border-r border-slate-200 dark:border-slate-800/70 flex-col transition-all duration-300 shrink-0`}>
+        <div className="flex items-center justify-between p-4.5 border-b border-slate-200 dark:border-slate-800/70">
           {!collapsed && (
             <div className="flex items-center gap-2.5">
               <div className="w-8 h-8 rounded-lg bg-gradient-to-tr from-blue-600 to-indigo-500 flex items-center justify-center shadow-md shadow-blue-500/30">
                 <Sparkles size={18} className="text-white" />
               </div>
-              <span className="font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-indigo-300 text-lg tracking-tight">FinTrack</span>
+              <span className="font-extrabold text-lg tracking-tight text-blue-600 dark:text-transparent dark:bg-clip-text dark:bg-gradient-to-r dark:from-blue-400 dark:to-indigo-300">FinTrack</span>
             </div>
           )}
           <button onClick={() => setCollapsed(!collapsed)}
-            className="p-2 rounded-xl hover:bg-slate-800/80 text-slate-400 hover:text-slate-200 ml-auto transition-colors cursor-pointer">
+            className="p-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800/80 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 ml-auto transition-colors cursor-pointer">
             {collapsed ? <ChevronRight size={18}/> : <ChevronLeft size={18}/>}
           </button>
         </div>
@@ -202,17 +202,17 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       {/* Main content */}
       <div className="flex-1 flex flex-col overflow-hidden">
         {/* Mobile topbar */}
-        <div className="lg:hidden flex items-center justify-between px-4 py-3.5 glass-card border-b border-slate-800/80 shrink-0">
+        <div className="lg:hidden flex items-center justify-between px-4 py-3.5 glass-card border-b border-slate-200 dark:border-slate-800/80 shrink-0">
           <div className="flex items-center gap-3">
             <button onClick={() => setMobileOpen(true)}
-              className="p-2 rounded-xl hover:bg-slate-800/80 text-slate-300 cursor-pointer">
+              className="p-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800/80 text-slate-600 dark:text-slate-300 cursor-pointer">
               <Menu size={22}/>
             </button>
             <div className="flex items-center gap-2">
               <div className="w-7 h-7 rounded-md bg-gradient-to-tr from-blue-600 to-indigo-500 flex items-center justify-center">
                 <Sparkles size={15} className="text-white" />
               </div>
-              <span className="font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-indigo-300 text-base">FinTrack</span>
+              <span className="font-extrabold text-base tracking-tight text-blue-600 dark:text-transparent dark:bg-clip-text dark:bg-gradient-to-r dark:from-blue-400 dark:to-indigo-300">FinTrack</span>
             </div>
           </div>
 

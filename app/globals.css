@@ -226,3 +226,60 @@ body {
   background-color: #ffffff !important;
   color: #0f172a !important;
 }
+
+/* Light mode specific badge & text overrides */
+.light .text-rose-400 {
+  color: #e11d48 !important;
+}
+.light .text-rose-300 {
+  color: #be123c !important;
+}
+.light .text-emerald-400 {
+  color: #059669 !important;
+}
+.light .text-emerald-300 {
+  color: #047857 !important;
+}
+.light .text-amber-400 {
+  color: #d97706 !important;
+}
+.light .text-amber-300 {
+  color: #b45309 !important;
+}
+.light .text-blue-400 {
+  color: #2563eb !important;
+}
+.light .text-indigo-400 {
+  color: #4f46e5 !important;
+}
+
+/* Ensure button text with colored backgrounds and gradients stays crisp white in light mode */
+.light .bg-blue-600,
+.light .bg-blue-500,
+.light .bg-indigo-600,
+.light .bg-indigo-500,
+.light .bg-emerald-600,
+.light .bg-rose-600,
+.light button[class*="bg-blue-"],
+.light button[class*="bg-indigo-"],
+.light button[class*="bg-gradient-"],
+.light .bg-gradient-to-r,
+.light .bg-gradient-to-tr {
+  color: #ffffff !important;
+}
+
+.light button[class*="bg-blue-"] *,
+.light button[class*="bg-indigo-"] *,
+.light button[class*="bg-gradient-"] *,
+.light .bg-blue-600 *,
+.light .bg-blue-500 *,
+.light .bg-indigo-600 * {
+  color: #ffffff !important;
+}
+
+/* Light mode code block */
+.light code.text-amber-300 {
+  color: #b45309 !important;
+  background-color: #fef3c7 !important;
+  border-color: #fde68a !important;
+}

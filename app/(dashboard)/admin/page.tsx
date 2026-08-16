@@ -7,7 +7,7 @@ import {
   Users, UserPlus, ShieldAlert, CheckCircle2, AlertCircle, 
   RefreshCw, Calendar, Clock, LogOut, Sparkles, Mail, Key, 
   Trash2, UserCheck, Search, Pencil, X, Save, UserX, RotateCcw,
-  AlertTriangle, ShieldBan
+  AlertTriangle, ShieldBan, Copy, Check
 } from 'lucide-react'
 
 type Profile = {
@@ -25,6 +25,8 @@ export default function AdminDashboardPage() {
   const [profiles, setProfiles] = useState<Profile[]>([])
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState('')
+  const [roleFilter, setRoleFilter] = useState<'all' | 'user' | 'admin'>('user')
+  const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'expired' | 'deleted'>('active')
 
   // Create User Form state
   const [email, setEmail] = useState('')
@@ -32,6 +34,13 @@ export default function AdminDashboardPage() {
   const [createLoading, setCreateLoading] = useState(false)
   const [createSuccess, setCreateSuccess] = useState('')
   const [createError, setCreateError] = useState('')
+  const [copiedPassword, setCopiedPassword] = useState(false)
+
+  function handleCopyPassword() {
+    navigator.clipboard.writeText('fintrack@2026')
+    setCopiedPassword(true)
+    setTimeout(() => setCopiedPassword(false), 2000)
+  }
 
   // Edit Expiration Modal state
   const [editingUser, setEditingUser] = useState<Profile | null>(null)
@@ -239,10 +248,33 @@ export default function AdminDashboardPage() {
   }
 
   const filteredProfiles = profiles
-    .filter(p => 
-      p.email?.toLowerCase().includes(search.toLowerCase()) || 
-      p.display_name?.toLowerCase().includes(search.toLowerCase())
-    )
+    .filter(p => {
+      // 1. Search Query Filter
+      const matchesSearch = 
+        p.email?.toLowerCase().includes(search.toLowerCase()) || 
+        p.display_name?.toLowerCase().includes(search.toLowerCase())
+      if (!matchesSearch) return false
+
+      // 2. Role Filter ('all' | 'user' | 'admin')
+      const isAdmin = p.role === 'admin' || p.email === 'admin@fintrack.com'
+      if (roleFilter === 'user' && isAdmin) return false
+      if (roleFilter === 'admin' && !isAdmin) return false
+
+      // 3. Status Filter ('all' | 'active' | 'expired' | 'deleted')
+      const { isExpired, isSoftDeleted } = getExpirationStatus(p)
+      if (statusFilter === 'active') {
+        // Aktif: tidak soft deleted dan tidak kadaluwarsa (admin permanen juga aktif)
+        if (isSoftDeleted || (isExpired && !isAdmin)) return false
+      } else if (statusFilter === 'expired') {
+        // Kadaluwarsa: bukan soft deleted tapi sudah lewat masa tenggang
+        if (isSoftDeleted || !isExpired || isAdmin) return false
+      } else if (statusFilter === 'deleted') {
+        // Nonaktif (Soft Deleted)
+        if (!isSoftDeleted) return false
+      }
+
+      return true
+    })
     .sort((a, b) => {
       // 1. Admin/Permanent accounts placed at the bottom
       const aIsAdmin = a.role === 'admin' || a.email === 'admin@fintrack.com' || !a.expires_at
@@ -259,10 +291,8 @@ export default function AdminDashboardPage() {
     })
 
   return (
-    <div className="min-h-screen bg-[#070a12] text-slate-100 p-4 sm:p-6 lg:p-8">
-      <div className="max-w-6xl mx-auto space-y-8">
-        
-        {/* Top Navbar */}
+    <div className="max-w-6xl mx-auto space-y-6">
+      {/* Top Navbar */}
         <div className="glass-card p-5 sm:p-6 rounded-3xl border border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-rose-600 to-amber-600 flex items-center justify-center shadow-lg shadow-rose-500/20">
@@ -357,14 +387,38 @@ export default function AdminDashboardPage() {
                   </p>
                 </div>
 
-                <div className="p-3.5 rounded-xl bg-slate-900/60 border border-slate-800/80 text-xs text-slate-400 space-y-1">
-                  <div className="flex items-center gap-1.5 text-slate-300 font-semibold">
-                    <Key size={13} className="text-amber-400" />
+                <div className="p-3.5 rounded-xl bg-slate-900/60 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800/80 text-xs text-slate-600 dark:text-slate-400 space-y-2">
+                  <div className="flex items-center gap-1.5 text-slate-700 dark:text-slate-300 font-semibold">
+                    <Key size={13} className="text-amber-500 dark:text-amber-400" />
                     <span>Password Default Pengguna:</span>
                   </div>
-                  <code className="text-amber-300 bg-black/40 px-2 py-0.5 rounded font-mono text-[11px] inline-block">
-                    fintrack@2026
-                  </code>
+                  <div className="flex items-center gap-2">
+                    <code className="text-amber-700 dark:text-amber-300 bg-amber-50 dark:bg-black/40 px-2.5 py-1 rounded-lg font-mono text-[11px] inline-block select-all border border-amber-300 dark:border-amber-500/20 flex-1">
+                      fintrack@2026
+                    </code>
+                    <button
+                      type="button"
+                      onClick={handleCopyPassword}
+                      className={`px-3 py-1.5 rounded-lg text-[11px] font-semibold flex items-center gap-1.5 transition-all cursor-pointer border shrink-0 ${
+                        copiedPassword 
+                          ? 'bg-emerald-500/20 text-emerald-600 dark:text-emerald-300 border-emerald-500/40 shadow-sm shadow-emerald-500/20' 
+                          : 'bg-white dark:bg-slate-800/90 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border-slate-300 dark:border-slate-700 shadow-sm'
+                      }`}
+                      title="Salin Password Default"
+                    >
+                      {copiedPassword ? (
+                        <>
+                          <Check size={13} className="text-emerald-600 dark:text-emerald-400" />
+                          <span>Tersalin!</span>
+                        </>
+                      ) : (
+                        <>
+                          <Copy size={13} className="text-slate-500 dark:text-slate-400" />
+                          <span>Salin</span>
+                        </>
+                      )}
+                    </button>
+                  </div>
                 </div>
               </form>
             </div>
@@ -394,26 +448,73 @@ export default function AdminDashboardPage() {
           {/* User List Table */}
           <div className="lg:col-span-2 glass-card p-6 rounded-3xl border border-slate-800 flex flex-col justify-between">
             <div>
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-5 pb-3 border-b border-slate-800">
-                <div className="flex items-center gap-2.5">
-                  <div className="p-2 rounded-xl bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">
-                    <Users size={18} />
+              <div className="flex flex-col gap-3 mb-5 pb-3 border-b border-slate-800">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                  <div className="flex items-center gap-2.5">
+                    <div className="p-2 rounded-xl bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">
+                      <Users size={18} />
+                    </div>
+                    <div>
+                      <h2 className="text-base font-bold text-white">
+                        Daftar Pengguna ({filteredProfiles.length}{filteredProfiles.length !== profiles.length ? ` dari ${profiles.length}` : ''})
+                      </h2>
+                      <p className="text-xs text-slate-400">Status akun & perpanjangan masa tenggang</p>
+                    </div>
                   </div>
-                  <div>
-                    <h2 className="text-base font-bold text-white">Daftar Pengguna ({profiles.length})</h2>
-                    <p className="text-xs text-slate-400">Status akun & perpanjangan masa tenggang</p>
+
+                  <div className="relative w-full sm:w-64">
+                    <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" />
+                    <input
+                      type="text"
+                      placeholder="Cari email..."
+                      value={search}
+                      onChange={(e) => setSearch(e.target.value)}
+                      className="w-full bg-slate-900/80 border border-slate-700/80 rounded-xl py-1.5 pl-8 pr-3 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500"
+                    />
                   </div>
                 </div>
 
-                <div className="relative w-full sm:w-64">
-                  <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" />
-                  <input
-                    type="text"
-                    placeholder="Cari email..."
-                    value={search}
-                    onChange={(e) => setSearch(e.target.value)}
-                    className="w-full bg-slate-900/80 border border-slate-700/80 rounded-xl py-1.5 pl-8 pr-3 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500"
-                  />
+                {/* Filter Bar: Role & Status */}
+                <div className="flex flex-wrap items-center gap-2 pt-2 border-t border-slate-800/60 text-xs">
+                  <div className="flex items-center gap-1.5 bg-slate-900/90 border border-slate-800 rounded-xl px-2.5 py-1">
+                    <span className="text-[11px] font-semibold text-slate-400">Role:</span>
+                    <select
+                      value={roleFilter}
+                      onChange={(e) => setRoleFilter(e.target.value as any)}
+                      className="bg-transparent text-white font-medium text-xs focus:outline-none cursor-pointer pr-1"
+                    >
+                      <option value="user" className="bg-slate-900 text-white">User</option>
+                      <option value="admin" className="bg-slate-900 text-white">Admin</option>
+                      <option value="all" className="bg-slate-900 text-white">Semua Role</option>
+                    </select>
+                  </div>
+
+                  <div className="flex items-center gap-1.5 bg-slate-900/90 border border-slate-800 rounded-xl px-2.5 py-1">
+                    <span className="text-[11px] font-semibold text-slate-400">Status:</span>
+                    <select
+                      value={statusFilter}
+                      onChange={(e) => setStatusFilter(e.target.value as any)}
+                      className="bg-transparent text-white font-medium text-xs focus:outline-none cursor-pointer pr-1"
+                    >
+                      <option value="active" className="bg-slate-900 text-white">Aktif</option>
+                      <option value="expired" className="bg-slate-900 text-white">Kadaluwarsa</option>
+                      <option value="deleted" className="bg-slate-900 text-white">Nonaktif (Deleted)</option>
+                      <option value="all" className="bg-slate-900 text-white">Semua Status</option>
+                    </select>
+                  </div>
+
+                  {(roleFilter !== 'user' || statusFilter !== 'active' || search !== '') && (
+                    <button
+                      onClick={() => {
+                        setRoleFilter('user')
+                        setStatusFilter('active')
+                        setSearch('')
+                      }}
+                      className="text-[11px] text-slate-400 hover:text-rose-400 transition-colors ml-auto flex items-center gap-1 cursor-pointer py-1 px-2 rounded-lg hover:bg-rose-500/10"
+                    >
+                      <X size={12} /> Reset Filter
+                    </button>
+                  )}
                 </div>
               </div>
 
@@ -494,37 +595,15 @@ export default function AdminDashboardPage() {
                             </td>
                             <td className="px-4 py-3 text-center">
                               {!isAdmin && (
-                                <div className="flex items-center justify-center gap-1.5">
-                                  {/* Edit Expiration Button */}
+                                <div className="flex items-center justify-center">
+                                  {/* Single Action Button: Pencil Icon */}
                                   <button
                                     onClick={() => openEditModal(p)}
-                                    className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-slate-800/80 hover:bg-amber-500/10 text-slate-300 hover:text-amber-400 border border-slate-700/60 hover:border-amber-500/30 text-[11px] font-medium transition-all cursor-pointer"
-                                    title="Ubah Masa Tenggang"
+                                    className="p-2 rounded-xl bg-slate-800/80 hover:bg-amber-500/20 text-slate-300 hover:text-amber-400 border border-slate-700/60 hover:border-amber-500/30 transition-all cursor-pointer shadow-sm group"
+                                    title="Kelola Akun (Ubah Masa Tenggang / Status)"
                                   >
-                                    <Pencil size={11} />
-                                    <span>Edit Tenggang</span>
+                                    <Pencil size={14} className="group-hover:scale-110 transition-transform" />
                                   </button>
-
-                                  {/* Soft Delete or Restore Button */}
-                                  {isSoftDeleted ? (
-                                    <button
-                                      onClick={() => setDeletingUser({ user: p, action: 'restore' })}
-                                      className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-[11px] font-medium transition-all cursor-pointer"
-                                      title="Aktifkan Kembali Akun"
-                                    >
-                                      <RotateCcw size={11} />
-                                      <span>Pulihkan</span>
-                                    </button>
-                                  ) : (
-                                    <button
-                                      onClick={() => setDeletingUser({ user: p, action: 'soft' })}
-                                      className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-slate-800/80 hover:bg-rose-500/10 text-slate-300 hover:text-rose-400 border border-slate-700/60 hover:border-rose-500/30 text-[11px] font-medium transition-all cursor-pointer"
-                                      title="Nonaktifkan Akun (Soft Delete)"
-                                    >
-                                      <UserX size={11} />
-                                      <span>Nonaktifkan</span>
-                                    </button>
-                                  )}
                                 </div>
                               )}
                             </td>
@@ -549,20 +628,18 @@ export default function AdminDashboardPage() {
           </div>
         </div>
 
-      </div>
-
-      {/* Modal: Edit Expiration Period (Single Number Input: Months) */}
+      {/* Modal: Kelola Akun Pengguna (Edit Masa Tenggang & Nonaktifkan / Pulihkan Akun) */}
       {editingUser && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-sm animate-fadeIn">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-fadeIn">
           <div className="glass-card p-6 sm:p-8 rounded-3xl border border-slate-800 shadow-2xl w-full max-w-md relative animate-scaleUp">
             
             <div className="flex items-center justify-between pb-3 border-b border-slate-800 mb-5">
               <div className="flex items-center gap-2.5">
                 <div className="p-2 rounded-xl bg-amber-500/10 text-amber-400 border border-amber-500/20">
-                  <Clock size={18} />
+                  <Pencil size={18} />
                 </div>
                 <div>
-                  <h3 className="text-base font-bold text-white">Ubah Masa Tenggang</h3>
+                  <h3 className="text-base font-bold text-white">Kelola Akun Pengguna</h3>
                   <p className="text-xs text-slate-400">{editingUser.email}</p>
                 </div>
               </div>
@@ -589,56 +666,111 @@ export default function AdminDashboardPage() {
               </div>
             )}
 
-            <form onSubmit={handleUpdateExpiration} className="space-y-4">
-              <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-1.5 uppercase tracking-wide">
-                  Masa Tenggang Baru (Bulan dari Hari Ini)
-                </label>
-                <div className="relative">
-                  <Clock size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500" />
-                  <input
-                    type="number"
-                    required
-                    min="1"
-                    placeholder="Contoh: 1, 3, 6, 12"
-                    value={editMonths}
-                    onChange={(e) => setEditMonths(e.target.value)}
-                    className="w-full bg-slate-900/90 border border-slate-700/80 rounded-xl py-2.5 pl-10 pr-4 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-amber-500 transition-colors"
-                  />
+            <div className="space-y-6">
+              {/* Bagian 1: Ubah Masa Tenggang */}
+              <form onSubmit={handleUpdateExpiration} className="space-y-4">
+                <div>
+                  <label className="block text-xs font-semibold text-slate-300 mb-1.5 uppercase tracking-wide">
+                    Masa Tenggang Baru (Bulan dari Hari Ini)
+                  </label>
+                  <div className="relative">
+                    <Clock size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500" />
+                    <input
+                      type="number"
+                      required
+                      min="1"
+                      placeholder="Contoh: 1, 3, 6, 12"
+                      value={editMonths}
+                      onChange={(e) => setEditMonths(e.target.value)}
+                      className="w-full bg-slate-900/90 border border-slate-700/80 rounded-xl py-2.5 pl-10 pr-4 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-amber-500 transition-colors"
+                    />
+                  </div>
+                  <p className="text-[11px] text-slate-400 mt-1.5">
+                    Akun akan aktif selama <strong>{editMonths || 0} bulan</strong> ke depan (pukul 23:59).
+                  </p>
                 </div>
-                <p className="text-[11px] text-slate-400 mt-1.5">
-                  Akun akan aktif selama <strong>{editMonths || 0} bulan</strong> ke depan (pukul 23:59).
-                </p>
-              </div>
 
-              <div className="flex items-center gap-3 pt-3">
-                <button
-                  type="button"
-                  onClick={() => setEditingUser(null)}
-                  className="flex-1 py-2.5 rounded-xl border border-slate-700 text-slate-400 hover:text-white hover:bg-slate-800/80 text-xs font-medium transition-colors cursor-pointer"
-                >
-                  Batal
-                </button>
                 <button
                   type="submit"
                   disabled={editLoading}
-                  className="flex-1 py-2.5 rounded-xl bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-500 hover:to-orange-500 text-white text-xs font-bold shadow-lg shadow-amber-500/20 transition-all flex items-center justify-center gap-1.5 cursor-pointer disabled:opacity-50"
+                  className="w-full py-2.5 rounded-xl bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-500 hover:to-orange-500 text-white text-xs font-bold shadow-lg shadow-amber-500/20 transition-all flex items-center justify-center gap-1.5 cursor-pointer disabled:opacity-50"
                 >
                   {editLoading ? (
                     <>
                       <RefreshCw size={13} className="animate-spin" />
-                      <span>Menyimpan...</span>
+                      <span>Menyimpan Masa Tenggang...</span>
                     </>
                   ) : (
                     <>
                       <Save size={13} />
-                      <span>Simpan Masa Tenggang</span>
+                      <span>Simpan Perubahan Masa Tenggang</span>
                     </>
                   )}
                 </button>
-              </div>
+              </form>
 
-            </form>
+              {/* Bagian 2: Tindakan Status Akun (Nonaktifkan / Pulihkan) */}
+              <div className="pt-4 border-t border-slate-800/80">
+                <label className="block text-xs font-semibold text-slate-300 mb-2 uppercase tracking-wide">
+                  Status & Akses Akun
+                </label>
+                
+                {editingUser.is_deleted ? (
+                  <div className="p-3.5 rounded-2xl bg-rose-500/10 border border-rose-500/20 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                    <div>
+                      <div className="flex items-center gap-1.5 font-bold text-xs text-rose-300">
+                        <ShieldBan size={14} /> Akun Sedang Dinonaktifkan
+                      </div>
+                      <p className="text-[11px] text-slate-400 mt-0.5">Pengguna saat ini tidak dapat login ke aplikasi.</p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const target = editingUser
+                        setEditingUser(null)
+                        setDeletingUser({ user: target, action: 'restore' })
+                      }}
+                      className="px-3 py-1.5 rounded-xl bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-500/30 text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer shrink-0"
+                    >
+                      <RotateCcw size={13} />
+                      <span>Pulihkan Akun</span>
+                    </button>
+                  </div>
+                ) : (
+                  <div className="p-3.5 rounded-2xl bg-slate-900/80 border border-slate-800 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                    <div>
+                      <div className="flex items-center gap-1.5 font-bold text-xs text-emerald-400">
+                        <CheckCircle2 size={14} /> Akun Aktif
+                      </div>
+                      <p className="text-[11px] text-slate-400 mt-0.5">Pengguna dapat login dan mencatat transaksi.</p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const target = editingUser
+                        setEditingUser(null)
+                        setDeletingUser({ user: target, action: 'soft' })
+                      }}
+                      className="px-3 py-1.5 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/30 text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer shrink-0"
+                    >
+                      <UserX size={13} />
+                      <span>Nonaktifkan</span>
+                    </button>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            <div className="pt-5 mt-5 border-t border-slate-800 flex justify-end">
+              <button
+                type="button"
+                onClick={() => setEditingUser(null)}
+                className="px-5 py-2 rounded-xl border border-slate-700 text-slate-400 hover:text-white hover:bg-slate-800/80 text-xs font-medium transition-colors cursor-pointer"
+              >
+                Tutup
+              </button>
+            </div>
+
           </div>
         </div>
       )}

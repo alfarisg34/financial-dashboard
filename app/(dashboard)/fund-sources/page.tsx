@@ -441,9 +441,9 @@ export default function FundSourcesPage() {
               />
               <button
                 type="submit"
-                className="flex-1 bg-blue-600 hover:bg-blue-500 text-white font-bold text-sm rounded-xl transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+                className="flex-1 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold text-sm rounded-xl shadow-md shadow-blue-500/20 transition-all flex items-center justify-center gap-1.5 cursor-pointer py-2.5"
               >
-                <Plus size={16}/> Tambah
+                <Plus size={16}/> <span>Tambah</span>
               </button>
             </div>
           </div>
