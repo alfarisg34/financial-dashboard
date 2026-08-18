@@ -101,6 +101,7 @@ export default function TransferPage() {
         .select('*, from_source:fund_sources!from_fund_source_id(name, icon), to_source:fund_sources!to_fund_source_id(name, icon)')
         .eq('user_id', user.id)
         .order('date', { ascending: false })
+        .order('created_at', { ascending: false })
         .limit(30)
     ])
 

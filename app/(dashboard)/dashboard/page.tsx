@@ -91,6 +91,7 @@ export default function DashboardPage() {
       .select('*, categories(name), subcategories(name), fund_sources(name, icon, type)')
       .gte('date', startUtc).lte('date', endUtc)
       .order('date', { ascending: false })
+      .order('created_at', { ascending: false })
       .then(({ data }) => setTransactions(data || []))
   }, [startDate, endDate])
 

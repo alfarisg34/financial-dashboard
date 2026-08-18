@@ -191,6 +191,7 @@ export default function InputPage() {
       .select('*, fund_sources(name, icon)')
       .eq('user_id', user.id)
       .order('date', { ascending: false })
+      .order('created_at', { ascending: false })
       .limit(30)
 
     if (error) {
