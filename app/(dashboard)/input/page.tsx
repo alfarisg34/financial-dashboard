@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react'
 import { createClient } from '@/lib/supabase/client'
-import { ChevronDown, Check, Pencil, Trash2, X, Landmark, Plus } from 'lucide-react'
+import { ChevronDown, Check, Pencil, Trash2, X, Landmark, Plus, ChevronLeft, ChevronRight, Calendar } from 'lucide-react'
 import AmountCalculatorInput from '@/components/AmountCalculatorInput'
 
 type Category = { id: string; name: string; type: string }
@@ -67,6 +67,33 @@ function formatDateForDb(dateStr: string) {
   return d.toISOString()
 }
 
+function getTwoMonthsAgoStartDate(): Date {
+  const now = new Date()
+  return new Date(now.getFullYear(), now.getMonth() - 2, 1, 0, 0, 0, 0)
+}
+
+function getTwoMonthsAgoRangeLabel(): string {
+  const start = getTwoMonthsAgoStartDate()
+  const monthNames = [
+    'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
+    'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'
+  ]
+  return `1 ${monthNames[start.getMonth()]} ${start.getFullYear()} - Hari ini`
+}
+
+function getPageNumbers(currentPage: number, totalPages: number): (number | string)[] {
+  if (totalPages <= 7) {
+    return Array.from({ length: totalPages }, (_, i) => i + 1)
+  }
+  if (currentPage <= 4) {
+    return [1, 2, 3, 4, 5, '...', totalPages]
+  }
+  if (currentPage >= totalPages - 3) {
+    return [1, '...', totalPages - 4, totalPages - 3, totalPages - 2, totalPages - 1, totalPages]
+  }
+  return [1, '...', currentPage - 1, currentPage, currentPage + 1, '...', totalPages]
+}
+
 
 export default function InputPage() {
   const supabase = createClient()
@@ -89,9 +116,11 @@ export default function InputPage() {
   const [budgetInfo, setBudgetInfo] = useState<{ budget: number; spent: number } | null>(null)
   const [loadingBudget, setLoadingBudget] = useState(false)
 
-  // State untuk daftar transaksi (Last 30 Transactions)
+  // State untuk daftar transaksi (Last 2 Months Transactions)
   const [transactions, setTransactions] = useState<Transaction[]>([])
   const [loadingTransactions, setLoadingTransactions] = useState(false)
+  const [pageSize, setPageSize] = useState<number>(10)
+  const [currentPage, setCurrentPage] = useState<number>(1)
 
   // State untuk modal edit
   const [editingTransaction, setEditingTransaction] = useState<Transaction | null>(null)
@@ -177,7 +206,7 @@ export default function InputPage() {
     fetchBudgetInfo()
   }, [subcategoryId, date])
 
-  // Load Last 30 Transactions
+  // Load Last 2 Months Transactions
   async function loadTransactions() {
     setLoadingTransactions(true)
     const { data: { user } } = await supabase.auth.getUser()
@@ -186,13 +215,16 @@ export default function InputPage() {
       return
     }
 
+    const startDate = getTwoMonthsAgoStartDate()
+    const startIso = startDate.toISOString()
+
     const { data: txData, error } = await supabase
       .from('transactions')
       .select('*, fund_sources(name, icon)')
       .eq('user_id', user.id)
+      .gte('date', startIso)
       .order('date', { ascending: false })
       .order('created_at', { ascending: false })
-      .limit(30)
 
     if (error) {
       console.error('Error loading transactions:', error)
@@ -439,6 +471,14 @@ export default function InputPage() {
     setEditDropdownOpen(false)
   }
 
+  // Pagination calculations
+  const totalItems = transactions.length
+  const totalPages = Math.max(1, Math.ceil(totalItems / pageSize))
+  const safeCurrentPage = Math.min(Math.max(1, currentPage), totalPages)
+  const startIndex = (safeCurrentPage - 1) * pageSize
+  const endIndex = Math.min(startIndex + pageSize, totalItems)
+  const paginatedTransactions = transactions.slice(startIndex, endIndex)
+
   return (
     <div className="max-w-2xl w-full mx-auto space-y-6">
       <div className="glass-card p-6 rounded-2xl border border-slate-800">
@@ -629,75 +669,177 @@ export default function InputPage() {
         </button>
       </form>
 
-      {/* Last 30 Transactions List */}
-      <div className="mt-8">
-        <h2 className="text-lg font-bold text-white mb-4">Last 30 Transactions</h2>
+      {/* Last 2 Months Transactions Section */}
+      <div className="mt-8 space-y-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 glass-card p-4 rounded-xl border border-slate-800">
+          <div>
+            <div className="flex items-center gap-2 flex-wrap">
+              <h2 className="text-lg font-bold text-white">Last 2 Months Transactions</h2>
+              <span className="text-xs px-2.5 py-0.5 rounded-full bg-blue-500/10 text-blue-400 border border-blue-500/20 font-semibold">
+                {totalItems} data
+              </span>
+            </div>
+            <p className="text-xs text-slate-400 mt-1 flex items-center gap-1.5">
+              <Calendar size={13} className="text-slate-500" />
+              <span>Periode: <span className="text-slate-300 font-medium">{getTwoMonthsAgoRangeLabel()}</span></span>
+            </p>
+          </div>
+
+          {/* Page Size Selector */}
+          <div className="flex items-center gap-2 self-start sm:self-center">
+            <span className="text-xs text-slate-400 font-medium">Tampilkan:</span>
+            <div className="flex items-center bg-slate-900 border border-slate-800 rounded-lg p-0.5">
+              {[10, 25, 50].map(size => (
+                <button
+                  key={size}
+                  type="button"
+                  onClick={() => {
+                    setPageSize(size)
+                    setCurrentPage(1)
+                  }}
+                  className={`px-2.5 py-1 text-xs rounded-md font-semibold transition-all cursor-pointer ${
+                    pageSize === size
+                      ? 'bg-blue-600 text-white shadow-sm shadow-blue-500/30'
+                      : 'text-slate-400 hover:text-slate-200'
+                  }`}
+                >
+                  {size}
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
         
         {loadingTransactions ? (
-          <div className="text-center py-8 text-slate-500">Memuat transaksi...</div>
+          <div className="text-center py-8 text-slate-500 glass-card rounded-xl border border-slate-800">
+            Memuat transaksi...
+          </div>
         ) : transactions.length === 0 ? (
           <div className="text-center py-8 text-slate-500 glass-card rounded-xl border border-slate-800">
-            Belum ada transaksi recorded.
+            Belum ada transaksi recorded dalam 2 bulan terakhir.
           </div>
         ) : (
-          <div className="space-y-3">
-            {transactions.map((tx) => (
-              <div key={tx.id} className="glass-card glass-card-hover rounded-xl border border-slate-800 p-4">
-                <div className="flex justify-between items-start">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-1 flex-wrap">
-                      <span className={`text-[11px] font-bold px-2.5 py-0.5 rounded-md ${tx.type === 'income' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-rose-500/10 text-rose-400 border border-rose-500/20'}`}>
-                        {tx.type === 'income' ? 'Income' : 'Outcome'}
-                      </span>
-                      <span className="text-xs text-slate-400">
-                        {formatDisplayDate(tx.date)}
-                      </span>
-                      {tx.fund_source_name && (
-                        <span className="text-[11px] bg-slate-800 text-slate-300 border border-slate-700/60 px-2 py-0.5 rounded-md flex items-center gap-1">
-                          <span>{tx.fund_source_icon}</span>
-                          <span>{tx.fund_source_name}</span>
+          <>
+            <div className="space-y-3">
+              {paginatedTransactions.map((tx) => (
+                <div key={tx.id} className="glass-card glass-card-hover rounded-xl border border-slate-800 p-4">
+                  <div className="flex justify-between items-start">
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 mb-1 flex-wrap">
+                        <span className={`text-[11px] font-bold px-2.5 py-0.5 rounded-md ${tx.type === 'income' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-rose-500/10 text-rose-400 border border-rose-500/20'}`}>
+                          {tx.type === 'income' ? 'Income' : 'Outcome'}
                         </span>
-                      )}
-                    </div>
-                    <div className={`text-lg font-bold ${tx.type === 'income' ? 'text-emerald-400' : 'text-rose-400'}`}>
-                      {tx.type === 'income' ? '+' : '-'}{fmt(tx.amount)}
-                    </div>
-                    <div className="text-xs text-slate-400 mt-1 flex items-center gap-2">
-                      {tx.subcategory_name && (
-                        <span className="bg-slate-800/80 font-medium text-slate-200 px-2 py-0.5 rounded">
-                          {tx.subcategory_name}
+                        <span className="text-xs text-slate-400">
+                          {formatDisplayDate(tx.date)}
                         </span>
-                      )}
-                      {tx.category_name && (
-                        <span className="text-slate-500">
-                          ({tx.category_name})
-                        </span>
-                      )}
-                    </div>
-                    {tx.description && (
-                      <div className="text-xs text-slate-400 mt-2 bg-slate-950/40 p-2 rounded-lg border border-slate-800/50">
-                        📝 {tx.description}
+                        {tx.fund_source_name && (
+                          <span className="text-[11px] bg-slate-800 text-slate-300 border border-slate-700/60 px-2 py-0.5 rounded-md flex items-center gap-1">
+                            <span>{tx.fund_source_icon}</span>
+                            <span>{tx.fund_source_name}</span>
+                          </span>
+                        )}
                       </div>
-                    )}
-                  </div>
-                  <div className="flex gap-1.5 ml-4">
-                    <button
-                      onClick={() => openEditModal(tx)}
-                      className="p-2 text-blue-400 hover:bg-blue-500/10 rounded-lg transition-colors cursor-pointer"
-                    >
-                      <Pencil size={16} />
-                    </button>
-                    <button
-                      onClick={() => setDeleteConfirm({ show: true, transactionId: tx.id })}
-                      className="p-2 text-rose-400 hover:bg-rose-500/10 rounded-lg transition-colors cursor-pointer"
-                    >
-                      <Trash2 size={16} />
-                    </button>
+                      <div className={`text-lg font-bold ${tx.type === 'income' ? 'text-emerald-400' : 'text-rose-400'}`}>
+                        {tx.type === 'income' ? '+' : '-'}{fmt(tx.amount)}
+                      </div>
+                      <div className="text-xs text-slate-400 mt-1 flex items-center gap-2">
+                        {tx.subcategory_name && (
+                          <span className="bg-slate-800/80 font-medium text-slate-200 px-2 py-0.5 rounded">
+                            {tx.subcategory_name}
+                          </span>
+                        )}
+                        {tx.category_name && (
+                          <span className="text-slate-500">
+                            ({tx.category_name})
+                          </span>
+                        )}
+                      </div>
+                      {tx.description && (
+                        <div className="text-xs text-slate-400 mt-2 bg-slate-950/40 p-2 rounded-lg border border-slate-800/50">
+                          📝 {tx.description}
+                        </div>
+                      )}
+                    </div>
+                    <div className="flex gap-1.5 ml-4">
+                      <button
+                        onClick={() => openEditModal(tx)}
+                        className="p-2 text-blue-400 hover:bg-blue-500/10 rounded-lg transition-colors cursor-pointer"
+                        title="Edit Transaksi"
+                      >
+                        <Pencil size={16} />
+                      </button>
+                      <button
+                        onClick={() => setDeleteConfirm({ show: true, transactionId: tx.id })}
+                        className="p-2 text-rose-400 hover:bg-rose-500/10 rounded-lg transition-colors cursor-pointer"
+                        title="Hapus Transaksi"
+                      >
+                        <Trash2 size={16} />
+                      </button>
+                    </div>
                   </div>
                 </div>
+              ))}
+            </div>
+
+            {/* Pagination Controls */}
+            {totalPages > 1 && (
+              <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-3 px-1">
+                <span className="text-xs text-slate-400">
+                  Menampilkan <strong className="text-slate-200">{totalItems === 0 ? 0 : startIndex + 1}</strong> - <strong className="text-slate-200">{endIndex}</strong> dari <strong className="text-slate-200">{totalItems}</strong> transaksi
+                </span>
+                <div className="flex items-center gap-1.5 flex-wrap justify-center">
+                  <button
+                    type="button"
+                    disabled={safeCurrentPage <= 1}
+                    onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                    className={`p-2 rounded-lg border text-xs font-medium flex items-center justify-center transition-colors cursor-pointer ${
+                      safeCurrentPage <= 1
+                        ? 'border-slate-800/60 text-slate-600 cursor-not-allowed'
+                        : 'border-slate-800 bg-slate-900 text-slate-300 hover:bg-slate-800 hover:text-white'
+                    }`}
+                    title="Halaman Sebelumnya"
+                  >
+                    <ChevronLeft size={16} />
+                  </button>
+
+                  {getPageNumbers(safeCurrentPage, totalPages).map((pageNum, idx) => (
+                    typeof pageNum === 'number' ? (
+                      <button
+                        key={idx}
+                        type="button"
+                        onClick={() => setCurrentPage(pageNum)}
+                        className={`min-w-[32px] h-8 px-2 rounded-lg text-xs font-medium transition-colors cursor-pointer ${
+                          safeCurrentPage === pageNum
+                            ? 'bg-blue-600 text-white font-bold shadow-md shadow-blue-500/20'
+                            : 'border border-slate-800 bg-slate-900 text-slate-400 hover:bg-slate-800 hover:text-slate-200'
+                        }`}
+                      >
+                        {pageNum}
+                      </button>
+                    ) : (
+                      <span key={idx} className="px-1 text-slate-500 text-xs select-none">
+                        {pageNum}
+                      </span>
+                    )
+                  ))}
+
+                  <button
+                    type="button"
+                    disabled={safeCurrentPage >= totalPages}
+                    onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                    className={`p-2 rounded-lg border text-xs font-medium flex items-center justify-center transition-colors cursor-pointer ${
+                      safeCurrentPage >= totalPages
+                        ? 'border-slate-800/60 text-slate-600 cursor-not-allowed'
+                        : 'border-slate-800 bg-slate-900 text-slate-300 hover:bg-slate-800 hover:text-white'
+                    }`}
+                    title="Halaman Selanjutnya"
+                  >
+                    <ChevronRight size={16} />
+                  </button>
+                </div>
               </div>
-            ))}
-          </div>
+            )}
+          </>
         )}
       </div>
 
