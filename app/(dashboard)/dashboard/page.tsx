@@ -151,7 +151,10 @@ export default function DashboardPage() {
   function groupBy(txs: Transaction[], key: (t: Transaction) => string) {
     const map: Record<string, number> = {}
     txs.forEach(t => { map[key(t)] = (map[key(t)] || 0) + t.amount })
-    return Object.entries(map).filter(([, v]) => v > 0).map(([name, value]) => ({ name, value }))
+    return Object.entries(map)
+      .filter(([, v]) => v > 0)
+      .map(([name, value]) => ({ name, value }))
+      .sort((a, b) => b.value - a.value)
   }
 
   const incomeByCategory = groupBy(income, t => t.categories?.name || 'Lainnya')
@@ -564,8 +567,18 @@ export default function DashboardPage() {
       {/* Subcategory Pie Charts per Category */}
       {['income', 'outcome'].map(t => {
         const txs = transactions.filter(tx => tx.type === t)
-        const categoryNames = [...new Set(txs.map(tx => tx.categories?.name).filter(Boolean))] as string[]
-        if (categoryNames.length === 0) return null
+        const rawCategoryNames = [...new Set(txs.map(tx => tx.categories?.name).filter(Boolean))] as string[]
+        const categoryData = rawCategoryNames
+          .map(catName => {
+            const catTxs = txs.filter(tx => tx.categories?.name === catName)
+            const catTotal = catTxs.reduce((s, tx) => s + tx.amount, 0)
+            const data = groupBy(catTxs, tx => tx.subcategories?.name || 'Lainnya')
+            return { catName, catTotal, data }
+          })
+          .filter(item => item.data.length > 0)
+          .sort((a, b) => b.catTotal - a.catTotal)
+
+        if (categoryData.length === 0) return null
         return (
           <div key={t} className="space-y-4">
             <div className="flex items-center gap-2">
@@ -575,11 +588,7 @@ export default function DashboardPage() {
               </h2>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {categoryNames.map(catName => {
-                const catTxs = txs.filter(tx => tx.categories?.name === catName)
-                const catTotal = catTxs.reduce((s, tx) => s + tx.amount, 0)
-                const data = groupBy(catTxs, tx => tx.subcategories?.name || 'Lainnya')
-                if (data.length === 0) return null
+              {categoryData.map(({ catName, catTotal, data }) => {
                 return (
                   <div key={catName} className="glass-card rounded-2xl p-5">
                     <div className="flex items-center justify-between mb-4 pb-2 border-b border-[var(--border-subtle)]">
