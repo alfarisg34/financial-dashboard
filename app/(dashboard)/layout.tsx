@@ -79,28 +79,36 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       <Link
         href="/profile"
         onClick={() => setMobileOpen(false)}
-        style={{
-          backgroundColor: theme === 'dark' ? 'rgba(15, 23, 42, 0.7)' : '#ffffff',
-          borderColor: theme === 'dark' ? 'rgba(30, 41, 59, 0.8)' : '#e2e8f0'
-        }}
-        className={`mx-3 my-2.5 p-2.5 rounded-xl border flex items-center gap-3 shadow-sm hover:border-blue-500/50 hover:shadow-blue-500/10 transition-all group cursor-pointer ${collapsed && !mobileOpen ? 'justify-center p-2' : ''}`}
+        className={`mx-3 my-2.5 p-2.5 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-surface-elevated)] flex items-center gap-3 shadow-sm hover:border-[var(--accent-primary)]/40 hover:shadow-md transition-all duration-200 group cursor-pointer ${
+          collapsed && !mobileOpen ? 'justify-center p-2' : ''
+        }`}
       >
-        <div className={`w-8 h-8 rounded-lg ${isAdmin ? 'bg-gradient-to-tr from-rose-600 to-amber-600' : 'bg-gradient-to-tr from-blue-600 to-indigo-600'} flex items-center justify-center font-bold text-xs shrink-0 shadow-md uppercase transition-transform group-hover:scale-105`}>
-          <span style={{ color: '#ffffff' }}>
-            {isAdmin ? <ShieldAlert size={16} style={{ color: '#ffffff' }} /> : (userName ? userName.charAt(0) : <User size={16} style={{ color: '#ffffff' }} />)}
-          </span>
+        <div
+          className={`w-8 h-8 rounded-lg ${
+            isAdmin
+              ? 'bg-gradient-to-tr from-rose-600 to-amber-600 text-white'
+              : 'bg-gradient-to-tr from-blue-600 to-indigo-600 text-white'
+          } flex items-center justify-center font-bold text-xs shrink-0 shadow-md uppercase transition-transform group-hover:scale-105`}
+        >
+          {isAdmin ? (
+            <ShieldAlert size={16} />
+          ) : userName ? (
+            userName.charAt(0)
+          ) : (
+            <User size={16} />
+          )}
         </div>
         {(!collapsed || mobileOpen) && (
           <div className="flex flex-col min-w-0 overflow-hidden">
-            <span 
-              style={{ color: isAdmin ? '#f43f5e' : (theme === 'dark' ? '#60a5fa' : '#2563eb') }}
-              className="text-[10px] uppercase font-bold tracking-wider leading-none mb-0.5"
+            <span
+              className={`text-[10px] uppercase font-bold tracking-wider leading-none mb-0.5 ${
+                isAdmin ? 'text-rose-500 dark:text-rose-400' : 'text-blue-600 dark:text-blue-400'
+              }`}
             >
-              {isAdmin ? 'Admin' : 'Hai 👋'}
+              {isAdmin ? 'Admin Portal' : 'Hai 👋'}
             </span>
-            <span 
-              style={{ color: theme === 'dark' ? '#ffffff' : '#0f172a' }}
-              className="text-xs font-extrabold truncate leading-tight group-hover:text-blue-400 transition-colors" 
+            <span
+              className="text-xs font-bold truncate leading-tight text-[var(--text-primary)] group-hover:text-blue-500 transition-colors"
               title={userName}
             >
               {userName || 'Memuat...'}
@@ -109,118 +117,177 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         )}
       </Link>
 
-      <nav className="flex-1 p-3 space-y-1.5 overflow-y-auto">
+      {/* Navigation Links */}
+      <nav className="flex-1 px-3 py-2 space-y-1 overflow-y-auto">
         {navItemsToRender.map(({ href, icon: Icon, label }) => {
           const active = pathname === href
           return (
-            <Link key={href} href={href}
+            <Link
+              key={href}
+              href={href}
               onClick={() => setMobileOpen(false)}
-              className={`flex items-center gap-3.5 px-3.5 py-3 rounded-xl text-sm font-medium transition-all duration-200 group
-                ${active 
-                  ? (isAdmin && href === '/admin'
-                      ? 'bg-gradient-to-r from-rose-600/90 to-amber-600/90 text-white shadow-lg shadow-rose-500/25 border border-rose-400/30'
-                      : 'bg-gradient-to-r from-blue-600/90 to-indigo-600/90 text-white shadow-lg shadow-blue-500/25 border border-blue-400/30')
-                  : 'text-slate-400 hover:bg-slate-800/60 hover:text-slate-200'}`}>
-              <Icon size={19} className={`shrink-0 transition-transform duration-200 group-hover:scale-110 ${active ? 'text-white' : 'text-slate-400 group-hover:text-blue-400'}`} />
+              className={`flex items-center gap-3.5 px-3.5 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 group relative ${
+                active
+                  ? isAdmin && href === '/admin'
+                    ? 'bg-rose-500/15 text-rose-500 dark:text-rose-400 border border-rose-500/30 shadow-sm font-semibold'
+                    : 'bg-blue-500/15 text-blue-600 dark:text-blue-400 border border-blue-500/30 shadow-sm font-semibold'
+                  : 'text-[var(--text-muted)] hover:bg-[var(--bg-surface-hover)] hover:text-[var(--text-primary)]'
+              }`}
+            >
+              <Icon
+                size={18}
+                className={`shrink-0 transition-transform duration-200 group-hover:scale-110 ${
+                  active
+                    ? isAdmin && href === '/admin'
+                      ? 'text-rose-500 dark:text-rose-400'
+                      : 'text-blue-600 dark:text-blue-400'
+                    : 'text-[var(--text-muted)] group-hover:text-blue-500'
+                }`}
+              />
               {(!collapsed || mobileOpen) && <span className="truncate">{label}</span>}
+              {active && (!collapsed || mobileOpen) && (
+                <div
+                  className={`ml-auto w-1.5 h-1.5 rounded-full ${
+                    isAdmin && href === '/admin' ? 'bg-rose-500' : 'bg-blue-500'
+                  }`}
+                />
+              )}
             </Link>
           )
         })}
       </nav>
 
       {/* Mode Switcher & Logout */}
-      <div className="p-3 border-t border-slate-800/80 space-y-1.5">
-        <button 
+      <div className="p-3 border-t border-[var(--border-subtle)] space-y-1">
+        <button
           onClick={toggleTheme}
-          className="flex items-center gap-3.5 px-3.5 py-2.5 rounded-xl text-sm font-medium text-slate-400 hover:bg-slate-800/60 hover:text-slate-200 w-full transition-all duration-200 cursor-pointer"
+          className="flex items-center gap-3.5 px-3.5 py-2.5 rounded-xl text-sm font-medium text-[var(--text-muted)] hover:bg-[var(--bg-surface-hover)] hover:text-[var(--text-primary)] w-full transition-all duration-200 cursor-pointer"
         >
           {theme === 'dark' ? (
-            <Sun size={19} className="shrink-0 text-amber-400" />
+            <Sun size={18} className="shrink-0 text-amber-400 transition-transform hover:rotate-45" />
           ) : (
-            <Moon size={19} className="shrink-0 text-indigo-500" />
+            <Moon size={18} className="shrink-0 text-indigo-600 transition-transform hover:-rotate-12" />
           )}
           {(!collapsed || mobileOpen) && (
-            <span>{theme === 'dark' ? 'Light Mode' : 'Dark Mode'}</span>
+            <span>{theme === 'dark' ? 'Mode Terang' : 'Mode Gelap'}</span>
           )}
         </button>
 
-        <button onClick={handleLogout}
-          className="flex items-center gap-3.5 px-3.5 py-2.5 rounded-xl text-sm font-medium text-slate-400 hover:bg-rose-500/10 hover:text-rose-400 hover:border hover:border-rose-500/20 w-full transition-all duration-200 cursor-pointer">
-          <LogOut size={19} className="shrink-0 text-slate-400 group-hover:text-rose-400" />
-          {(!collapsed || mobileOpen) && <span>Logout</span>}
+        <button
+          onClick={handleLogout}
+          className="flex items-center gap-3.5 px-3.5 py-2.5 rounded-xl text-sm font-medium text-[var(--text-muted)] hover:bg-rose-500/10 hover:text-rose-500 hover:border hover:border-rose-500/20 w-full transition-all duration-200 cursor-pointer"
+        >
+          <LogOut size={18} className="shrink-0 transition-transform group-hover:translate-x-0.5" />
+          {(!collapsed || mobileOpen) && <span>Keluar</span>}
         </button>
       </div>
     </>
   )
 
   return (
-    <div className="flex h-screen bg-background text-foreground overflow-hidden">
-
+    <div className="flex h-screen bg-[var(--bg-base)] text-[var(--text-primary)] overflow-hidden">
       {/* Mobile overlay */}
       {mobileOpen && (
-        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-40 lg:hidden"
-          onClick={() => setMobileOpen(false)}/>
+        <div
+          className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 lg:hidden transition-opacity"
+          onClick={() => setMobileOpen(false)}
+        />
       )}
 
       {/* Mobile sidebar (drawer) */}
-      <aside className={`fixed top-0 left-0 h-full w-64 bg-white/95 dark:bg-[#0f172a]/95 backdrop-blur-xl border-r border-slate-200 dark:border-slate-800/80 flex flex-col z-50 transition-transform duration-300 lg:hidden
-        ${mobileOpen ? 'translate-x-0' : '-translate-x-full'}`}>
-        <div className="flex items-center justify-between p-4 border-b border-slate-200 dark:border-slate-800/80">
+      <aside
+        className={`fixed top-0 left-0 h-full w-68 bg-[var(--bg-surface)] backdrop-blur-2xl border-r border-[var(--border-subtle)] flex flex-col z-50 transition-transform duration-300 shadow-2xl lg:hidden ${
+          mobileOpen ? 'translate-x-0' : '-translate-x-full'
+        }`}
+      >
+        <div className="flex items-center justify-between p-4 border-b border-[var(--border-subtle)]">
           <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-tr from-blue-600 to-indigo-500 flex items-center justify-center shadow-md shadow-blue-500/30">
-              <Sparkles size={18} className="text-white" />
+            <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-600 flex items-center justify-center shadow-md shadow-blue-500/20 text-white">
+              <Sparkles size={17} />
             </div>
-            <span className="font-extrabold text-base tracking-tight text-blue-600 dark:text-transparent dark:bg-clip-text dark:bg-gradient-to-r dark:from-blue-400 dark:to-indigo-300">FinTrack</span>
+            <div className="flex flex-col">
+              <span className="font-extrabold text-base tracking-tight text-[var(--text-primary)]">
+                FinTrack
+              </span>
+              <span className="text-[10px] text-[var(--text-muted)] font-medium -mt-0.5">
+                Financial Management
+              </span>
+            </div>
           </div>
-          <button onClick={() => setMobileOpen(false)}
-            className="p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 cursor-pointer">
-            <X size={18}/>
+          <button
+            onClick={() => setMobileOpen(false)}
+            className="p-1.5 rounded-lg hover:bg-[var(--bg-surface-hover)] text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors cursor-pointer"
+          >
+            <X size={18} />
           </button>
         </div>
-        <NavLinks/>
+        <NavLinks />
       </aside>
 
       {/* Desktop sidebar */}
-      <aside className={`hidden lg:flex ${collapsed ? 'w-20' : 'w-60'} glass-card border-r border-slate-200 dark:border-slate-800/70 flex-col transition-all duration-300 shrink-0`}>
-        <div className="flex items-center justify-between p-4.5 border-b border-slate-200 dark:border-slate-800/70">
+      <aside
+        className={`hidden lg:flex ${
+          collapsed ? 'w-20' : 'w-64'
+        } glass-card border-r border-[var(--border-subtle)] flex-col transition-all duration-300 shrink-0 z-20`}
+      >
+        <div className="flex items-center justify-between p-4.5 border-b border-[var(--border-subtle)]">
           {!collapsed && (
             <div className="flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-lg bg-gradient-to-tr from-blue-600 to-indigo-500 flex items-center justify-center shadow-md shadow-blue-500/30">
-                <Sparkles size={18} className="text-white" />
+              <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-600 flex items-center justify-center shadow-md shadow-blue-500/20 text-white">
+                <Sparkles size={17} />
               </div>
-              <span className="font-extrabold text-lg tracking-tight text-blue-600 dark:text-transparent dark:bg-clip-text dark:bg-gradient-to-r dark:from-blue-400 dark:to-indigo-300">FinTrack</span>
+              <div className="flex flex-col">
+                <span className="font-extrabold text-base tracking-tight text-[var(--text-primary)]">
+                  FinTrack
+                </span>
+                <span className="text-[10px] text-[var(--text-muted)] font-medium -mt-0.5">
+                  Pro Finance
+                </span>
+              </div>
             </div>
           )}
-          <button onClick={() => setCollapsed(!collapsed)}
-            className="p-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800/80 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 ml-auto transition-colors cursor-pointer">
-            {collapsed ? <ChevronRight size={18}/> : <ChevronLeft size={18}/>}
+          <button
+            onClick={() => setCollapsed(!collapsed)}
+            className="p-2 rounded-xl hover:bg-[var(--bg-surface-hover)] text-[var(--text-muted)] hover:text-[var(--text-primary)] ml-auto transition-colors cursor-pointer"
+            title={collapsed ? 'Perluas Sidebar' : 'Ciutkan Sidebar'}
+          >
+            {collapsed ? <ChevronRight size={18} /> : <ChevronLeft size={18} />}
           </button>
         </div>
-        <NavLinks/>
+        <NavLinks />
       </aside>
 
-      {/* Main content */}
+      {/* Main content area */}
       <div className="flex-1 flex flex-col overflow-hidden">
         {/* Mobile topbar */}
-        <div className="lg:hidden flex items-center justify-between px-4 py-3.5 glass-card border-b border-slate-200 dark:border-slate-800/80 shrink-0">
+        <div className="lg:hidden flex items-center justify-between px-4 py-3 glass-card border-b border-[var(--border-subtle)] shrink-0">
           <div className="flex items-center gap-3">
-            <button onClick={() => setMobileOpen(true)}
-              className="p-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800/80 text-slate-600 dark:text-slate-300 cursor-pointer">
-              <Menu size={22}/>
+            <button
+              onClick={() => setMobileOpen(true)}
+              className="p-2 rounded-xl hover:bg-[var(--bg-surface-hover)] text-[var(--text-primary)] transition-colors cursor-pointer"
+            >
+              <Menu size={20} />
             </button>
             <div className="flex items-center gap-2">
-              <div className="w-7 h-7 rounded-md bg-gradient-to-tr from-blue-600 to-indigo-500 flex items-center justify-center">
-                <Sparkles size={15} className="text-white" />
+              <div className="w-7 h-7 rounded-lg bg-gradient-to-tr from-blue-600 to-indigo-600 flex items-center justify-center shadow-sm text-white">
+                <Sparkles size={15} />
               </div>
-              <span className="font-extrabold text-base tracking-tight text-blue-600 dark:text-transparent dark:bg-clip-text dark:bg-gradient-to-r dark:from-blue-400 dark:to-indigo-300">FinTrack</span>
+              <span className="font-bold text-base tracking-tight text-[var(--text-primary)]">
+                FinTrack
+              </span>
             </div>
           </div>
 
-          <button 
+          <button
             onClick={toggleTheme}
-            className="p-2 rounded-xl hover:bg-slate-800/80 text-slate-300 cursor-pointer"
+            className="p-2 rounded-xl hover:bg-[var(--bg-surface-hover)] text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors cursor-pointer"
+            title="Ganti Tema"
           >
-            {theme === 'dark' ? <Sun size={20} className="text-amber-400" /> : <Moon size={20} className="text-indigo-600" />}
+            {theme === 'dark' ? (
+              <Sun size={18} className="text-amber-400" />
+            ) : (
+              <Moon size={18} className="text-indigo-600" />
+            )}
           </button>
         </div>
 

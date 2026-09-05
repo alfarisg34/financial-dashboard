@@ -195,32 +195,32 @@ export default function TransferPage() {
   return (
     <div className="max-w-4xl w-full mx-auto space-y-6">
       {/* Header */}
-      <div className="glass-card p-6 rounded-2xl border border-slate-800 flex items-center justify-between">
+      <div className="glass-card p-6 rounded-2xl border border-slate-200/80 dark:border-slate-800 flex items-center justify-between">
         <div>
-          <h1 className="text-xl font-bold text-white mb-1 flex items-center gap-2">
-            <ArrowLeftRight size={20} className="text-blue-400" />
+          <h1 className="text-xl font-bold text-slate-900 dark:text-white mb-1 flex items-center gap-2">
+            <ArrowLeftRight size={20} className="text-blue-600 dark:text-blue-400" />
             Transfer Saldo
           </h1>
-          <p className="text-xs text-slate-400">Transfer saldo antar akun bank, e-wallet, atau dompet fisik Anda</p>
+          <p className="text-xs text-slate-500 dark:text-slate-400">Transfer saldo antar akun bank, e-wallet, atau dompet fisik Anda</p>
         </div>
       </div>
 
       {success && (
-        <div className="bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 px-4 py-3 rounded-xl text-sm font-medium">
+        <div className="bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 px-4 py-3 rounded-xl text-sm font-medium">
           {success}
         </div>
       )}
 
       {/* Form Transfer */}
-      <form onSubmit={handleSubmit} className="glass-card rounded-2xl border border-slate-800 p-6 space-y-5">
-        <h2 className="text-xs font-bold uppercase tracking-wider text-slate-300">Form Transfer</h2>
+      <form onSubmit={handleSubmit} className="glass-card rounded-2xl border border-slate-200/80 dark:border-slate-800 p-6 space-y-5">
+        <h2 className="text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300">Form Transfer</h2>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
             <div className="flex justify-between items-center mb-2">
-              <label className="text-xs font-semibold uppercase tracking-wider text-slate-400">Dari (Asal Saldo)</label>
+              <label className="text-xs font-semibold uppercase tracking-wider text-slate-600 dark:text-slate-400">Dari (Asal Saldo)</label>
               {selectedFromSource && (
-                <span className={`text-xs font-bold ${selectedFromSource.balance >= 0 ? 'text-emerald-400' : 'text-rose-400'}`}>
+                <span className={`text-xs font-bold ${selectedFromSource.balance >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'}`}>
                   Saldo: {fmt(selectedFromSource.balance)}
                 </span>
               )}
@@ -229,11 +229,11 @@ export default function TransferPage() {
               value={fromId}
               onChange={e => setFromId(e.target.value)}
               required
-              className="w-full px-4 py-3 rounded-xl border border-slate-800 bg-slate-900 text-slate-100 text-sm font-semibold outline-none cursor-pointer"
+              className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/30 text-sm font-semibold outline-none cursor-pointer transition-all"
             >
-              <option value="" className="bg-slate-900 text-slate-100">-- Pilih Asal --</option>
+              <option value="" className="bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100">-- Pilih Asal --</option>
               {sourcesWithBalance.map(s => (
-                <option key={s.id} value={s.id} className="bg-slate-900 text-slate-100">
+                <option key={s.id} value={s.id} className="bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100">
                   {s.icon} {s.name} ({s.type}) — Saldo: {fmt(s.balance)}
                 </option>
               ))}
@@ -242,9 +242,9 @@ export default function TransferPage() {
 
           <div>
             <div className="flex justify-between items-center mb-2">
-              <label className="text-xs font-semibold uppercase tracking-wider text-slate-400">Ke (Tujuan Saldo)</label>
+              <label className="text-xs font-semibold uppercase tracking-wider text-slate-600 dark:text-slate-400">Ke (Tujuan Saldo)</label>
               {selectedToSource && (
-                <span className={`text-xs font-bold ${selectedToSource.balance >= 0 ? 'text-blue-400' : 'text-rose-400'}`}>
+                <span className={`text-xs font-bold ${selectedToSource.balance >= 0 ? 'text-blue-600 dark:text-blue-400' : 'text-rose-600 dark:text-rose-400'}`}>
                   Saldo: {fmt(selectedToSource.balance)}
                 </span>
               )}
@@ -253,11 +253,11 @@ export default function TransferPage() {
               value={toId}
               onChange={e => setToId(e.target.value)}
               required
-              className="w-full px-4 py-3 rounded-xl border border-slate-800 bg-slate-900 text-slate-100 text-sm font-semibold outline-none cursor-pointer"
+              className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/30 text-sm font-semibold outline-none cursor-pointer transition-all"
             >
-              <option value="" className="bg-slate-900 text-slate-100">-- Pilih Tujuan --</option>
+              <option value="" className="bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100">-- Pilih Tujuan --</option>
               {sourcesWithBalance.filter(s => s.id !== fromId).map(s => (
-                <option key={s.id} value={s.id} className="bg-slate-900 text-slate-100">
+                <option key={s.id} value={s.id} className="bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100">
                   {s.icon} {s.name} ({s.type}) — Saldo: {fmt(s.balance)}
                 </option>
               ))}
@@ -267,9 +267,9 @@ export default function TransferPage() {
 
         {/* Amount */}
         <div>
-          <label className="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2 block">Nominal Transfer (Rp)</label>
+          <label className="text-xs font-semibold uppercase tracking-wider text-slate-600 dark:text-slate-400 mb-2 block">Nominal Transfer (Rp)</label>
           <div className="relative">
-            <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-sm font-semibold pointer-events-none">Rp</span>
+            <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500 text-sm font-semibold pointer-events-none">Rp</span>
             <input
               type="text"
               inputMode="numeric"
@@ -277,38 +277,38 @@ export default function TransferPage() {
               onChange={e => setDisplayAmount(formatThousands(e.target.value))}
               placeholder="0"
               required
-              className="w-full pl-11 pr-4 py-3 rounded-xl border border-slate-800 bg-slate-900 text-slate-100 text-sm font-semibold outline-none"
+              className="w-full pl-11 pr-4 py-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/30 text-sm font-semibold outline-none transition-all"
             />
           </div>
         </div>
 
         {/* Date */}
         <div>
-          <label className="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2 block">Tanggal & Waktu</label>
+          <label className="text-xs font-semibold uppercase tracking-wider text-slate-600 dark:text-slate-400 mb-2 block">Tanggal & Waktu</label>
           <input
             type="datetime-local"
             value={date}
             onChange={e => setDate(e.target.value)}
             required
-            className="w-full px-4 py-3 rounded-xl border border-slate-800 bg-slate-900 text-slate-100 text-sm outline-none"
+            className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-900 dark:text-white focus:border-blue-500 focus:ring-2 focus:ring-blue-500/30 text-sm outline-none transition-all"
           />
         </div>
 
         {/* Description */}
         <div>
-          <label className="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2 block">Deskripsi / Catatan (Opsional)</label>
+          <label className="text-xs font-semibold uppercase tracking-wider text-slate-600 dark:text-slate-400 mb-2 block">Deskripsi / Catatan (Opsional)</label>
           <input
             type="text"
             value={description}
             onChange={e => setDescription(e.target.value)}
             placeholder="Contoh: Tarik tunai dari BCA / Top up GoPay"
-            className="w-full px-4 py-3 rounded-xl border border-slate-800 bg-slate-900 text-slate-100 text-sm outline-none"
+            className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/30 text-sm outline-none transition-all"
           />
         </div>
 
         <button
           type="submit"
-          className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white py-3.5 rounded-xl font-bold text-sm shadow-lg shadow-blue-600/30 hover:shadow-blue-500/50 transition-all cursor-pointer"
+          className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white py-3.5 rounded-xl font-bold text-sm shadow-lg shadow-blue-600/20 hover:shadow-blue-500/30 transition-all cursor-pointer"
         >
           Proses Transfer Saldo
         </button>
@@ -316,47 +316,47 @@ export default function TransferPage() {
 
       {/* History List */}
       <div>
-        <h2 className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-3">Riwayat Transfer Terakhir ({transfers.length})</h2>
+        <h2 className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-3">Riwayat Transfer Terakhir ({transfers.length})</h2>
 
         {loading ? (
           <div className="text-center py-8 text-slate-500">Memuat riwayat transfer...</div>
         ) : transfers.length === 0 ? (
-          <div className="text-center py-8 text-slate-500 glass-card rounded-2xl border border-slate-800">
+          <div className="text-center py-8 text-slate-500 glass-card rounded-2xl border border-slate-200/80 dark:border-slate-800">
             Belum ada riwayat transfer.
           </div>
         ) : (
           <div className="space-y-2.5">
             {transfers.map(t => (
-              <div key={t.id} className="glass-card rounded-xl border border-slate-800 p-4 flex items-center justify-between gap-3">
+              <div key={t.id} className="glass-card glass-card-hover rounded-xl border border-slate-200/80 dark:border-slate-800 p-4 flex items-center justify-between gap-3">
                 <div className="flex items-center gap-3 min-w-0">
-                  <div className="w-10 h-10 rounded-xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-blue-400 shrink-0">
+                  <div className="w-10 h-10 rounded-xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-blue-600 dark:text-blue-400 shrink-0">
                     <ArrowLeftRight size={18} />
                   </div>
 
                   <div className="min-w-0">
-                    <div className="flex items-center gap-1.5 text-sm font-bold text-slate-200">
+                    <div className="flex items-center gap-1.5 text-sm font-bold text-slate-800 dark:text-slate-200">
                       <span>{t.from_source?.icon || '💰'} {t.from_source?.name || 'Asal'}</span>
-                      <ArrowRight size={14} className="text-slate-400 shrink-0" />
+                      <ArrowRight size={14} className="text-slate-400 dark:text-slate-500 shrink-0" />
                       <span>{t.to_source?.icon || '💰'} {t.to_source?.name || 'Tujuan'}</span>
                     </div>
 
-                    <div className="flex items-center gap-3 text-xs text-slate-400 mt-1">
+                    <div className="flex items-center gap-3 text-xs text-slate-500 dark:text-slate-400 mt-1">
                       <span className="flex items-center gap-1">
-                        <Calendar size={12} className="text-slate-500" />
+                        <Calendar size={12} className="text-slate-400 dark:text-slate-500" />
                         {formatDisplayDate(t.date)}
                       </span>
-                      {t.description && <span className="truncate max-w-[200px] text-slate-400">— {t.description}</span>}
+                      {t.description && <span className="truncate max-w-[200px] text-slate-500 dark:text-slate-400">— {t.description}</span>}
                     </div>
                   </div>
                 </div>
 
                 <div className="flex items-center gap-3 shrink-0">
-                  <span className="text-sm font-extrabold text-blue-400">
+                  <span className="text-sm font-extrabold text-blue-600 dark:text-blue-400">
                     {fmt(t.amount)}
                   </span>
                   <button
                     onClick={() => setDeleteId(t.id)}
-                    className="p-1.5 text-rose-400 hover:bg-rose-500/10 rounded-lg transition-colors cursor-pointer"
+                    className="p-1.5 text-rose-500 dark:text-rose-400 hover:bg-rose-500/10 rounded-lg transition-colors cursor-pointer"
                   >
                     <Trash2 size={15} />
                   </button>
@@ -369,25 +369,25 @@ export default function TransferPage() {
 
       {/* Delete Modal */}
       {deleteId && (
-        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="glass-card rounded-2xl max-w-sm w-full border border-slate-800">
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="glass-card rounded-2xl max-w-sm w-full border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-2xl">
             <div className="p-6 text-center">
               <div className="w-12 h-12 mx-auto mb-4 rounded-full bg-rose-500/10 border border-rose-500/20 flex items-center justify-center">
-                <Trash2 size={24} className="text-rose-400" />
+                <Trash2 size={24} className="text-rose-500 dark:text-rose-400" />
               </div>
-              <h3 className="text-lg font-bold text-white mb-2">Hapus Riwayat Transfer?</h3>
-              <p className="text-xs text-slate-400">Apakah anda yakin ingin menghapus data transfer ini?</p>
+              <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-2">Hapus Riwayat Transfer?</h3>
+              <p className="text-xs text-slate-500 dark:text-slate-400">Apakah anda yakin ingin menghapus data transfer ini?</p>
             </div>
-            <div className="flex gap-3 p-5 border-t border-slate-800">
+            <div className="flex gap-3 p-5 border-t border-slate-100 dark:border-slate-800">
               <button
                 onClick={() => setDeleteId(null)}
-                className="flex-1 py-3 rounded-xl border border-slate-800 text-slate-400 font-medium hover:bg-slate-800 transition-colors cursor-pointer"
+                className="flex-1 py-3 rounded-xl border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 font-medium hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
               >
                 Batal
               </button>
               <button
                 onClick={handleDelete}
-                className="flex-1 bg-rose-600 text-white py-3 rounded-xl font-bold hover:bg-rose-500 transition-colors cursor-pointer"
+                className="flex-1 bg-rose-600 hover:bg-rose-500 text-white py-3 rounded-xl font-bold transition-colors cursor-pointer"
               >
                 Hapus
               </button>

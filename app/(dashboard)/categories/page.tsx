@@ -210,18 +210,18 @@ export default function CategoriesPage() {
 
   return (
     <div className="max-w-2xl w-full mx-auto space-y-6">
-      <div className="glass-card p-6 rounded-2xl border border-slate-800">
+      <div className="glass-card p-6 rounded-2xl border border-slate-200/80 dark:border-slate-800">
         <div className="flex items-center gap-2">
-          <h1 className="text-xl font-bold text-white mb-1">
+          <h1 className="text-xl font-bold text-slate-900 dark:text-white mb-1">
             {isAdmin ? 'Default Kategori & Subkategori' : 'Kategori & Subkategori'}
           </h1>
           {isAdmin && (
-            <span className="bg-rose-500/10 text-rose-400 border border-rose-500/20 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase">
+            <span className="bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/20 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase">
               Admin Seed Template
             </span>
           )}
         </div>
-        <p className="text-xs text-slate-400">
+        <p className="text-xs text-slate-500 dark:text-slate-400">
           {isAdmin 
             ? 'Kelola daftar kategori dan subkategori default yang akan otomatis diberikan ke akun pengguna baru.'
             : 'Kelola hirarki kategori transaksi finansial Anda'}
@@ -239,7 +239,7 @@ export default function CategoriesPage() {
             <div key={typeLabel} className="space-y-3">
               {/* Section Header with Add Category Button */}
               <div className="flex items-center justify-between">
-                <h2 className={`text-xs font-bold uppercase tracking-wider ${isIncome ? 'text-emerald-400' : 'text-rose-400'}`}>
+                <h2 className={`text-xs font-bold uppercase tracking-wider ${isIncome ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'}`}>
                   {isIncome ? '📈 Kategori Income (Pemasukan)' : '📉 Kategori Outcome (Pengeluaran)'}
                 </h2>
                 {!isAddingCat && (
@@ -247,8 +247,8 @@ export default function CategoriesPage() {
                     onClick={() => { setAddingCatType(typeLabel); setAddingCatName('') }}
                     className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer shadow-sm ${
                       isIncome
-                        ? 'bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20 border border-emerald-500/20'
-                        : 'bg-rose-500/10 text-rose-400 hover:bg-rose-500/20 border border-rose-500/20'
+                        ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-500/20 border border-emerald-500/20'
+                        : 'bg-rose-500/10 text-rose-600 dark:text-rose-400 hover:bg-rose-500/20 border border-rose-500/20'
                     }`}>
                     <Plus size={14} /> + Kategori {isIncome ? 'Income' : 'Outcome'}
                   </button>
@@ -270,18 +270,18 @@ export default function CategoriesPage() {
                       if (e.key === 'Escape') setAddingCatType(null)
                     }}
                     autoFocus
-                    className="flex-1 min-w-0 bg-slate-900 px-3.5 py-2 rounded-xl border border-slate-800 text-sm text-slate-200 outline-none focus:ring-2 focus:ring-blue-500/40"
+                    className="flex-1 min-w-0 bg-white dark:bg-slate-900 px-3.5 py-2 rounded-xl border border-slate-200 dark:border-slate-800 text-sm text-slate-900 dark:text-slate-200 placeholder:text-slate-400 outline-none focus:ring-2 focus:ring-blue-500/40 transition-all"
                   />
                   <button
                     onClick={() => handleAddCategory(typeLabel)}
-                    className={`px-4 py-2 text-xs text-white font-bold rounded-xl transition-all cursor-pointer ${
+                    className={`px-4 py-2 text-xs text-white font-bold rounded-xl transition-all cursor-pointer shadow-sm ${
                       isIncome ? 'bg-emerald-600 hover:bg-emerald-500' : 'bg-rose-600 hover:bg-rose-500'
                     }`}>
                     Simpan
                   </button>
                   <button
                     onClick={() => setAddingCatType(null)}
-                    className="p-2 text-slate-400 hover:bg-slate-800 rounded-xl transition-colors cursor-pointer"
+                    className="p-2 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-colors cursor-pointer"
                     title="Batal">
                     <X size={16} />
                   </button>
@@ -291,7 +291,7 @@ export default function CategoriesPage() {
               {/* List of Categories */}
               <div className="space-y-2">
                 {filteredCats.length === 0 ? (
-                  <p className="text-xs text-slate-500 py-3 text-center glass-card rounded-xl border border-slate-800/60">
+                  <p className="text-xs text-slate-500 py-3 text-center glass-card rounded-xl border border-slate-200/80 dark:border-slate-800/60">
                     Belum ada kategori {isIncome ? 'income' : 'outcome'}. Klik tombol di atas untuk menambah.
                   </p>
                 ) : (
@@ -301,8 +301,8 @@ export default function CategoriesPage() {
                     const isEditingCat = editingCatId === cat.id
 
                     return (
-                      <div key={cat.id} className="glass-card rounded-xl border border-slate-800 overflow-hidden">
-                        <div className="flex items-center justify-between px-4 py-3 hover:bg-slate-800/40 transition-colors">
+                      <div key={cat.id} className="rounded-xl border border-slate-200/80 dark:border-slate-800 overflow-hidden bg-white dark:bg-slate-900/40 shadow-sm">
+                        <div className="flex items-center justify-between px-4 py-3 hover:bg-slate-50 dark:hover:bg-slate-800/40 transition-colors">
                           {isEditingCat ? (
                             <div className="flex items-center gap-2 flex-1 min-w-0 pr-2" onClick={e => e.stopPropagation()}>
                               <input
@@ -314,17 +314,17 @@ export default function CategoriesPage() {
                                   if (e.key === 'Escape') cancelEditCat()
                                 }}
                                 autoFocus
-                                className="flex-1 min-w-0 bg-slate-900 px-3 py-1.5 rounded-lg border border-blue-500/50 text-sm font-semibold text-slate-100 outline-none focus:ring-2 focus:ring-blue-500/30"
+                                className="flex-1 min-w-0 bg-white dark:bg-slate-900 px-3 py-1.5 rounded-lg border border-blue-500/50 text-sm font-semibold text-slate-900 dark:text-slate-100 outline-none focus:ring-2 focus:ring-blue-500/30"
                               />
                               <button
                                 onClick={() => saveEditCat(cat.id)}
-                                className="p-1.5 text-emerald-400 hover:bg-emerald-500/10 rounded-lg transition-colors cursor-pointer"
+                                className="p-1.5 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-500/10 rounded-lg transition-colors cursor-pointer"
                                 title="Simpan">
                                 <Check size={16} />
                               </button>
                               <button
                                 onClick={cancelEditCat}
-                                className="p-1.5 text-slate-400 hover:bg-slate-700/50 rounded-lg transition-colors cursor-pointer"
+                                className="p-1.5 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700/50 rounded-lg transition-colors cursor-pointer"
                                 title="Batal">
                                 <X size={16} />
                               </button>
@@ -332,10 +332,10 @@ export default function CategoriesPage() {
                           ) : (
                             <button
                               onClick={() => toggleExpand(cat.id)}
-                              className="flex items-center gap-2.5 text-sm font-semibold text-slate-200 flex-1 text-left min-w-0 cursor-pointer">
-                              {isOpen ? <ChevronDown size={17} className="shrink-0 text-blue-400"/> : <ChevronRight size={17} className="shrink-0 text-slate-400"/>}
+                              className="flex items-center gap-2.5 text-sm font-semibold text-slate-800 dark:text-slate-200 flex-1 text-left min-w-0 cursor-pointer">
+                              {isOpen ? <ChevronDown size={17} className="shrink-0 text-blue-500 dark:text-blue-400"/> : <ChevronRight size={17} className="shrink-0 text-slate-400"/>}
                               <span className="truncate">{cat.name}</span>
-                              <span className="text-xs text-slate-500 font-normal ml-1 shrink-0">({subs.length} sub)</span>
+                              <span className="text-xs text-slate-500 dark:text-slate-400 font-normal ml-1 shrink-0">({subs.length} sub)</span>
                             </button>
                           )}
 
@@ -348,19 +348,19 @@ export default function CategoriesPage() {
                                   setAddingSubName('')
                                   if (!isOpen) toggleExpand(cat.id)
                                 }}
-                                className="px-2.5 py-1 text-xs font-bold text-indigo-400 hover:bg-indigo-500/10 border border-indigo-500/20 rounded-lg transition-all flex items-center gap-1 cursor-pointer"
+                                className="px-2.5 py-1 text-xs font-bold text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-500/10 border border-indigo-500/20 rounded-lg transition-all flex items-center gap-1 cursor-pointer"
                                 title="Tambah Subkategori">
                                 <Plus size={13} /> <span className="hidden sm:inline">Sub</span>
                               </button>
                               <button
                                 onClick={(e) => { e.stopPropagation(); startEditCat(cat) }}
-                                className="p-1.5 text-slate-500 hover:text-blue-400 hover:bg-blue-500/10 rounded-lg transition-colors cursor-pointer"
+                                className="p-1.5 text-slate-400 dark:text-slate-500 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-500/10 rounded-lg transition-colors cursor-pointer"
                                 title="Edit Kategori">
                                 <Pencil size={15}/>
                               </button>
                               <button
                                 onClick={(e) => { e.stopPropagation(); deleteCategory(cat.id) }}
-                                className="p-1.5 text-slate-500 hover:text-rose-400 hover:bg-rose-500/10 rounded-lg transition-colors cursor-pointer"
+                                className="p-1.5 text-slate-400 dark:text-slate-500 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-500/10 rounded-lg transition-colors cursor-pointer"
                                 title="Hapus Kategori">
                                 <Trash2 size={15}/>
                               </button>
@@ -369,17 +369,17 @@ export default function CategoriesPage() {
                         </div>
 
                         {isOpen && (
-                          <div className="bg-slate-950/60 border-t border-slate-800/80 divide-y divide-slate-800/40">
+                          <div className="bg-slate-50/60 dark:bg-slate-950/60 border-t border-slate-200/80 dark:border-slate-800/80 divide-y divide-slate-200/60 dark:divide-slate-800/40">
                             {subs.length === 0 && addingSubCatId !== cat.id ? (
-                              <p className="text-xs text-slate-600 px-6 py-3 italic">Belum ada subkategori</p>
+                              <p className="text-xs text-slate-500 px-6 py-3 italic">Belum ada subkategori</p>
                             ) : (
                               subs.map(sub => {
                                 const isEditingSub = editingSubId === sub.id
                                 return (
-                                  <div key={sub.id} className="flex items-center justify-between px-6 py-2.5 hover:bg-slate-900/60 transition-colors">
+                                  <div key={sub.id} className="flex items-center justify-between px-6 py-2.5 hover:bg-white dark:hover:bg-slate-900/60 transition-colors">
                                     {isEditingSub ? (
                                       <div className="flex items-center gap-2 flex-1 min-w-0 pr-2">
-                                        <span className="text-xs text-slate-500 shrink-0">↳</span>
+                                        <span className="text-xs text-slate-400 dark:text-slate-500 shrink-0">↳</span>
                                         <input
                                           type="text"
                                           value={editingSubName}
@@ -389,34 +389,34 @@ export default function CategoriesPage() {
                                             if (e.key === 'Escape') cancelEditSub()
                                           }}
                                           autoFocus
-                                          className="flex-1 min-w-0 bg-slate-900 px-2.5 py-1 rounded-lg border border-indigo-500/50 text-xs text-slate-200 outline-none focus:ring-2 focus:ring-indigo-500/30"
+                                          className="flex-1 min-w-0 bg-white dark:bg-slate-900 px-2.5 py-1 rounded-lg border border-indigo-500/50 text-xs text-slate-900 dark:text-slate-200 outline-none focus:ring-2 focus:ring-indigo-500/30"
                                         />
                                         <button
                                           onClick={() => saveEditSub(sub.id)}
-                                          className="p-1 text-emerald-400 hover:bg-emerald-500/10 rounded-lg transition-colors cursor-pointer"
+                                          className="p-1 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-500/10 rounded-lg transition-colors cursor-pointer"
                                           title="Simpan">
                                           <Check size={14} />
                                         </button>
                                         <button
                                           onClick={cancelEditSub}
-                                          className="p-1 text-slate-400 hover:bg-slate-700/50 rounded-lg transition-colors cursor-pointer"
+                                          className="p-1 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700/50 rounded-lg transition-colors cursor-pointer"
                                           title="Batal">
                                           <X size={14} />
                                         </button>
                                       </div>
                                     ) : (
                                       <>
-                                        <span className="text-xs text-slate-300 truncate min-w-0 mr-2 font-medium">↳ {sub.name}</span>
+                                        <span className="text-xs text-slate-700 dark:text-slate-300 truncate min-w-0 mr-2 font-medium">↳ {sub.name}</span>
                                         <div className="flex items-center gap-1 shrink-0">
                                           <button
                                             onClick={() => startEditSub(sub)}
-                                            className="p-1 text-slate-500 hover:text-blue-400 hover:bg-blue-500/10 rounded-lg transition-colors cursor-pointer"
+                                            className="p-1 text-slate-400 dark:text-slate-500 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-500/10 rounded-lg transition-colors cursor-pointer"
                                             title="Edit Subkategori">
                                             <Pencil size={13}/>
                                           </button>
                                           <button
                                             onClick={() => deleteSubcategory(sub.id)}
-                                            className="p-1 text-slate-500 hover:text-rose-400 hover:bg-rose-500/10 rounded-lg transition-colors cursor-pointer"
+                                            className="p-1 text-slate-400 dark:text-slate-500 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-500/10 rounded-lg transition-colors cursor-pointer"
                                             title="Hapus Subkategori">
                                             <Trash2 size={13}/>
                                           </button>
@@ -429,10 +429,10 @@ export default function CategoriesPage() {
                             )}
 
                             {/* Inline Add Subcategory input inside expanded panel */}
-                            <div className="px-6 py-2.5 bg-slate-900/40">
+                            <div className="px-6 py-2.5 bg-slate-100/60 dark:bg-slate-900/40">
                               {addingSubCatId === cat.id ? (
                                 <div className="flex items-center gap-2">
-                                  <span className="text-xs text-indigo-400 font-bold shrink-0">↳</span>
+                                  <span className="text-xs text-indigo-500 dark:text-indigo-400 font-bold shrink-0">↳</span>
                                   <input
                                     type="text"
                                     value={addingSubName}
@@ -443,16 +443,16 @@ export default function CategoriesPage() {
                                       if (e.key === 'Escape') setAddingSubCatId(null)
                                     }}
                                     autoFocus
-                                    className="flex-1 min-w-0 bg-slate-900 px-2.5 py-1 rounded-lg border border-indigo-500/50 text-xs text-slate-200 outline-none focus:ring-2 focus:ring-indigo-500/30"
+                                    className="flex-1 min-w-0 bg-white dark:bg-slate-900 px-2.5 py-1 rounded-lg border border-indigo-500/50 text-xs text-slate-900 dark:text-slate-200 placeholder:text-slate-400 outline-none focus:ring-2 focus:ring-indigo-500/30"
                                   />
                                   <button
                                     onClick={() => handleAddSubcategory(cat.id)}
-                                    className="px-3 py-1 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg text-xs font-bold transition-all cursor-pointer">
+                                    className="px-3 py-1 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg text-xs font-bold transition-all cursor-pointer shadow-sm">
                                     Simpan
                                   </button>
                                   <button
                                     onClick={() => setAddingSubCatId(null)}
-                                    className="p-1 text-slate-400 hover:bg-slate-800 rounded-lg transition-colors cursor-pointer"
+                                    className="p-1 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-800 rounded-lg transition-colors cursor-pointer"
                                     title="Batal">
                                     <X size={14} />
                                   </button>
@@ -463,7 +463,7 @@ export default function CategoriesPage() {
                                     setAddingSubCatId(cat.id)
                                     setAddingSubName('')
                                   }}
-                                  className="text-xs font-bold text-indigo-400 hover:text-indigo-300 flex items-center gap-1 cursor-pointer transition-colors">
+                                  className="text-xs font-bold text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 flex items-center gap-1 cursor-pointer transition-colors">
                                   <Plus size={13} /> Tambah Subkategori
                                 </button>
                               )}

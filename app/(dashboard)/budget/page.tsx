@@ -69,7 +69,7 @@ function BudgetRow({
   const hasAnyPrevInfo = hasPrevBudget || hasPrevActual
 
   return (
-    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 px-4 sm:px-6 py-3.5 border-b border-slate-800/40 last:border-0 hover:bg-slate-900/40 transition-colors">
+    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 px-4 sm:px-6 py-3.5 border-b border-slate-200/60 dark:border-slate-800/40 last:border-0 hover:bg-slate-100/70 dark:hover:bg-slate-900/40 transition-colors">
       {/* Subcategory Name & indicator */}
       <div className="flex items-center gap-2.5 min-w-0 pr-2">
         <span className="text-xs text-slate-400 dark:text-slate-500 font-bold shrink-0">↳</span>
@@ -99,14 +99,14 @@ function BudgetRow({
         {/* Input Field + Simpan Button */}
         <div className="flex items-center gap-2 w-full sm:w-auto">
           <div className="relative flex-1 sm:flex-initial">
-            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs font-semibold pointer-events-none">Rp</span>
+            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500 text-xs font-semibold pointer-events-none">Rp</span>
             <input
               type="text"
               inputMode="numeric"
               value={displayValue}
               onChange={e => handleAmountChange(sub.id, e.target.value, type, setOutcomeAmounts, setIncomeAmounts)}
               placeholder="0"
-              className="w-full sm:w-40 pl-9 pr-3 py-1.5 rounded-xl border border-slate-800 text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-blue-500/40 text-slate-200 placeholder:text-slate-600 bg-slate-900/90"
+              className="w-full sm:w-40 pl-9 pr-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-800 text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-blue-500/40 text-slate-800 dark:text-slate-200 placeholder:text-slate-400 dark:placeholder:text-slate-600 bg-white dark:bg-slate-900/90 shadow-sm"
             />
           </div>
 
@@ -115,10 +115,10 @@ function BudgetRow({
             className={`px-3.5 py-1.5 text-xs rounded-xl transition-all font-bold whitespace-nowrap flex items-center justify-center gap-1 cursor-pointer shrink-0 ${isSaved
                 ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/30'
                 : isError
-                  ? 'bg-rose-500/20 text-rose-400 border border-rose-500/30'
+                  ? 'bg-rose-500/20 text-rose-600 dark:text-rose-400 border border-rose-500/30'
                   : type === 'outcome'
-                    ? 'bg-rose-500/10 text-rose-400 hover:bg-rose-500/20 border border-rose-500/20'
-                    : 'bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20 border border-emerald-500/20'
+                    ? 'bg-rose-500/10 text-rose-600 dark:text-rose-400 hover:bg-rose-500/20 border border-rose-500/20'
+                    : 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-500/20 border border-emerald-500/20'
               }`}>
             {isSaved ? <><Check size={13} /> Tersimpan</> : isError ? 'Gagal!' : 'Simpan'}
           </button>
@@ -271,26 +271,26 @@ export default function BudgetPage() {
 
   return (
     <div className="max-w-3xl w-full mx-auto space-y-6">
-      <div className="glass-card p-6 rounded-2xl border border-slate-800">
-        <h1 className="text-xl font-bold text-white mb-1">Manajemen Budget & Target</h1>
-        <p className="text-xs text-slate-400">Atur batasan pengeluaran dan target pemasukan bulanan per kategori & subkategori</p>
+      <div className="glass-card p-6 rounded-2xl border border-slate-200/80 dark:border-slate-800">
+        <h1 className="text-xl font-bold text-slate-900 dark:text-white mb-1">Manajemen Budget & Target</h1>
+        <p className="text-xs text-slate-500 dark:text-slate-400">Atur batasan pengeluaran dan target pemasukan bulanan per kategori & subkategori</p>
       </div>
 
       {/* Month/Year picker */}
-      <div className="glass-card rounded-2xl border border-slate-800 p-4 flex flex-wrap items-center justify-between gap-3">
+      <div className="glass-card rounded-2xl border border-slate-200/80 dark:border-slate-800 p-4 flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-center gap-3">
-          <Calendar size={18} className="text-blue-400 ml-1" />
+          <Calendar size={18} className="text-blue-500 dark:text-blue-400 ml-1" />
           <select value={month} onChange={e => setMonth(Number(e.target.value))}
-            className="px-4 py-2 rounded-xl border border-slate-800 text-sm font-semibold text-slate-200 outline-none cursor-pointer bg-slate-900">
+            className="px-4 py-2 rounded-xl border border-slate-200 dark:border-slate-800 text-sm font-semibold text-slate-800 dark:text-slate-200 outline-none cursor-pointer bg-white dark:bg-slate-900 shadow-sm">
             {months.map((m, i) => <option key={i} value={i + 1}>{m}</option>)}
           </select>
           <select value={year} onChange={e => setYear(Number(e.target.value))}
-            className="px-4 py-2 rounded-xl border border-slate-800 text-sm font-semibold text-slate-200 outline-none cursor-pointer bg-slate-900">
+            className="px-4 py-2 rounded-xl border border-slate-200 dark:border-slate-800 text-sm font-semibold text-slate-800 dark:text-slate-200 outline-none cursor-pointer bg-white dark:bg-slate-900 shadow-sm">
             {[2024, 2025, 2026, 2027].map(y => <option key={y} value={y}>{y}</option>)}
           </select>
         </div>
-        <span className="text-xs font-semibold text-slate-400 bg-slate-900/80 px-3 py-1.5 rounded-lg border border-slate-800">
-          Periode: <span className="text-blue-400">{months[month - 1]} {year}</span>
+        <span className="text-xs font-semibold text-slate-600 dark:text-slate-400 bg-slate-100 dark:bg-slate-900/80 px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-800">
+          Periode: <span className="text-blue-600 dark:text-blue-400 font-bold">{months[month - 1]} {year}</span>
         </span>
       </div>
 
@@ -308,7 +308,7 @@ export default function BudgetPage() {
           const totalAmount = getTotalPerType(typeKey)
 
           return (
-            <div key={typeKey} className="glass-card rounded-2xl border border-slate-800 overflow-hidden shadow-lg shadow-black/20">
+            <div key={typeKey} className="glass-card rounded-2xl border border-slate-200/80 dark:border-slate-800 overflow-hidden shadow-sm dark:shadow-lg dark:shadow-black/20">
               {/* Level 1: Header Dropdown */}
               <button
                 type="button"
@@ -354,7 +354,7 @@ export default function BudgetPage() {
 
               {/* Level 1 Content */}
               {isTypeExpanded && (
-                <div className="p-4 space-y-3 bg-slate-950/40 border-t border-slate-800">
+                <div className="p-4 space-y-3 bg-slate-50/70 dark:bg-slate-950/40 border-t border-slate-200/80 dark:border-slate-800">
                   {typeCats.length === 0 ? (
                     <p className="text-xs text-slate-500 py-6 text-center">
                       Belum ada kategori {isOutcome ? 'pengeluaran (outcome)' : 'pemasukan (income)'}. Tambahkan di halaman Kategori.
@@ -366,22 +366,22 @@ export default function BudgetPage() {
                       const catTotal = getCategoryTotal(cat.id, typeKey)
 
                       return (
-                        <div key={cat.id} className="glass-card rounded-xl border border-slate-800/80 overflow-hidden bg-slate-900/60">
+                        <div key={cat.id} className="rounded-xl border border-slate-200/80 dark:border-slate-800/80 overflow-hidden bg-white dark:bg-slate-900/60 shadow-sm">
                           {/* Level 2: Kategori Dropdown Header */}
                           <button
                             type="button"
                             onClick={() => toggleCategoryExpand(cat.id)}
-                            className="w-full flex items-center justify-between px-4 py-3 hover:bg-slate-800/50 transition-colors cursor-pointer select-none">
+                            className="w-full flex items-center justify-between px-4 py-3 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors cursor-pointer select-none">
                             <div className="flex items-center gap-2.5 min-w-0 pr-2">
                               {isCatExpanded ? (
-                                <ChevronDown size={17} className="text-blue-400 shrink-0" />
+                                <ChevronDown size={17} className="text-blue-500 dark:text-blue-400 shrink-0" />
                               ) : (
                                 <ChevronRight size={17} className="text-slate-400 shrink-0" />
                               )}
                               <span className="text-sm font-semibold text-slate-800 dark:text-slate-100 truncate">
                                 {cat.name}
                               </span>
-                              <span className="text-xs text-slate-500 dark:text-slate-400 bg-slate-200/70 dark:bg-slate-800/80 px-2 py-0.5 rounded-md border border-slate-300 dark:border-slate-700/50 shrink-0 font-medium">
+                              <span className="text-xs text-slate-600 dark:text-slate-400 bg-slate-100 dark:bg-slate-800/80 px-2 py-0.5 rounded-md border border-slate-200 dark:border-slate-700/50 shrink-0 font-medium">
                                 {catSubs.length} sub
                               </span>
                             </div>
@@ -401,13 +401,13 @@ export default function BudgetPage() {
 
                           {/* Level 3: List Subkategori */}
                           {isCatExpanded && (
-                            <div className="bg-slate-950/70 border-t border-slate-800/80">
+                            <div className="bg-slate-50/50 dark:bg-slate-950/70 border-t border-slate-200/80 dark:border-slate-800/80">
                               {catSubs.length === 0 ? (
                                 <p className="text-xs text-slate-500 px-6 py-4 italic text-center">
                                   Belum ada subkategori pada kategori ini.
                                 </p>
                               ) : (
-                                <div className="divide-y divide-slate-800/40">
+                                <div className="divide-y divide-slate-200/60 dark:divide-slate-800/40">
                                   {catSubs.map(sub => (
                                     <BudgetRow
                                       key={sub.id}

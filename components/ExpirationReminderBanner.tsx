@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
-import { AlertTriangle, X, Clock } from 'lucide-react'
+import { AlertTriangle, X } from 'lucide-react'
 
 export function ExpirationReminderBanner() {
   const [show, setShow] = useState(false)
@@ -51,7 +51,7 @@ export function ExpirationReminderBanner() {
         // Automatically hide reminder after 5 seconds
         const timer = setTimeout(() => {
           setShow(false)
-        }, 5000)
+        }, 6000)
 
         return () => clearTimeout(timer)
       }
@@ -63,20 +63,21 @@ export function ExpirationReminderBanner() {
   if (!show || !message) return null
 
   return (
-    <div className="fixed top-4 left-1/2 -translate-x-1/2 z-50 w-11/12 max-w-lg animate-bounce-short">
-      <div className="glass-card p-4 rounded-2xl bg-amber-500/15 border border-amber-500/40 text-amber-200 shadow-2xl backdrop-blur-xl flex items-center justify-between gap-3">
-        <div className="flex items-center gap-2.5">
-          <div className="p-2 rounded-xl bg-amber-500/20 text-amber-300 shrink-0">
+    <div className="fixed top-4 left-1/2 -translate-x-1/2 z-50 w-11/12 max-w-lg animate-fade-in">
+      <div className="glass-card p-3.5 sm:p-4 rounded-2xl bg-amber-500/15 dark:bg-amber-500/10 border border-amber-500/30 text-amber-900 dark:text-amber-200 shadow-2xl backdrop-blur-xl flex items-center justify-between gap-3">
+        <div className="flex items-center gap-3">
+          <div className="p-2 rounded-xl bg-amber-500/20 text-amber-600 dark:text-amber-400 shrink-0">
             <AlertTriangle size={18} />
           </div>
           <div>
-            <p className="text-xs font-bold text-amber-300">Peringatan Masa Aktif Akun</p>
-            <p className="text-xs text-amber-100/90 mt-0.5">{message}</p>
+            <p className="text-xs font-bold text-amber-800 dark:text-amber-300">Peringatan Masa Aktif Akun</p>
+            <p className="text-xs text-amber-700 dark:text-amber-200/90 mt-0.5">{message}</p>
           </div>
         </div>
         <button
           onClick={() => setShow(false)}
-          className="p-1.5 rounded-lg hover:bg-amber-500/20 text-amber-300 hover:text-white transition-colors cursor-pointer shrink-0"
+          className="p-1.5 rounded-lg hover:bg-amber-500/20 text-amber-700 dark:text-amber-300 hover:text-amber-950 dark:hover:text-white transition-colors cursor-pointer shrink-0"
+          title="Tutup"
         >
           <X size={16} />
         </button>

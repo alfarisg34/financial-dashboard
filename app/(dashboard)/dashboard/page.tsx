@@ -2,9 +2,16 @@
 import { useState, useEffect, useMemo } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { PieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer } from 'recharts'
-import { ArrowUpDown, ArrowUp, ArrowDown, Wallet, TrendingUp, TrendingDown, Calendar, Layers, ShieldAlert, CheckCircle2 } from 'lucide-react'
+import { 
+  ArrowUpDown, ArrowUp, ArrowDown, Wallet, TrendingUp, TrendingDown, 
+  Calendar, Layers, ShieldAlert, CheckCircle2, Clock, Sparkles, AlertTriangle, Receipt
+} from 'lucide-react'
 
-const COLORS = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899', '#06b6d4', '#84cc16', '#a855f7', '#6366f1']
+const COLORS = [
+  '#3b82f6', '#10b981', '#f59e0b', '#ec4899', 
+  '#8b5cf6', '#06b6d4', '#14b8a6', '#6366f1', 
+  '#f43f5e', '#84cc16'
+]
 
 type Transaction = {
   id: string; type: string; amount: number; date: string; description: string
@@ -76,7 +83,11 @@ export default function DashboardPage() {
 
   function RekapSortIcon({ col }: { col: RekapSortKey }) {
     if (rekapSortKey !== col) return <ArrowUpDown size={12} className="inline ml-1 opacity-40" />
-    return rekapSortDir === 'asc' ? <ArrowUp size={12} className="inline ml-1 text-blue-400" /> : <ArrowDown size={12} className="inline ml-1 text-blue-400" />
+    return rekapSortDir === 'asc' ? (
+      <ArrowUp size={12} className="inline ml-1 text-blue-500" />
+    ) : (
+      <ArrowDown size={12} className="inline ml-1 text-blue-500" />
+    )
   }
 
   // Fetch transactions with categories, subcategories, and fund_sources
@@ -148,7 +159,6 @@ export default function DashboardPage() {
 
   // Rekap Budget vs Actual per Subcategory & Category
   const budgetVsActualRecap = useMemo(() => {
-    // Map subcategoryId -> actual spent (outcome)
     const actualSpentMap: Record<string, number> = {}
     outcome.forEach(t => {
       if (t.subcategory_id) {
@@ -156,7 +166,6 @@ export default function DashboardPage() {
       }
     })
 
-    // Subcategories with budget or transactions
     const outcomeSubs = subcategories.filter(s => s.categories?.type === 'outcome')
 
     const list = outcomeSubs.map(sub => {
@@ -196,10 +205,10 @@ export default function DashboardPage() {
   }, [subcategories, budgets, outcome, rekapSortKey, rekapSortDir])
 
   function SortIcon({ col }: { col: typeof sortKey }) {
-    if (sortKey !== col) return <ArrowUpDown size={13} className="text-slate-600 ml-1 inline"/>
+    if (sortKey !== col) return <ArrowUpDown size={12} className="text-[var(--text-muted)] opacity-50 ml-1 inline"/>
     return sortDir === 'asc'
-      ? <ArrowUp size={13} className="text-blue-400 ml-1 inline"/>
-      : <ArrowDown size={13} className="text-blue-400 ml-1 inline"/>
+      ? <ArrowUp size={12} className="text-blue-500 ml-1 inline"/>
+      : <ArrowDown size={12} className="text-blue-500 ml-1 inline"/>
   }
 
   function handleSort(key: typeof sortKey) {
@@ -237,69 +246,156 @@ export default function DashboardPage() {
     return 0
   })
 
-  return (
-    <div className="space-y-8 max-w-7xl mx-auto">
-
-      {/* Title & Filter */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 glass-card p-5 rounded-2xl border border-slate-800">
-        <div>
-          <h1 className="text-2xl font-bold text-white tracking-tight">DashboardKeuangan</h1>
-          <p className="text-slate-400 text-xs mt-1">Ringkasan realisasi dan proyeksi anggaran Anda</p>
+  // Custom Recharts Tooltip
+  const CustomChartTooltip = ({ active, payload }: any) => {
+    if (active && payload && payload.length) {
+      const data = payload[0]
+      return (
+        <div className="glass-card p-3 rounded-xl border border-[var(--border-default)] shadow-xl text-xs space-y-1">
+          <div className="flex items-center gap-2">
+            <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: data.payload.fill || data.color }} />
+            <span className="font-semibold text-[var(--text-primary)]">{data.name}</span>
+          </div>
+          <p className="font-bold text-[var(--text-primary)] tabular-nums pl-4.5">
+            {fmt(data.value)}
+          </p>
         </div>
-        <div className="flex items-center gap-2.5 bg-slate-900/80 p-1.5 rounded-xl border border-slate-800 self-start sm:self-auto">
-          <Calendar size={15} className="text-slate-300 ml-2 shrink-0" />
+      )
+    }
+    return null
+  }
+
+  return (
+    <div className="space-y-8 max-w-7xl mx-auto animate-fade-in">
+
+      {/* Header & Date Range Filter */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 glass-card p-5 sm:p-6 rounded-2xl">
+        <div>
+          <div className="flex items-center gap-2.5 mb-1">
+            <div className="w-8 h-8 rounded-lg bg-blue-500/10 text-blue-500 flex items-center justify-center border border-blue-500/20">
+              <Sparkles size={17} />
+            </div>
+            <h1 className="text-xl sm:text-2xl font-extrabold text-[var(--text-primary)] tracking-tight">
+              Dashboard Keuangan
+            </h1>
+          </div>
+          <p className="text-[var(--text-muted)] text-xs sm:text-sm pl-10.5">
+            Ringkasan realisasi transaksi dan proyeksi anggaran Anda
+          </p>
+        </div>
+
+        <div className="flex items-center gap-2 bg-[var(--bg-surface-elevated)] p-1.5 rounded-xl border border-[var(--border-subtle)] shadow-inner self-start sm:self-auto">
+          <Calendar size={15} className="text-[var(--text-muted)] ml-2 shrink-0" />
           <input 
             type="date" 
             value={startDate} 
             onChange={e => setStartDate(e.target.value)}
-            className="bg-transparent border-none text-xs text-slate-200 focus:outline-none py-1"
+            className="bg-transparent border-none text-xs text-[var(--text-primary)] font-medium focus:outline-none py-1 cursor-pointer"
           />
-          <span className="text-slate-600 text-xs">–</span>
+          <span className="text-[var(--text-muted)] text-xs">–</span>
           <input 
             type="date" 
             value={endDate} 
             onChange={e => setEndDate(e.target.value)}
-            className="bg-transparent border-none text-xs text-slate-200 focus:outline-none py-1"
+            className="bg-transparent border-none text-xs text-[var(--text-primary)] font-medium focus:outline-none py-1 cursor-pointer"
           />
         </div>
       </div>
 
-      {/* Realization Cards */}
+      {/* Realization Cards (Bento Grid) */}
       <div>
-        <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3.5 flex items-center gap-2">
-          <TrendingUp size={14} className="text-emerald-400" />
-          Realisasi Transaksi
-        </p>
+        <div className="flex items-center justify-between mb-3.5">
+          <p className="text-xs font-bold text-[var(--text-muted)] uppercase tracking-wider flex items-center gap-2">
+            <TrendingUp size={14} className="text-emerald-500" />
+            Realisasi Transaksi Periode Ini
+          </p>
+          <span className="text-[11px] text-[var(--text-muted)] font-medium bg-[var(--bg-surface-elevated)] px-2.5 py-0.5 rounded-full border border-[var(--border-subtle)]">
+            {days} Hari Tercatat
+          </span>
+        </div>
+
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <div className="glass-card glass-card-hover p-5 rounded-2xl border border-slate-800/80 relative overflow-hidden">
-            <div className="absolute top-0 right-0 w-24 h-24 bg-emerald-500/10 rounded-full blur-2xl -mr-6 -mt-6 pointer-events-none" />
-            <p className="text-xs font-medium text-emerald-400 uppercase tracking-wide mb-1">Total Pemasukan</p>
-            <p className="text-2xl font-bold text-emerald-400 tracking-tight">{fmt(totalIncome)}</p>
-          </div>
-
-          <div className="glass-card glass-card-hover p-5 rounded-2xl border border-slate-800/80 relative overflow-hidden">
-            <div className="absolute top-0 right-0 w-24 h-24 bg-rose-500/10 rounded-full blur-2xl -mr-6 -mt-6 pointer-events-none" />
-            <p className="text-xs font-medium text-rose-400 uppercase tracking-wide mb-1">Total Pengeluaran</p>
-            <p className="text-2xl font-bold text-rose-400 tracking-tight">{fmt(totalOutcome)}</p>
-          </div>
-
-          <div className={`glass-card glass-card-hover p-5 rounded-2xl border border-slate-800/80 relative overflow-hidden`}>
-            <div className={`absolute top-0 right-0 w-24 h-24 ${actualBalance >= 0 ? 'bg-blue-500/10' : 'bg-rose-500/10'} rounded-full blur-2xl -mr-6 -mt-6 pointer-events-none`} />
-            <p className={`text-xs font-medium uppercase tracking-wide mb-1 ${actualBalance >= 0 ? 'text-blue-400' : 'text-rose-400'}`}>
-              Actual Balance
+          {/* Card: Total Pemasukan */}
+          <div className="glass-card glass-card-hover p-5 rounded-2xl relative overflow-hidden group">
+            <div className="flex items-center justify-between mb-3">
+              <span className="text-xs font-semibold text-emerald-600 dark:text-emerald-400 uppercase tracking-wide">
+                Total Pemasukan
+              </span>
+              <div className="w-8 h-8 rounded-lg bg-emerald-500/10 text-emerald-500 flex items-center justify-center border border-emerald-500/20 group-hover:scale-105 transition-transform">
+                <ArrowUp size={16} />
+              </div>
+            </div>
+            <p className="text-2xl sm:text-3xl font-extrabold text-emerald-600 dark:text-emerald-400 tracking-tight tabular-nums">
+              {fmt(totalIncome)}
             </p>
-            <p className={`text-2xl font-bold tracking-tight ${actualBalance >= 0 ? 'text-blue-400' : 'text-rose-400'}`}>
+            <p className="text-[11px] text-[var(--text-muted)] mt-1.5 flex items-center gap-1">
+              <span>{income.length} transaksi masuk</span>
+            </p>
+          </div>
+
+          {/* Card: Total Pengeluaran */}
+          <div className="glass-card glass-card-hover p-5 rounded-2xl relative overflow-hidden group">
+            <div className="flex items-center justify-between mb-3">
+              <span className="text-xs font-semibold text-rose-600 dark:text-rose-400 uppercase tracking-wide">
+                Total Pengeluaran
+              </span>
+              <div className="w-8 h-8 rounded-lg bg-rose-500/10 text-rose-500 flex items-center justify-center border border-rose-500/20 group-hover:scale-105 transition-transform">
+                <ArrowDown size={16} />
+              </div>
+            </div>
+            <p className="text-2xl sm:text-3xl font-extrabold text-rose-600 dark:text-rose-400 tracking-tight tabular-nums">
+              {fmt(totalOutcome)}
+            </p>
+            <p className="text-[11px] text-[var(--text-muted)] mt-1.5 flex items-center gap-1">
+              <span>{outcome.length} transaksi keluar</span>
+            </p>
+          </div>
+
+          {/* Card: Actual Balance */}
+          <div className="glass-card glass-card-hover p-5 rounded-2xl relative overflow-hidden group">
+            <div className="flex items-center justify-between mb-3">
+              <span className={`text-xs font-semibold uppercase tracking-wide ${actualBalance >= 0 ? 'text-blue-600 dark:text-blue-400' : 'text-rose-600 dark:text-rose-400'}`}>
+                Actual Balance
+              </span>
+              <div className={`w-8 h-8 rounded-lg flex items-center justify-center border group-hover:scale-105 transition-transform ${
+                actualBalance >= 0 
+                  ? 'bg-blue-500/10 text-blue-500 border-blue-500/20' 
+                  : 'bg-rose-500/10 text-rose-500 border-rose-500/20'
+              }`}>
+                <Wallet size={16} />
+              </div>
+            </div>
+            <p className={`text-2xl sm:text-3xl font-extrabold tracking-tight tabular-nums ${
+              actualBalance >= 0 ? 'text-blue-600 dark:text-blue-400' : 'text-rose-600 dark:text-rose-400'
+            }`}>
               {fmt(actualBalance)}
             </p>
-            <p className={`text-xs mt-1.5 font-medium ${actualBalance >= 0 ? 'text-blue-400/80' : 'text-rose-400/80'}`}>
-              {actualBalance >= 0 ? 'Surplus (+)' : '⚠️ Defisit (-)'}
-            </p>
+            <div className="mt-2">
+              <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold ${
+                actualBalance >= 0 ? 'badge-emerald' : 'badge-rose'
+              }`}>
+                {actualBalance >= 0 ? <CheckCircle2 size={11} /> : <AlertTriangle size={11} />}
+                {actualBalance >= 0 ? 'Surplus (+)' : 'Defisit (-)'}
+              </span>
+            </div>
           </div>
 
-          <div className="glass-card glass-card-hover p-5 rounded-2xl border border-slate-800/80 relative overflow-hidden">
-            <div className="absolute top-0 right-0 w-24 h-24 bg-purple-500/10 rounded-full blur-2xl -mr-6 -mt-6 pointer-events-none" />
-            <p className="text-xs font-medium text-purple-400 uppercase tracking-wide mb-1">Rata-rata/Hari</p>
-            <p className="text-2xl font-bold text-purple-400 tracking-tight">{fmt(Math.round(avgPerDay))}</p>
+          {/* Card: Rata-rata / Hari */}
+          <div className="glass-card glass-card-hover p-5 rounded-2xl relative overflow-hidden group">
+            <div className="flex items-center justify-between mb-3">
+              <span className="text-xs font-semibold text-purple-600 dark:text-purple-400 uppercase tracking-wide">
+                Rata-rata/Hari
+              </span>
+              <div className="w-8 h-8 rounded-lg bg-purple-500/10 text-purple-500 flex items-center justify-center border border-purple-500/20 group-hover:scale-105 transition-transform">
+                <Clock size={16} />
+              </div>
+            </div>
+            <p className="text-2xl sm:text-3xl font-extrabold text-purple-600 dark:text-purple-400 tracking-tight tabular-nums">
+              {fmt(Math.round(avgPerDay))}
+            </p>
+            <p className="text-[11px] text-[var(--text-muted)] mt-1.5">
+              Rata-rata belanja harian
+            </p>
           </div>
         </div>
       </div>
@@ -319,38 +415,53 @@ export default function DashboardPage() {
 
         return (
           <div>
-            <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3.5 flex items-center gap-2">
-              <TrendingDown size={14} className="text-amber-400" />
+            <p className="text-xs font-bold text-[var(--text-muted)] uppercase tracking-wider mb-3.5 flex items-center gap-2">
+              <TrendingDown size={14} className="text-amber-500" />
               Estimasi & Rekomendasi Pengeluaran
             </p>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div className="glass-card glass-card-hover p-5 rounded-2xl border border-slate-800/80 relative overflow-hidden">
-                <div className={`absolute top-0 right-0 w-24 h-24 ${isProjectedOverIncome ? 'bg-rose-500/10' : 'bg-amber-500/10'} rounded-full blur-2xl -mr-6 -mt-6 pointer-events-none`} />
-                <p className="text-xs font-medium text-amber-400 uppercase tracking-wide mb-1">Perkiraan Pengeluaran Akhir Bulan</p>
-                <p className={`text-2xl font-bold tracking-tight ${isProjectedOverIncome ? 'text-rose-400' : 'text-amber-300'}`}>
+              <div className="glass-card glass-card-hover p-5 sm:p-6 rounded-2xl relative overflow-hidden">
+                <div className="flex items-center justify-between mb-2">
+                  <p className="text-xs font-semibold text-amber-600 dark:text-amber-400 uppercase tracking-wide">
+                    Perkiraan Pengeluaran Akhir Bulan
+                  </p>
+                  <span className="text-[10px] text-[var(--text-muted)] bg-[var(--bg-surface-elevated)] px-2 py-0.5 rounded border border-[var(--border-subtle)]">
+                    {totalDaysInMonth} Hari Penuh
+                  </span>
+                </div>
+                <p className={`text-2xl sm:text-3xl font-extrabold tracking-tight tabular-nums ${
+                  isProjectedOverIncome ? 'text-rose-500' : 'text-amber-600 dark:text-amber-300'
+                }`}>
                   {fmt(Math.round(projectedMonthEndCost))}
                 </p>
-                <p className="text-xs text-slate-400 mt-1">
-                  Berdasarkan rata-rata {fmt(Math.round(avgPerDay))}/hari ({totalDaysInMonth} hari)
+                <p className="text-xs text-[var(--text-muted)] mt-1.5">
+                  Berdasarkan laju rata-rata {fmt(Math.round(avgPerDay))}/hari
                 </p>
                 {isProjectedOverIncome && (
-                  <p className="text-[11px] font-semibold text-rose-400 mt-1.5 flex items-center gap-1">
-                    ⚠️ Melebihi Projected Income ({fmt(projectedIncome)})
-                  </p>
+                  <div className="mt-3 p-2.5 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-500 text-xs font-semibold flex items-center gap-2">
+                    <AlertTriangle size={14} className="shrink-0" />
+                    <span>Melebihi Target Income ({fmt(projectedIncome)})</span>
+                  </div>
                 )}
               </div>
 
-              <div className="glass-card glass-card-hover p-5 rounded-2xl border border-slate-800/80 relative overflow-hidden">
-                <div className="absolute top-0 right-0 w-24 h-24 bg-cyan-500/10 rounded-full blur-2xl -mr-6 -mt-6 pointer-events-none" />
-                <p className="text-xs font-medium text-cyan-400 uppercase tracking-wide mb-1">Rekomendasi Maks. Rata-rata/Hari</p>
-                <p className="text-2xl font-bold text-cyan-300 tracking-tight">
+              <div className="glass-card glass-card-hover p-5 sm:p-6 rounded-2xl relative overflow-hidden">
+                <div className="flex items-center justify-between mb-2">
+                  <p className="text-xs font-semibold text-cyan-600 dark:text-cyan-400 uppercase tracking-wide">
+                    Rekomendasi Maks. Belanja/Hari
+                  </p>
+                  <span className="text-[10px] text-[var(--text-muted)] bg-[var(--bg-surface-elevated)] px-2 py-0.5 rounded border border-[var(--border-subtle)]">
+                    Sisa {remainingDays} Hari
+                  </span>
+                </div>
+                <p className="text-2xl sm:text-3xl font-extrabold text-cyan-600 dark:text-cyan-300 tracking-tight tabular-nums">
                   {fmt(Math.round(recommendedDailyLimit))}
                 </p>
-                <p className="text-xs text-slate-400 mt-1">
+                <p className="text-xs text-[var(--text-muted)] mt-1.5">
                   {projectedIncome > 0 ? (
-                    <>Untuk sisa {remainingDays} hari agar tak melebihi Projected Income</>
+                    <>Alokasi aman per hari agar pengeluaran tidak melampaui Projected Income</>
                   ) : (
-                    <>Set Projected Income di menu Budget terlebih dahulu</>
+                    <>Tentukan target Projected Income pada menu Budget terlebih dahulu</>
                   )}
                 </p>
               </div>
@@ -359,65 +470,93 @@ export default function DashboardPage() {
         )
       })()}
 
-      {/* Projection Cards */}
+      {/* Target & Proyeksi Anggaran Bulan Ini */}
       <div>
-        <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3.5 flex items-center gap-2">
-          <Wallet size={14} className="text-indigo-400" />
-          Proyeksi Anggaran Bulan Ini
+        <p className="text-xs font-bold text-[var(--text-muted)] uppercase tracking-wider mb-3.5 flex items-center gap-2">
+          <Wallet size={14} className="text-indigo-500" />
+          Target & Proyeksi Anggaran Bulan Ini
         </p>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          <div className="glass-card glass-card-hover p-5 rounded-2xl border border-slate-800/80">
-            <p className="text-xs font-medium text-indigo-400 uppercase tracking-wide mb-1">Projected Income</p>
-            <p className="text-2xl font-bold text-indigo-300 tracking-tight">{fmt(projectedIncome)}</p>
-            <p className="text-xs text-slate-400 mt-1">Target penerimaan</p>
+          <div className="glass-card glass-card-hover p-5 rounded-2xl">
+            <p className="text-xs font-semibold text-indigo-600 dark:text-indigo-400 uppercase tracking-wide mb-1">
+              Projected Income
+            </p>
+            <p className="text-2xl font-extrabold text-indigo-600 dark:text-indigo-300 tracking-tight tabular-nums">
+              {fmt(projectedIncome)}
+            </p>
+            <p className="text-xs text-[var(--text-muted)] mt-1.5">Target pemasukan bulan ini</p>
           </div>
 
-          <div className="glass-card glass-card-hover p-5 rounded-2xl border border-slate-800/80">
-            <p className="text-xs font-medium text-amber-400 uppercase tracking-wide mb-1">Projected Cost</p>
-            <p className="text-2xl font-bold text-amber-300 tracking-tight">{fmt(projectedCost)}</p>
-            <p className="text-xs text-slate-400 mt-1">Batas pengeluaran</p>
+          <div className="glass-card glass-card-hover p-5 rounded-2xl">
+            <p className="text-xs font-semibold text-amber-600 dark:text-amber-400 uppercase tracking-wide mb-1">
+              Projected Cost
+            </p>
+            <p className="text-2xl font-extrabold text-amber-600 dark:text-amber-300 tracking-tight tabular-nums">
+              {fmt(projectedCost)}
+            </p>
+            <p className="text-xs text-[var(--text-muted)] mt-1.5">Batas total alokasi pengeluaran</p>
           </div>
 
-          <div className="glass-card glass-card-hover p-5 rounded-2xl border border-slate-800/80">
-            <p className={`text-xs font-medium uppercase tracking-wide mb-1 ${projectedBalance >= 0 ? 'text-teal-400' : 'text-rose-400'}`}>
+          <div className="glass-card glass-card-hover p-5 rounded-2xl">
+            <p className={`text-xs font-semibold uppercase tracking-wide mb-1 ${
+              projectedBalance >= 0 ? 'text-teal-600 dark:text-teal-400' : 'text-rose-600 dark:text-rose-400'
+            }`}>
               Projected Balance
             </p>
-            <p className={`text-2xl font-bold tracking-tight ${projectedBalance >= 0 ? 'text-teal-300' : 'text-rose-300'}`}>
+            <p className={`text-2xl font-extrabold tracking-tight tabular-nums ${
+              projectedBalance >= 0 ? 'text-teal-600 dark:text-teal-300' : 'text-rose-600 dark:text-rose-400'
+            }`}>
               {fmt(projectedBalance)}
             </p>
-            <p className={`text-xs mt-1 ${projectedBalance >= 0 ? 'text-teal-400/80' : 'text-rose-400/80'}`}>
-              {projectedBalance >= 0 ? 'Estimasi Surplus' : '⚠️ Estimasi Defisit'}
+            <p className={`text-xs mt-1.5 font-medium ${
+              projectedBalance >= 0 ? 'text-teal-600/90 dark:text-teal-400/90' : 'text-rose-600/90 dark:text-rose-400/90'
+            }`}>
+              {projectedBalance >= 0 ? 'Estimasi Surplus (+) ' : '⚠️ Estimasi Defisit (-)'}
             </p>
           </div>
         </div>
       </div>
 
-      {/* Main Category Pie Charts */}
+      {/* Main Category Donut Charts */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {[
-          { title: 'Income per Category', total: totalIncome, data: incomeByCategory, color: 'text-emerald-400' },
-          { title: 'Outcome per Category', total: totalOutcome, data: outcomeByCategory, color: 'text-rose-400' }
-        ].map(({ title, total, data, color }) => (
-          <div key={title} className="glass-card rounded-2xl border border-slate-800 p-5">
-            <div className="flex items-center justify-between mb-4 pb-3 border-b border-slate-800">
-              <h2 className="text-sm font-bold text-slate-200">{title}</h2>
-              <span className={`text-sm font-bold ${color}`}>
+          { title: 'Pemasukan per Kategori', total: totalIncome, data: incomeByCategory, color: 'text-emerald-500', badge: 'badge-emerald' },
+          { title: 'Pengeluaran per Kategori', total: totalOutcome, data: outcomeByCategory, color: 'text-rose-500', badge: 'badge-rose' }
+        ].map(({ title, total, data, color, badge }) => (
+          <div key={title} className="glass-card rounded-2xl p-5 sm:p-6 flex flex-col">
+            <div className="flex items-center justify-between mb-4 pb-3 border-b border-[var(--border-subtle)]">
+              <h2 className="text-sm font-bold text-[var(--text-primary)]">{title}</h2>
+              <span className={`text-xs font-bold px-2.5 py-1 rounded-full tabular-nums ${badge}`}>
                 Total: {fmt(total)}
               </span>
             </div>
-            {data.length === 0
-              ? <p className="text-sm text-slate-500 text-center py-12">Belum ada data</p>
-              : <ResponsiveContainer width="100%" height={240}>
-                  <PieChart>
-                    <Pie data={data} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={85}
-                      label={({ name, percent }) => `${name} ${((percent ?? 0) * 100).toFixed(0)}%`}
-                      labelLine={false} fontSize={11}>
-                      {data.map((_, i) => <Cell key={i} fill={COLORS[i % COLORS.length]}/>)}
-                    </Pie>
-                    <Tooltip formatter={(v: any) => fmt(v)} contentStyle={{ backgroundColor: '#0f172a', borderColor: '#334155', borderRadius: '12px', color: '#fff' }} />
-                  </PieChart>
-                </ResponsiveContainer>
-            }
+            {data.length === 0 ? (
+              <div className="flex-1 flex flex-col items-center justify-center py-12 text-[var(--text-muted)] text-xs">
+                <Receipt size={28} className="opacity-40 mb-2" />
+                <p>Belum ada data transaksi</p>
+              </div>
+            ) : (
+              <ResponsiveContainer width="100%" height={250}>
+                <PieChart>
+                  <Pie 
+                    data={data} 
+                    dataKey="value" 
+                    nameKey="name" 
+                    cx="50%" 
+                    cy="50%" 
+                    innerRadius={50}
+                    outerRadius={85}
+                    paddingAngle={3}
+                    label={({ name, percent }) => `${name} ${((percent ?? 0) * 100).toFixed(0)}%`}
+                    labelLine={false} 
+                    fontSize={11}
+                  >
+                    {data.map((_, i) => <Cell key={i} fill={COLORS[i % COLORS.length]} stroke="var(--card-border)" strokeWidth={1} />)}
+                  </Pie>
+                  <Tooltip content={<CustomChartTooltip />} />
+                </PieChart>
+              </ResponsiveContainer>
+            )}
           </div>
         ))}
       </div>
@@ -429,9 +568,12 @@ export default function DashboardPage() {
         if (categoryNames.length === 0) return null
         return (
           <div key={t} className="space-y-4">
-            <h2 className={`text-sm font-bold tracking-wide ${t === 'income' ? 'text-emerald-400' : 'text-rose-400'}`}>
-              {t === 'income' ? '📈 Income' : '📉 Outcome'} per Subcategory
-            </h2>
+            <div className="flex items-center gap-2">
+              <span className={`w-2 h-2 rounded-full ${t === 'income' ? 'bg-emerald-500' : 'bg-rose-500'}`} />
+              <h2 className={`text-sm font-bold tracking-wide ${t === 'income' ? 'text-emerald-500' : 'text-rose-500'}`}>
+                {t === 'income' ? 'Detail Subkategori Pemasukan' : 'Detail Subkategori Pengeluaran'}
+              </h2>
+            </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {categoryNames.map(catName => {
                 const catTxs = txs.filter(tx => tx.categories?.name === catName)
@@ -439,21 +581,29 @@ export default function DashboardPage() {
                 const data = groupBy(catTxs, tx => tx.subcategories?.name || 'Lainnya')
                 if (data.length === 0) return null
                 return (
-                  <div key={catName} className="glass-card rounded-2xl border border-slate-800 p-5">
-                    <div className="flex items-center justify-between mb-4 pb-2 border-b border-slate-800/80">
-                      <h3 className="text-sm font-semibold text-slate-200">{catName}</h3>
-                      <span className="text-xs font-bold text-slate-300 bg-slate-800/80 px-2.5 py-1 rounded-lg border border-slate-700/50">
+                  <div key={catName} className="glass-card rounded-2xl p-5">
+                    <div className="flex items-center justify-between mb-4 pb-2 border-b border-[var(--border-subtle)]">
+                      <h3 className="text-sm font-bold text-[var(--text-primary)]">{catName}</h3>
+                      <span className="text-xs font-bold text-[var(--text-secondary)] bg-[var(--bg-surface-elevated)] px-2.5 py-1 rounded-lg border border-[var(--border-subtle)] tabular-nums">
                         {fmt(catTotal)}
                       </span>
                     </div>
                     <ResponsiveContainer width="100%" height={210}>
                       <PieChart>
-                        <Pie data={data} dataKey="value" nameKey="name"
-                          cx="50%" cy="50%" outerRadius={70} innerRadius={35}>
-                          {data.map((_, i) => <Cell key={i} fill={COLORS[i % COLORS.length]}/>)}
+                        <Pie 
+                          data={data} 
+                          dataKey="value" 
+                          nameKey="name"
+                          cx="50%" 
+                          cy="50%" 
+                          outerRadius={70} 
+                          innerRadius={36}
+                          paddingAngle={2}
+                        >
+                          {data.map((_, i) => <Cell key={i} fill={COLORS[i % COLORS.length]} stroke="var(--card-border)" strokeWidth={1} />)}
                         </Pie>
-                        <Tooltip formatter={(v: any) => fmt(v)} contentStyle={{ backgroundColor: '#0f172a', borderColor: '#334155', borderRadius: '12px', color: '#fff' }} />
-                        <Legend iconSize={9} wrapperStyle={{fontSize: '11px', color: '#94a3b8'}}/>
+                        <Tooltip content={<CustomChartTooltip />} />
+                        <Legend iconSize={8} wrapperStyle={{ fontSize: '11px', color: 'var(--text-muted)' }} />
                       </PieChart>
                     </ResponsiveContainer>
                   </div>
@@ -465,58 +615,93 @@ export default function DashboardPage() {
       })}
 
       {/* Section: Rekap Budget vs Actual */}
-      <div className="glass-card rounded-2xl border border-slate-800 p-5">
-        <div className="flex items-center gap-2 mb-4 pb-3 border-b border-slate-800">
-          <Layers size={18} className="text-blue-400" />
-          <h2 className="text-base font-bold text-white">Rekap Budget vs Actual (Pengeluaran)</h2>
+      <div className="glass-card rounded-2xl overflow-hidden">
+        <div className="flex items-center justify-between p-5 border-b border-[var(--border-subtle)]">
+          <div className="flex items-center gap-2.5">
+            <div className="w-7 h-7 rounded-lg bg-blue-500/10 text-blue-500 flex items-center justify-center border border-blue-500/20">
+              <Layers size={16} />
+            </div>
+            <div>
+              <h2 className="text-base font-bold text-[var(--text-primary)]">
+                Rekap Anggaran vs Realisasi (Pengeluaran)
+              </h2>
+              <p className="text-xs text-[var(--text-muted)]">
+                Pantau sisa kuota dan persentase penggunaan per subkategori
+              </p>
+            </div>
+          </div>
         </div>
 
         {budgetVsActualRecap.length === 0 ? (
-          <p className="text-sm text-slate-500 text-center py-8">Belum ada data budget atau transaksi untuk periode ini.</p>
+          <div className="text-center py-12 text-[var(--text-muted)] text-xs">
+            <Layers size={32} className="opacity-30 mx-auto mb-2" />
+            <p>Belum ada data anggaran atau transaksi untuk periode ini.</p>
+          </div>
         ) : (
           <div className="overflow-x-auto">
-            <table className="w-full text-xs text-left text-slate-300 min-w-[650px]">
-              <thead className="bg-slate-900/80 uppercase font-semibold text-slate-400 border-b border-slate-800">
+            <table className="w-full text-xs text-left min-w-[700px]">
+              <thead className="bg-[var(--bg-surface-elevated)] uppercase font-bold text-[var(--text-muted)] tracking-wider border-b border-[var(--border-subtle)]">
                 <tr>
-                  <th className="px-4 py-3 cursor-pointer hover:text-blue-400 select-none transition-colors" onClick={() => handleRekapSort('categoryName')}>
+                  <th className="px-5 py-3.5 cursor-pointer hover:text-blue-500 select-none transition-colors" onClick={() => handleRekapSort('categoryName')}>
                     Kategori <RekapSortIcon col="categoryName"/>
                   </th>
-                  <th className="px-4 py-3 cursor-pointer hover:text-blue-400 select-none transition-colors" onClick={() => handleRekapSort('subcategoryName')}>
+                  <th className="px-5 py-3.5 cursor-pointer hover:text-blue-500 select-none transition-colors" onClick={() => handleRekapSort('subcategoryName')}>
                     Subkategori <RekapSortIcon col="subcategoryName"/>
                   </th>
-                  <th className="px-4 py-3 text-right cursor-pointer hover:text-blue-400 select-none transition-colors" onClick={() => handleRekapSort('budget')}>
-                    Budget <RekapSortIcon col="budget"/>
+                  <th className="px-5 py-3.5 text-right cursor-pointer hover:text-blue-500 select-none transition-colors" onClick={() => handleRekapSort('budget')}>
+                    Anggaran <RekapSortIcon col="budget"/>
                   </th>
-                  <th className="px-4 py-3 text-right cursor-pointer hover:text-blue-400 select-none transition-colors" onClick={() => handleRekapSort('actual')}>
-                    Actual Realisasi <RekapSortIcon col="actual"/>
+                  <th className="px-5 py-3.5 text-right cursor-pointer hover:text-blue-500 select-none transition-colors" onClick={() => handleRekapSort('actual')}>
+                    Realisasi <RekapSortIcon col="actual"/>
                   </th>
-                  <th className="px-4 py-3 text-right cursor-pointer hover:text-blue-400 select-none transition-colors" onClick={() => handleRekapSort('sisa')}>
-                    Sisa Budget <RekapSortIcon col="sisa"/>
+                  <th className="px-5 py-3.5 text-right cursor-pointer hover:text-blue-500 select-none transition-colors" onClick={() => handleRekapSort('sisa')}>
+                    Sisa Anggaran <RekapSortIcon col="sisa"/>
                   </th>
-                  <th className="px-4 py-3 text-center cursor-pointer hover:text-blue-400 select-none transition-colors" onClick={() => handleRekapSort('statusText')}>
+                  <th className="px-5 py-3.5 text-center cursor-pointer hover:text-blue-500 select-none transition-colors" onClick={() => handleRekapSort('statusText')}>
                     Status <RekapSortIcon col="statusText"/>
                   </th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-800/60">
+              <tbody className="divide-y divide-[var(--border-subtle)]">
                 {budgetVsActualRecap.map(item => {
                   const isOver = item.sisa < 0
+                  const pct = Math.min(100, Math.round(item.percentage))
                   return (
-                    <tr key={item.id} className="hover:bg-slate-800/40 transition-colors">
-                      <td className="px-4 py-3 font-medium text-slate-400">{item.categoryName}</td>
-                      <td className="px-4 py-3 font-semibold text-slate-200">{item.subcategoryName}</td>
-                      <td className="px-4 py-3 text-right text-slate-300">{item.budget > 0 ? fmt(item.budget) : '-'}</td>
-                      <td className="px-4 py-3 text-right font-medium text-rose-400">{fmt(item.actual)}</td>
-                      <td className={`px-4 py-3 text-right font-semibold ${isOver ? 'text-rose-400' : 'text-emerald-400'}`}>
+                    <tr key={item.id} className="hover:bg-[var(--bg-surface-hover)] transition-colors">
+                      <td className="px-5 py-3.5 font-medium text-[var(--text-muted)]">{item.categoryName}</td>
+                      <td className="px-5 py-3.5 font-semibold text-[var(--text-primary)]">
+                        <div>
+                          <span>{item.subcategoryName}</span>
+                          {item.budget > 0 && (
+                            <div className="w-24 h-1.5 bg-[var(--border-subtle)] rounded-full overflow-hidden mt-1.5">
+                              <div 
+                                className={`h-full rounded-full transition-all ${
+                                  isOver ? 'bg-rose-500' : pct > 80 ? 'bg-amber-500' : 'bg-emerald-500'
+                                }`}
+                                style={{ width: `${pct}%` }}
+                              />
+                            </div>
+                          )}
+                        </div>
+                      </td>
+                      <td className="px-5 py-3.5 text-right text-[var(--text-secondary)] font-medium tabular-nums">
+                        {item.budget > 0 ? fmt(item.budget) : '-'}
+                      </td>
+                      <td className="px-5 py-3.5 text-right font-bold text-rose-500 tabular-nums">
+                        {fmt(item.actual)}
+                      </td>
+                      <td className={`px-5 py-3.5 text-right font-bold tabular-nums ${
+                        isOver ? 'text-rose-500' : 'text-emerald-500'
+                      }`}>
                         {fmt(item.sisa)}
                       </td>
-                      <td className="px-4 py-3 text-center">
-                        <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-semibold ${
+                      <td className="px-5 py-3.5 text-center">
+                        <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold ${
                           isOver 
-                            ? 'bg-rose-500/10 text-rose-400 border border-rose-500/20' 
+                            ? 'badge-rose' 
                             : item.budget > 0
-                            ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
-                            : 'bg-slate-800 text-slate-400'
+                            ? 'badge-emerald'
+                            : 'bg-[var(--bg-surface-elevated)] text-[var(--text-muted)] border border-[var(--border-subtle)]'
                         }`}>
                           {isOver ? <ShieldAlert size={12}/> : <CheckCircle2 size={12}/>}
                           {isOver ? 'Over Budget' : item.budget > 0 ? 'On Track' : 'No Budget'}
@@ -532,59 +717,86 @@ export default function DashboardPage() {
       </div>
 
       {/* Transaction Details Table */}
-      <div className="glass-card rounded-2xl border border-slate-800 overflow-hidden">
-        <h2 className="text-base font-bold text-white px-6 py-4 border-b border-slate-800">Detail Transaksi</h2>
+      <div className="glass-card rounded-2xl overflow-hidden">
+        <div className="flex items-center justify-between p-5 border-b border-[var(--border-subtle)]">
+          <div className="flex items-center gap-2.5">
+            <div className="w-7 h-7 rounded-lg bg-emerald-500/10 text-emerald-500 flex items-center justify-center border border-emerald-500/20">
+              <Receipt size={16} />
+            </div>
+            <div>
+              <h2 className="text-base font-bold text-[var(--text-primary)]">Rincian Transaksi</h2>
+              <p className="text-xs text-[var(--text-muted)]">Daftar transaksi yang tercatat dalam rentang waktu yang dipilih</p>
+            </div>
+          </div>
+          <span className="text-xs font-semibold text-[var(--text-muted)] bg-[var(--bg-surface-elevated)] px-3 py-1 rounded-full border border-[var(--border-subtle)] tabular-nums">
+            {sortedTransactions.length} Transaksi
+          </span>
+        </div>
+
         <div className="overflow-x-auto">
-          <table className="w-full text-xs text-slate-300 min-w-[700px]">
+          <table className="w-full text-xs min-w-[720px]">
             <thead>
-              <tr className="bg-slate-900/90 text-slate-400 font-semibold uppercase tracking-wider border-b border-slate-800">
-                <th className="px-5 py-3.5 text-left cursor-pointer hover:text-blue-400 select-none" onClick={() => handleSort('date')}>
+              <tr className="bg-[var(--bg-surface-elevated)] text-[var(--text-muted)] font-bold uppercase tracking-wider border-b border-[var(--border-subtle)]">
+                <th className="px-5 py-3.5 text-left cursor-pointer hover:text-blue-500 select-none" onClick={() => handleSort('date')}>
                   Tanggal & Waktu <SortIcon col="date"/>
                 </th>
-                <th className="px-5 py-3.5 text-left cursor-pointer hover:text-blue-400 select-none" onClick={() => handleSort('type')}>
+                <th className="px-5 py-3.5 text-left cursor-pointer hover:text-blue-500 select-none" onClick={() => handleSort('type')}>
                   Jenis <SortIcon col="type"/>
                 </th>
-                <th className="px-5 py-3.5 text-left cursor-pointer hover:text-blue-400 select-none" onClick={() => handleSort('subcategory')}>
+                <th className="px-5 py-3.5 text-left cursor-pointer hover:text-blue-500 select-none" onClick={() => handleSort('subcategory')}>
                   Subkategori <SortIcon col="subcategory"/>
                 </th>
-                <th className="px-5 py-3.5 text-left cursor-pointer hover:text-blue-400 select-none" onClick={() => handleSort('fund_source')}>
+                <th className="px-5 py-3.5 text-left cursor-pointer hover:text-blue-500 select-none" onClick={() => handleSort('fund_source')}>
                   Sumber Dana <SortIcon col="fund_source"/>
                 </th>
-                <th className="px-5 py-3.5 text-left cursor-pointer hover:text-blue-400 select-none" onClick={() => handleSort('description')}>
+                <th className="px-5 py-3.5 text-left cursor-pointer hover:text-blue-500 select-none" onClick={() => handleSort('description')}>
                   Deskripsi <SortIcon col="description"/>
                 </th>
-                <th className="px-5 py-3.5 text-right cursor-pointer hover:text-blue-400 select-none" onClick={() => handleSort('amount')}>
+                <th className="px-5 py-3.5 text-right cursor-pointer hover:text-blue-500 select-none" onClick={() => handleSort('amount')}>
                   Nominal <SortIcon col="amount"/>
                 </th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-800/60">
+            <tbody className="divide-y divide-[var(--border-subtle)]">
               {sortedTransactions.length === 0 ? (
-                <tr><td colSpan={6} className="text-center py-10 text-slate-500">Belum ada transaksi pada rentang tanggal ini</td></tr>
+                <tr>
+                  <td colSpan={6} className="text-center py-12 text-[var(--text-muted)]">
+                    <Receipt size={28} className="opacity-30 mx-auto mb-2" />
+                    Belum ada transaksi pada rentang tanggal ini
+                  </td>
+                </tr>
               ) : (
                 sortedTransactions.map(t => (
-                  <tr key={t.id} className="hover:bg-slate-800/50 transition-colors">
-                    <td className="px-5 py-3.5 text-slate-400 whitespace-nowrap">
+                  <tr key={t.id} className="hover:bg-[var(--bg-surface-hover)] transition-colors">
+                    <td className="px-5 py-3.5 text-[var(--text-muted)] whitespace-nowrap tabular-nums">
                       {formatDisplayDate(t.date)}
                     </td>
                     <td className="px-5 py-3.5 whitespace-nowrap">
-                      <span className={`px-2.5 py-1 rounded-md text-[11px] font-semibold ${t.type === 'income' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-rose-500/10 text-rose-400 border border-rose-500/20'}`}>
-                        {t.type === 'income' ? 'Income' : 'Outcome'}
+                      <span className={`px-2.5 py-1 rounded-md text-[11px] font-bold ${
+                        t.type === 'income' ? 'badge-emerald' : 'badge-rose'
+                      }`}>
+                        {t.type === 'income' ? 'Pemasukan' : 'Pengeluaran'}
                       </span>
                     </td>
-                    <td className="px-5 py-3.5 font-medium text-slate-200 whitespace-nowrap">{t.subcategories?.name || '-'}</td>
+                    <td className="px-5 py-3.5 font-semibold text-[var(--text-primary)] whitespace-nowrap">
+                      {t.subcategories?.name || '-'}
+                    </td>
                     <td className="px-5 py-3.5 whitespace-nowrap">
                       {t.fund_sources ? (
-                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-slate-800/80 border border-slate-700/60 text-slate-200 text-xs">
+                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-[var(--bg-surface-elevated)] border border-[var(--border-subtle)] text-[var(--text-primary)] text-xs font-medium">
                           <span>{t.fund_sources.icon}</span>
                           <span>{t.fund_sources.name}</span>
                         </span>
                       ) : (
-                        <span className="text-slate-600 text-xs">-</span>
+                        <span className="text-[var(--text-muted)] text-xs">-</span>
                       )}
                     </td>
-                    <td className="px-5 py-3.5 text-slate-400 max-w-xs truncate">{t.description || '-'}</td>
-                    <td className={`px-5 py-3.5 text-right font-bold whitespace-nowrap ${t.type === 'income' ? 'text-emerald-400' : 'text-rose-400'}`}>
+                    <td className="px-5 py-3.5 text-[var(--text-secondary)] max-w-xs truncate" title={t.description || ''}>
+                      {t.description || '-'}
+                    </td>
+                    <td className={`px-5 py-3.5 text-right font-extrabold whitespace-nowrap tabular-nums ${
+                      t.type === 'income' ? 'text-emerald-500' : 'text-rose-500'
+                    }`}>
                       {t.type === 'income' ? '+' : '-'}{fmt(t.amount)}
                     </td>
                   </tr>

@@ -3,14 +3,188 @@
 @variant dark (&:where(.dark, .dark *));
 
 :root {
-  --background: #f8fafc;
-  --foreground: #0f172a;
+  /* Surface Colors */
+  --bg-base: #f8fafc;
+  --bg-surface: #ffffff;
+  --bg-surface-elevated: #f1f5f9;
+  --bg-surface-hover: #e2e8f0;
+
+  /* Border Colors */
+  --border-subtle: #e2e8f0;
+  --border-default: #cbd5e1;
+  --border-strong: #94a3b8;
+
+  /* Text Colors */
+  --text-primary: #0f172a;
+  --text-secondary: #334155;
+  --text-muted: #64748b;
+  --text-faint: #94a3b8;
+
+  /* Semantic Accents */
+  --accent-primary: #2563eb;
+  --accent-primary-hover: #1d4ed8;
+  --accent-emerald: #059669;
+  --accent-emerald-subtle: rgba(5, 150, 105, 0.1);
+  --accent-rose: #e11d48;
+  --accent-rose-subtle: rgba(225, 29, 72, 0.1);
+  --accent-amber: #d97706;
+  --accent-amber-subtle: rgba(217, 119, 6, 0.1);
+  --accent-indigo: #4f46e5;
+  --accent-purple: #7c3aed;
+
+  /* Card Background & Shadows */
+  --card-bg: rgba(255, 255, 255, 0.88);
+  --card-border: rgba(226, 232, 240, 0.85);
+  --card-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.05);
+
+  color-scheme: light;
 }
 
 .dark {
-  --background: #090d16;
-  --foreground: #f1f5f9;
+  /* Surface Colors */
+  --bg-base: #070a11;
+  --bg-surface: #0e1422;
+  --bg-surface-elevated: #141c2e;
+  --bg-surface-hover: #1e293b;
+
+  /* Border Colors */
+  --border-subtle: rgba(255, 255, 255, 0.08);
+  --border-default: rgba(255, 255, 255, 0.14);
+  --border-strong: rgba(255, 255, 255, 0.24);
+
+  /* Text Colors */
+  --text-primary: #f8fafc;
+  --text-secondary: #cbd5e1;
+  --text-muted: #94a3b8;
+  --text-faint: #64748b;
+
+  /* Semantic Accents */
+  --accent-primary: #3b82f6;
+  --accent-primary-hover: #60a5fa;
+  --accent-emerald: #10b981;
+  --accent-emerald-subtle: rgba(16, 185, 129, 0.15);
+  --accent-rose: #f43f5e;
+  --accent-rose-subtle: rgba(244, 63, 94, 0.15);
+  --accent-amber: #f59e0b;
+  --accent-amber-subtle: rgba(245, 158, 11, 0.15);
+  --accent-indigo: #6366f1;
+  --accent-purple: #a855f7;
+
+  /* Card Background & Shadows */
+  --card-bg: rgba(14, 20, 34, 0.72);
+  --card-border: rgba(255, 255, 255, 0.09);
+  --card-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.5);
+
   color-scheme: dark;
+}
+
+@theme inline {
+  --color-background: var(--bg-base);
+  --color-foreground: var(--text-primary);
+  --font-sans: var(--font-inter), system-ui, -apple-system, sans-serif;
+}
+
+/* Base Body Styling */
+body {
+  background-color: var(--bg-base);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  min-height: 100vh;
+  transition: background-color 0.25s ease, color 0.25s ease;
+}
+
+/* Tabular figures for financial data */
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Subtle background textures */
+.dark body {
+  background-image: 
+    radial-gradient(at 0% 0%, rgba(37, 99, 235, 0.12) 0px, transparent 45%),
+    radial-gradient(at 100% 0%, rgba(124, 58, 237, 0.1) 0px, transparent 45%),
+    radial-gradient(at 50% 100%, rgba(15, 23, 42, 0.6) 0px, transparent 50%);
+  background-attachment: fixed;
+}
+
+.light body {
+  background-image: 
+    radial-gradient(at 0% 0%, rgba(219, 234, 254, 0.45) 0px, transparent 50%),
+    radial-gradient(at 100% 0%, rgba(243, 232, 255, 0.35) 0px, transparent 50%);
+  background-attachment: fixed;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.dark ::-webkit-scrollbar-track {
+  background: rgba(14, 20, 34, 0.6);
+}
+
+.dark ::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.16);
+  border-radius: 9999px;
+}
+
+.dark ::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.25);
+}
+
+.light ::-webkit-scrollbar-track {
+  background: #f1f5f9;
+}
+
+.light ::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 9999px;
+}
+
+.light ::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* Glassmorphism card utilities */
+.glass-card {
+  background: var(--card-bg);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--card-border);
+  box-shadow: var(--card-shadow);
+  transition: background-color 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease, transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.glass-card-hover {
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.glass-card-hover:hover {
+  border-color: var(--border-strong);
+  transform: translateY(-2px);
+  box-shadow: 0 12px 28px -5px rgba(0, 0, 0, 0.08);
+}
+
+.dark .glass-card-hover:hover {
+  box-shadow: 0 16px 36px -6px rgba(0, 0, 0, 0.65);
+}
+
+/* Smooth Focus Ring */
+.focus-ring {
+  transition: box-shadow 0.15s ease, border-color 0.15s ease;
+}
+
+.focus-ring:focus-visible,
+.focus-ring:focus {
+  outline: none;
+  border-color: var(--accent-primary) !important;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25) !important;
+}
+
+/* Interactive elements */
+button, a {
+  -webkit-tap-highlight-color: transparent;
 }
 
 /* Date & Datetime picker dark mode support */
@@ -27,199 +201,25 @@
 .dark input[type="date"]::-webkit-calendar-picker-indicator,
 .dark input[type="datetime-local"]::-webkit-calendar-picker-indicator {
   filter: brightness(0) invert(1) !important;
-  opacity: 0.9;
+  opacity: 0.8;
   cursor: pointer;
 }
 
-.dark input[type="date"]::-webkit-calendar-picker-indicator:hover,
-.dark input[type="datetime-local"]::-webkit-calendar-picker-indicator:hover {
-  opacity: 1;
-}
-
 .dark select {
-  background-color: #0f172a !important;
-  color: #f1f5f9 !important;
+  background-color: var(--bg-surface) !important;
+  color: var(--text-primary) !important;
   color-scheme: dark !important;
 }
 
 .dark select option {
-  background-color: #0f172a !important;
-  color: #f1f5f9 !important;
+  background-color: #0e1422 !important;
+  color: #f8fafc !important;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-inter), system-ui, -apple-system, sans-serif;
-}
-
-/* Base Body Styling */
-body {
-  background-color: var(--background);
-  color: var(--foreground);
-  font-family: var(--font-sans);
-  min-height: 100vh;
-  transition: background-color 0.3s ease, color 0.3s ease;
-}
-
-/* Dark mode specific body background gradient */
-.dark body {
-  background-image: 
-    radial-gradient(at 0% 0%, rgba(30, 58, 138, 0.25) 0px, transparent 50%),
-    radial-gradient(at 100% 0%, rgba(88, 28, 135, 0.2) 0px, transparent 50%),
-    radial-gradient(at 50% 100%, rgba(15, 23, 42, 0.8) 0px, transparent 50%);
-  background-attachment: fixed;
-}
-
-/* Light mode specific body background gradient */
-.light body {
-  background-image: 
-    radial-gradient(at 0% 0%, rgba(219, 234, 254, 0.5) 0px, transparent 50%),
-    radial-gradient(at 100% 0%, rgba(238, 242, 255, 0.5) 0px, transparent 50%);
-  background-attachment: fixed;
-}
-
-/* Custom scrollbar */
-::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
-}
-
-.dark ::-webkit-scrollbar-track {
-  background: rgba(15, 23, 42, 0.6);
-}
-
-.dark ::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.15);
-  border-radius: 9999px;
-}
-
-.light ::-webkit-scrollbar-track {
-  background: #f1f5f9;
-}
-
-.light ::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
-  border-radius: 9999px;
-}
-
-/* Glassmorphism card utility */
-.glass-card {
-  transition: background-color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
-}
-
-.dark .glass-card {
-  background: rgba(15, 23, 42, 0.65);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-}
-
-.light .glass-card {
-  background: rgba(255, 255, 255, 0.85);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(226, 232, 240, 0.8);
-  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.05);
-}
-
-.glass-card-hover {
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.dark .glass-card-hover:hover {
-  border-color: rgba(255, 255, 255, 0.18);
-  transform: translateY(-2px);
-  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
-}
-
-.light .glass-card-hover:hover {
-  border-color: rgba(148, 163, 184, 0.4);
-  transform: translateY(-2px);
-  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.08);
-}
-
-/* Light mode override utility classes for text/backgrounds in existing Tailwind components */
-.light .text-white {
-  color: #0f172a !important;
-}
-
-.light .text-slate-100,
-.light .text-slate-200 {
-  color: #1e293b !important;
-}
-
-.light .text-slate-300,
-.light .text-slate-400 {
-  color: #475569 !important;
-}
-
-.light .text-slate-500 {
-  color: #64748b !important;
-}
-
-.light .bg-slate-900\/95,
-.light .bg-slate-900\/90,
-.light .bg-slate-900\/80,
-.light .bg-slate-900\/70,
-.light .bg-slate-900\/60,
-.light .bg-slate-900\/50,
-.light .bg-slate-900\/40,
-.light .bg-slate-900\/30,
-.light .bg-slate-900\/20,
-.light .bg-slate-900\/10,
-.light .bg-slate-900,
-.light .bg-slate-950\/80,
-.light .bg-slate-950\/70,
-.light .bg-slate-950\/60,
-.light .bg-slate-950\/50,
-.light .bg-slate-950\/40 {
-  background-color: #f1f5f9 !important;
-}
-
-.light .bg-slate-800,
-.light .bg-slate-800\/80,
-.light .bg-slate-800\/60,
-.light .bg-slate-800\/50,
-.light .bg-slate-800\/40,
-.light .bg-slate-800\/30 {
-  background-color: #e2e8f0 !important;
-}
-
-/* Light mode table & row hover background overrides */
-.light tr:hover,
-.light .hover\:bg-slate-800\/60:hover,
-.light .hover\:bg-slate-800\/50:hover,
-.light .hover\:bg-slate-800\/40:hover,
-.light .hover\:bg-slate-800\/30:hover,
-.light .hover\:bg-slate-800\/20:hover,
-.light .hover\:bg-slate-900\/60:hover,
-.light .hover\:bg-slate-900\/50:hover {
-  background-color: #cbd5e1 !important;
-}
-
-.light .border-slate-800,
-.light .border-slate-800\/80,
-.light .border-slate-800\/70,
-.light .border-slate-800\/60,
-.light .border-slate-800\/50,
-.light .border-slate-700\/80,
-.light .border-slate-700\/60,
-.light .border-slate-700\/50 {
-  border-color: #cbd5e1 !important;
-}
-
-.light input[type="text"],
-.light input[type="email"],
-.light input[type="password"],
-.light input[type="number"],
-.light input[type="date"],
-.light input[type="datetime-local"],
-.light select,
-.light textarea {
-  color: #0f172a !important;
+.light select {
   background-color: #ffffff !important;
-  border-color: #cbd5e1 !important;
+  color: #0f172a !important;
+  color-scheme: light !important;
 }
 
 .light select option {
@@ -227,59 +227,43 @@ body {
   color: #0f172a !important;
 }
 
-/* Light mode specific badge & text overrides */
-.light .text-rose-400 {
-  color: #e11d48 !important;
-}
-.light .text-rose-300 {
-  color: #be123c !important;
-}
-.light .text-emerald-400 {
-  color: #059669 !important;
-}
-.light .text-emerald-300 {
-  color: #047857 !important;
-}
-.light .text-amber-400 {
-  color: #d97706 !important;
-}
-.light .text-amber-300 {
-  color: #b45309 !important;
-}
-.light .text-blue-400 {
-  color: #2563eb !important;
-}
-.light .text-indigo-400 {
-  color: #4f46e5 !important;
+/* Badge and status chip styles */
+.badge-emerald {
+  background-color: var(--accent-emerald-subtle);
+  color: var(--accent-emerald);
+  border: 1px solid rgba(16, 185, 129, 0.25);
 }
 
-/* Ensure button text with colored backgrounds and gradients stays crisp white in light mode */
-.light .bg-blue-600,
-.light .bg-blue-500,
-.light .bg-indigo-600,
-.light .bg-indigo-500,
-.light .bg-emerald-600,
-.light .bg-rose-600,
-.light button[class*="bg-blue-"],
-.light button[class*="bg-indigo-"],
-.light button[class*="bg-gradient-"],
-.light .bg-gradient-to-r,
-.light .bg-gradient-to-tr {
-  color: #ffffff !important;
+.badge-rose {
+  background-color: var(--accent-rose-subtle);
+  color: var(--accent-rose);
+  border: 1px solid rgba(244, 63, 94, 0.25);
 }
 
-.light button[class*="bg-blue-"] *,
-.light button[class*="bg-indigo-"] *,
-.light button[class*="bg-gradient-"] *,
-.light .bg-blue-600 *,
-.light .bg-blue-500 *,
-.light .bg-indigo-600 * {
-  color: #ffffff !important;
+.badge-amber {
+  background-color: var(--accent-amber-subtle);
+  color: var(--accent-amber);
+  border: 1px solid rgba(245, 158, 11, 0.25);
 }
 
-/* Light mode code block */
-.light code.text-amber-300 {
-  color: #b45309 !important;
-  background-color: #fef3c7 !important;
-  border-color: #fde68a !important;
+.badge-blue {
+  background-color: rgba(59, 130, 246, 0.12);
+  color: var(--accent-primary);
+  border: 1px solid rgba(59, 130, 246, 0.25);
+}
+
+/* Animation utilities */
+@keyframes fadeInShort {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fadeInShort 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }

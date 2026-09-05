@@ -481,31 +481,31 @@ export default function InputPage() {
 
   return (
     <div className="max-w-2xl w-full mx-auto space-y-6">
-      <div className="glass-card p-6 rounded-2xl border border-slate-800">
-        <h1 className="text-xl font-bold text-white mb-1">Input Transaksi</h1>
-        <p className="text-xs text-slate-400">Catat transaksi pemasukan atau pengeluaran Anda</p>
+      <div className="glass-card p-6 rounded-2xl border border-slate-200/80 dark:border-slate-800">
+        <h1 className="text-xl font-bold text-slate-900 dark:text-white mb-1">Input Transaksi</h1>
+        <p className="text-xs text-slate-500 dark:text-slate-400">Catat transaksi pemasukan atau pengeluaran Anda</p>
       </div>
 
       {success && (
-        <div className="bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 px-4 py-3 rounded-xl text-sm animate-fade-in">
+        <div className="bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 px-4 py-3 rounded-xl text-sm font-semibold animate-fade-in">
           {success}
         </div>
       )}
 
-      <form onSubmit={handleSubmit} className="glass-card rounded-2xl border border-slate-800 p-6 space-y-5">
+      <form onSubmit={handleSubmit} className="glass-card rounded-2xl border border-slate-200/80 dark:border-slate-800 p-6 space-y-5">
 
         {/* Type toggle */}
         <div>
-          <label className="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2 block">Jenis Transaksi</label>
+          <label className="text-xs font-semibold uppercase tracking-wider text-slate-600 dark:text-slate-400 mb-2 block">Jenis Transaksi</label>
           <div className="grid grid-cols-2 gap-3">
             {(['income', 'outcome'] as const).map(t => (
               <button key={t} type="button" onClick={() => setType(t)}
                 className={`py-3 rounded-xl text-sm font-bold transition-all cursor-pointer flex items-center justify-center gap-2
                   ${type === t
                     ? t === 'income' 
-                      ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 shadow-lg shadow-emerald-500/10' 
-                      : 'bg-rose-500/20 text-rose-400 border border-rose-500/40 shadow-lg shadow-rose-500/10'
-                    : 'bg-slate-900/60 text-slate-400 border border-slate-800 hover:bg-slate-800/80'}`}>
+                      ? 'bg-emerald-50 text-emerald-700 border border-emerald-300 dark:bg-emerald-500/20 dark:text-emerald-400 dark:border-emerald-500/40 shadow-sm dark:shadow-lg dark:shadow-emerald-500/10' 
+                      : 'bg-rose-50 text-rose-700 border border-rose-300 dark:bg-rose-500/20 dark:text-rose-400 dark:border-rose-500/40 shadow-sm dark:shadow-lg dark:shadow-rose-500/10'
+                    : 'bg-slate-100 hover:bg-slate-200 text-slate-600 border border-slate-200 dark:bg-slate-900/60 dark:text-slate-400 dark:border-slate-800 dark:hover:bg-slate-800/80'}`}>
                 {t === 'income' ? '📈 Income (Pemasukan)' : '📉 Outcome (Pengeluaran)'}
               </button>
             ))}
@@ -514,7 +514,7 @@ export default function InputPage() {
 
         {/* Amount */}
         <div>
-          <label className="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2 block">Nominal (Rp)</label>
+          <label className="text-xs font-semibold uppercase tracking-wider text-slate-600 dark:text-slate-400 mb-2 block">Nominal (Rp)</label>
           <AmountCalculatorInput
             value={displayAmount}
             onChange={setDisplayAmount}
@@ -525,30 +525,30 @@ export default function InputPage() {
 
         {/* Date */}
         <div>
-          <label className="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2 block">Tanggal & Waktu</label>
+          <label className="text-xs font-semibold uppercase tracking-wider text-slate-600 dark:text-slate-400 mb-2 block">Tanggal & Waktu</label>
           <input 
             type="datetime-local" 
             value={date} 
             onChange={e => setDate(e.target.value)} 
             required
-            className="w-full px-4 py-3 rounded-xl border border-slate-800 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/30 text-sm outline-none"
+            className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-900 dark:text-white focus:border-blue-500 focus:ring-2 focus:ring-blue-500/30 text-sm outline-none transition-all"
           />
         </div>
 
         {/* Sumber Dana */}
         <div>
-          <label className="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2 block flex items-center justify-between">
+          <label className="text-xs font-semibold uppercase tracking-wider text-slate-600 dark:text-slate-400 mb-2 block flex items-center justify-between">
             <span>Sumber Dana</span>
-            <span className="text-[11px] text-blue-400 font-normal lowercase">opsional</span>
+            <span className="text-[11px] text-blue-600 dark:text-blue-400 font-normal lowercase">opsional</span>
           </label>
           <select 
             value={fundSourceId} 
             onChange={e => setFundSourceId(e.target.value)}
-            className="w-full px-4 py-3 rounded-xl border border-slate-800 bg-slate-900 text-slate-100 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/30 text-sm outline-none cursor-pointer"
+            className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/30 text-sm outline-none cursor-pointer transition-all"
           >
-            <option value="" className="bg-slate-900 text-slate-100">-- Tanpa Sumber Dana --</option>
+            <option value="" className="bg-white text-slate-900 dark:bg-slate-900 dark:text-slate-100">-- Tanpa Sumber Dana --</option>
             {fundSources.map(fs => (
-              <option key={fs.id} value={fs.id} className="bg-slate-900 text-slate-100">
+              <option key={fs.id} value={fs.id} className="bg-white text-slate-900 dark:bg-slate-900 dark:text-slate-100">
                 {fs.icon} {fs.name} ({fs.type})
               </option>
             ))}
@@ -557,21 +557,21 @@ export default function InputPage() {
 
         {/* Subcategory searchable dropdown */}
         <div>
-          <label className="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2 block">Subkategori</label>
+          <label className="text-xs font-semibold uppercase tracking-wider text-slate-600 dark:text-slate-400 mb-2 block">Subkategori</label>
           <div className="relative" ref={dropdownRef}>
             <button 
               type="button" 
               onClick={() => setDropdownOpen(prev => !prev)}
-              className={`w-full px-4 py-3 rounded-xl border text-sm text-left flex items-center justify-between transition-all outline-none cursor-pointer bg-slate-900
-                ${dropdownOpen ? 'border-blue-500 ring-2 ring-blue-500/30' : 'border-slate-800'}
-                ${subcategoryId ? 'text-slate-100 font-medium' : 'text-slate-400'}`}>
+              className={`w-full px-4 py-3 rounded-xl border text-sm text-left flex items-center justify-between transition-all outline-none cursor-pointer bg-white dark:bg-slate-900
+                ${dropdownOpen ? 'border-blue-500 ring-2 ring-blue-500/30' : 'border-slate-200 dark:border-slate-800'}
+                ${subcategoryId ? 'text-slate-900 dark:text-slate-100 font-medium' : 'text-slate-400 dark:text-slate-500'}`}>
               <span>{subcategoryId ? subcategoryName : '-- Pilih Subkategori --'}</span>
               <ChevronDown size={16} className={`text-slate-400 transition-transform ${dropdownOpen ? 'rotate-180' : ''}`}/>
             </button>
 
             {dropdownOpen && (
-              <div className="absolute z-50 w-full mt-1 bg-slate-900 border border-slate-700/80 rounded-xl shadow-2xl overflow-hidden backdrop-blur-xl">
-                <div className="p-2 border-b border-slate-800">
+              <div className="absolute z-50 w-full mt-1 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700/80 rounded-xl shadow-2xl overflow-hidden backdrop-blur-xl">
+                <div className="p-2 border-b border-slate-100 dark:border-slate-800">
                   <input
                     ref={searchRef}
                     type="text"
@@ -579,27 +579,27 @@ export default function InputPage() {
                     onChange={e => setSearch(e.target.value)}
                     onKeyDown={handleSearchKeyDown}
                     placeholder="Cari subkategori..."
-                    className="w-full px-3 py-2 rounded-lg border border-slate-700 bg-slate-950 text-slate-100 placeholder:text-slate-400 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
-                <ul className="max-h-56 overflow-y-auto divide-y divide-slate-800/40">
+                <ul className="max-h-56 overflow-y-auto divide-y divide-slate-100 dark:divide-slate-800/40">
                   {filteredSubs.length === 0 ? (
                     <li className="px-4 py-3 text-sm text-slate-500 text-center">Tidak ditemukan</li>
                   ) : (
                     filteredSubs.map((sub, idx) => (
                       <li key={sub.id}>
                         {(idx === 0 || filteredSubs[idx - 1].categoryName !== sub.categoryName) && (
-                          <div className="px-4 py-1.5 text-[10px] font-bold text-slate-400 uppercase tracking-wider bg-slate-950/80">
+                          <div className="px-4 py-1.5 text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider bg-slate-100 dark:bg-slate-950/80">
                             {sub.categoryName}
                           </div>
                         )}
                         <button
                           type="button"
                           onClick={() => selectSubcategory(sub)}
-                          className={`w-full px-4 py-2.5 text-sm text-left flex items-center justify-between transition-colors cursor-pointer hover:bg-blue-600 hover:text-white group
-                            ${subcategoryId === sub.id ? 'text-blue-400 font-semibold bg-blue-500/10' : 'text-slate-300'}`}>
+                          className={`w-full px-4 py-2.5 text-sm text-left flex items-center justify-between transition-colors cursor-pointer hover:bg-blue-50 dark:hover:bg-blue-600 hover:text-blue-700 dark:hover:text-white group
+                            ${subcategoryId === sub.id ? 'text-blue-600 dark:text-blue-400 font-semibold bg-blue-50/70 dark:bg-blue-500/10' : 'text-slate-700 dark:text-slate-300'}`}>
                           <span>{sub.name}</span>
-                          {subcategoryId === sub.id && <Check size={14} className="text-blue-400 group-hover:text-white"/>}
+                          {subcategoryId === sub.id && <Check size={14} className="text-blue-600 dark:text-blue-400 group-hover:text-blue-700 dark:group-hover:text-white"/>}
                         </button>
                       </li>
                     ))
@@ -612,8 +612,8 @@ export default function InputPage() {
 
         {/* Category (auto-fill, readonly) */}
         <div>
-          <label className="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2 block">Kategori Parent</label>
-          <div className="w-full px-4 py-3 rounded-xl border border-slate-800/80 text-sm text-slate-400 bg-slate-950/50">
+          <label className="text-xs font-semibold uppercase tracking-wider text-slate-600 dark:text-slate-400 mb-2 block">Kategori Parent</label>
+          <div className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-800/80 text-sm text-slate-700 dark:text-slate-400 bg-slate-100 dark:bg-slate-950/50 font-medium">
             {categoryName || 'Otomatis terisi setelah memilih subkategori'}
           </div>
         </div>
@@ -622,27 +622,27 @@ export default function InputPage() {
         {subcategoryId && type === 'outcome' && (
           <div>
             {loadingBudget ? (
-              <div className="text-xs text-slate-400 px-4 py-3 bg-slate-900/60 rounded-xl border border-slate-800">
+              <div className="text-xs text-slate-500 dark:text-slate-400 px-4 py-3 bg-slate-50 dark:bg-slate-900/60 rounded-xl border border-slate-200 dark:border-slate-800">
                 Memuat info budget...
               </div>
             ) : budgetInfo && budgetInfo.budget > 0 ? (
-              <div className={`px-4 py-3 rounded-xl space-y-1.5 border ${sisa >= 0 ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-300' : 'bg-rose-500/10 border-rose-500/20 text-rose-300'}`}>
-                <div className="flex justify-between text-xs text-slate-400">
+              <div className={`px-4 py-3 rounded-xl space-y-1.5 border ${sisa >= 0 ? 'bg-emerald-50 dark:bg-emerald-500/10 border-emerald-200 dark:border-emerald-500/20 text-emerald-800 dark:text-emerald-300' : 'bg-rose-50 dark:bg-rose-500/10 border-rose-200 dark:border-rose-500/20 text-rose-800 dark:text-rose-300'}`}>
+                <div className="flex justify-between text-xs text-slate-500 dark:text-slate-400">
                   <span>Budget bulan ini</span>
-                  <span className="font-semibold text-slate-200">{fmt(budgetInfo.budget)}</span>
+                  <span className="font-semibold text-slate-800 dark:text-slate-200">{fmt(budgetInfo.budget)}</span>
                 </div>
-                <div className="flex justify-between text-xs text-slate-400">
+                <div className="flex justify-between text-xs text-slate-500 dark:text-slate-400">
                   <span>Sudah terpakai</span>
-                  <span className="font-semibold text-rose-400">{fmt(budgetInfo.spent)}</span>
+                  <span className="font-semibold text-rose-600 dark:text-rose-400">{fmt(budgetInfo.spent)}</span>
                 </div>
-                <div className={`flex justify-between text-xs font-bold pt-1.5 border-t ${sisa >= 0 ? 'border-emerald-500/20 text-emerald-400' : 'border-rose-500/20 text-rose-400'}`}>
+                <div className={`flex justify-between text-xs font-bold pt-1.5 border-t ${sisa >= 0 ? 'border-emerald-200 dark:border-emerald-500/20 text-emerald-700 dark:text-emerald-400' : 'border-rose-200 dark:border-rose-500/20 text-rose-700 dark:text-rose-400'}`}>
                   <span>Sisa budget</span>
                   <span>{fmt(sisa)}</span>
                 </div>
-                {sisa < 0 && <p className="text-[11px] text-rose-400 font-semibold pt-0.5">⚠️ Perhatian: Budget sudah melebih batas!</p>}
+                {sisa < 0 && <p className="text-[11px] text-rose-600 dark:text-rose-400 font-semibold pt-0.5">⚠️ Perhatian: Budget sudah melebihi batas!</p>}
               </div>
             ) : (
-              <div className="text-xs text-slate-500 px-4 py-3 bg-slate-950/40 rounded-xl border border-slate-800">
+              <div className="text-xs text-slate-500 px-4 py-3 bg-slate-50 dark:bg-slate-950/40 rounded-xl border border-slate-200 dark:border-slate-800">
                 Belum ada alokasi budget untuk subkategori ini di bulan yang dipilih.
               </div>
             )}
@@ -651,13 +651,13 @@ export default function InputPage() {
 
         {/* Description */}
         <div>
-          <label className="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2 block">Deskripsi / Catatan</label>
+          <label className="text-xs font-semibold uppercase tracking-wider text-slate-600 dark:text-slate-400 mb-2 block">Deskripsi / Catatan</label>
           <textarea 
             value={description} 
-            onChange={e => setDescription(e.target.value)}
+            onChange={e => setDescription(e.target.value)} 
             placeholder="Catatan tambahan..." 
             rows={3}
-            className="w-full px-4 py-3 rounded-xl border border-slate-800 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/30 text-sm resize-none outline-none"
+            className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-900 dark:text-white placeholder:text-slate-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/30 text-sm resize-none outline-none transition-all"
           />
         </div>
 
@@ -671,24 +671,24 @@ export default function InputPage() {
 
       {/* Last 2 Months Transactions Section */}
       <div className="mt-8 space-y-4">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 glass-card p-4 rounded-xl border border-slate-800">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 glass-card p-4 rounded-xl border border-slate-200/80 dark:border-slate-800">
           <div>
             <div className="flex items-center gap-2 flex-wrap">
-              <h2 className="text-lg font-bold text-white">Last 2 Months Transactions</h2>
-              <span className="text-xs px-2.5 py-0.5 rounded-full bg-blue-500/10 text-blue-400 border border-blue-500/20 font-semibold">
+              <h2 className="text-lg font-bold text-slate-900 dark:text-white">Last 2 Months Transactions</h2>
+              <span className="text-xs px-2.5 py-0.5 rounded-full bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20 font-semibold">
                 {totalItems} data
               </span>
             </div>
-            <p className="text-xs text-slate-400 mt-1 flex items-center gap-1.5">
-              <Calendar size={13} className="text-slate-500" />
-              <span>Periode: <span className="text-slate-300 font-medium">{getTwoMonthsAgoRangeLabel()}</span></span>
+            <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 flex items-center gap-1.5">
+              <Calendar size={13} className="text-slate-400 dark:text-slate-500" />
+              <span>Periode: <span className="text-slate-700 dark:text-slate-300 font-medium">{getTwoMonthsAgoRangeLabel()}</span></span>
             </p>
           </div>
 
           {/* Page Size Selector */}
           <div className="flex items-center gap-2 self-start sm:self-center">
-            <span className="text-xs text-slate-400 font-medium">Tampilkan:</span>
-            <div className="flex items-center bg-slate-900 border border-slate-800 rounded-lg p-0.5">
+            <span className="text-xs text-slate-500 dark:text-slate-400 font-medium">Tampilkan:</span>
+            <div className="flex items-center bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg p-0.5">
               {[10, 25, 50].map(size => (
                 <button
                   key={size}
@@ -700,7 +700,7 @@ export default function InputPage() {
                   className={`px-2.5 py-1 text-xs rounded-md font-semibold transition-all cursor-pointer ${
                     pageSize === size
                       ? 'bg-blue-600 text-white shadow-sm shadow-blue-500/30'
-                      : 'text-slate-400 hover:text-slate-200'
+                      : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
                   }`}
                 >
                   {size}
@@ -711,40 +711,40 @@ export default function InputPage() {
         </div>
         
         {loadingTransactions ? (
-          <div className="text-center py-8 text-slate-500 glass-card rounded-xl border border-slate-800">
+          <div className="text-center py-8 text-slate-500 glass-card rounded-xl border border-slate-200/80 dark:border-slate-800">
             Memuat transaksi...
           </div>
         ) : transactions.length === 0 ? (
-          <div className="text-center py-8 text-slate-500 glass-card rounded-xl border border-slate-800">
+          <div className="text-center py-8 text-slate-500 glass-card rounded-xl border border-slate-200/80 dark:border-slate-800">
             Belum ada transaksi recorded dalam 2 bulan terakhir.
           </div>
         ) : (
           <>
             <div className="space-y-3">
               {paginatedTransactions.map((tx) => (
-                <div key={tx.id} className="glass-card glass-card-hover rounded-xl border border-slate-800 p-4">
+                <div key={tx.id} className="glass-card glass-card-hover rounded-xl border border-slate-200/80 dark:border-slate-800 p-4">
                   <div className="flex justify-between items-start">
                     <div className="flex-1">
                       <div className="flex items-center gap-2 mb-1 flex-wrap">
-                        <span className={`text-[11px] font-bold px-2.5 py-0.5 rounded-md ${tx.type === 'income' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-rose-500/10 text-rose-400 border border-rose-500/20'}`}>
+                        <span className={`text-[11px] font-bold px-2.5 py-0.5 rounded-md ${tx.type === 'income' ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20' : 'bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/20'}`}>
                           {tx.type === 'income' ? 'Income' : 'Outcome'}
                         </span>
-                        <span className="text-xs text-slate-400">
+                        <span className="text-xs text-slate-500 dark:text-slate-400">
                           {formatDisplayDate(tx.date)}
                         </span>
                         {tx.fund_source_name && (
-                          <span className="text-[11px] bg-slate-800 text-slate-300 border border-slate-700/60 px-2 py-0.5 rounded-md flex items-center gap-1">
+                          <span className="text-[11px] bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700/60 px-2 py-0.5 rounded-md flex items-center gap-1 font-medium">
                             <span>{tx.fund_source_icon}</span>
                             <span>{tx.fund_source_name}</span>
                           </span>
                         )}
                       </div>
-                      <div className={`text-lg font-bold ${tx.type === 'income' ? 'text-emerald-400' : 'text-rose-400'}`}>
+                      <div className={`text-lg font-bold ${tx.type === 'income' ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'}`}>
                         {tx.type === 'income' ? '+' : '-'}{fmt(tx.amount)}
                       </div>
-                      <div className="text-xs text-slate-400 mt-1 flex items-center gap-2">
+                      <div className="text-xs text-slate-500 dark:text-slate-400 mt-1 flex items-center gap-2">
                         {tx.subcategory_name && (
-                          <span className="bg-slate-800/80 font-medium text-slate-200 px-2 py-0.5 rounded">
+                          <span className="bg-slate-100 dark:bg-slate-800/80 font-semibold text-slate-800 dark:text-slate-200 px-2 py-0.5 rounded border border-slate-200/60 dark:border-transparent">
                             {tx.subcategory_name}
                           </span>
                         )}
@@ -755,7 +755,7 @@ export default function InputPage() {
                         )}
                       </div>
                       {tx.description && (
-                        <div className="text-xs text-slate-400 mt-2 bg-slate-950/40 p-2 rounded-lg border border-slate-800/50">
+                        <div className="text-xs text-slate-700 dark:text-slate-400 mt-2 bg-slate-50 dark:bg-slate-950/40 p-2 rounded-lg border border-slate-200/80 dark:border-slate-800/50">
                           📝 {tx.description}
                         </div>
                       )}
@@ -763,14 +763,14 @@ export default function InputPage() {
                     <div className="flex gap-1.5 ml-4">
                       <button
                         onClick={() => openEditModal(tx)}
-                        className="p-2 text-blue-400 hover:bg-blue-500/10 rounded-lg transition-colors cursor-pointer"
+                        className="p-2 text-blue-500 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-500/10 rounded-lg transition-colors cursor-pointer"
                         title="Edit Transaksi"
                       >
                         <Pencil size={16} />
                       </button>
                       <button
                         onClick={() => setDeleteConfirm({ show: true, transactionId: tx.id })}
-                        className="p-2 text-rose-400 hover:bg-rose-500/10 rounded-lg transition-colors cursor-pointer"
+                        className="p-2 text-rose-500 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-500/10 rounded-lg transition-colors cursor-pointer"
                         title="Hapus Transaksi"
                       >
                         <Trash2 size={16} />
@@ -784,8 +784,8 @@ export default function InputPage() {
             {/* Pagination Controls */}
             {totalPages > 1 && (
               <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-3 px-1">
-                <span className="text-xs text-slate-400">
-                  Menampilkan <strong className="text-slate-200">{totalItems === 0 ? 0 : startIndex + 1}</strong> - <strong className="text-slate-200">{endIndex}</strong> dari <strong className="text-slate-200">{totalItems}</strong> transaksi
+                <span className="text-xs text-slate-500 dark:text-slate-400">
+                  Menampilkan <strong className="text-slate-800 dark:text-slate-200">{totalItems === 0 ? 0 : startIndex + 1}</strong> - <strong className="text-slate-800 dark:text-slate-200">{endIndex}</strong> dari <strong className="text-slate-800 dark:text-slate-200">{totalItems}</strong> transaksi
                 </span>
                 <div className="flex items-center gap-1.5 flex-wrap justify-center">
                   <button
@@ -794,8 +794,8 @@ export default function InputPage() {
                     onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
                     className={`p-2 rounded-lg border text-xs font-medium flex items-center justify-center transition-colors cursor-pointer ${
                       safeCurrentPage <= 1
-                        ? 'border-slate-800/60 text-slate-600 cursor-not-allowed'
-                        : 'border-slate-800 bg-slate-900 text-slate-300 hover:bg-slate-800 hover:text-white'
+                        ? 'border-slate-200 dark:border-slate-800/60 text-slate-300 dark:text-slate-600 cursor-not-allowed'
+                        : 'border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white'
                     }`}
                     title="Halaman Sebelumnya"
                   >
@@ -811,13 +811,13 @@ export default function InputPage() {
                         className={`min-w-[32px] h-8 px-2 rounded-lg text-xs font-medium transition-colors cursor-pointer ${
                           safeCurrentPage === pageNum
                             ? 'bg-blue-600 text-white font-bold shadow-md shadow-blue-500/20'
-                            : 'border border-slate-800 bg-slate-900 text-slate-400 hover:bg-slate-800 hover:text-slate-200'
+                            : 'border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-slate-200'
                         }`}
                       >
                         {pageNum}
                       </button>
                     ) : (
-                      <span key={idx} className="px-1 text-slate-500 text-xs select-none">
+                      <span key={idx} className="px-1 text-slate-400 dark:text-slate-500 text-xs select-none">
                         {pageNum}
                       </span>
                     )
@@ -829,8 +829,8 @@ export default function InputPage() {
                     onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
                     className={`p-2 rounded-lg border text-xs font-medium flex items-center justify-center transition-colors cursor-pointer ${
                       safeCurrentPage >= totalPages
-                        ? 'border-slate-800/60 text-slate-600 cursor-not-allowed'
-                        : 'border-slate-800 bg-slate-900 text-slate-300 hover:bg-slate-800 hover:text-white'
+                        ? 'border-slate-200 dark:border-slate-800/60 text-slate-300 dark:text-slate-600 cursor-not-allowed'
+                        : 'border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white'
                     }`}
                     title="Halaman Selanjutnya"
                   >
@@ -846,23 +846,23 @@ export default function InputPage() {
       {/* Modal Edit */}
       {editingTransaction && (
         <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="glass-card rounded-2xl max-w-md w-full max-h-[90vh] overflow-y-auto border border-slate-700">
-            <div className="flex justify-between items-center p-5 border-b border-slate-800">
-              <h3 className="font-bold text-white">Edit Transaksi</h3>
-              <button onClick={() => setEditingTransaction(null)} className="text-slate-400 hover:text-slate-200 cursor-pointer">
+          <div className="bg-white dark:bg-slate-900 rounded-2xl max-w-md w-full max-h-[90vh] overflow-y-auto border border-slate-200 dark:border-slate-700 shadow-2xl">
+            <div className="flex justify-between items-center p-5 border-b border-slate-100 dark:border-slate-800">
+              <h3 className="font-bold text-slate-900 dark:text-white">Edit Transaksi</h3>
+              <button onClick={() => setEditingTransaction(null)} className="text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 cursor-pointer">
                 <X size={20} />
               </button>
             </div>
             <div className="p-5 space-y-4">
               <div>
-                <label className="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2 block">Jenis Transaksi</label>
-                <div className={`px-4 py-2.5 rounded-xl text-sm font-bold ${editingTransaction.type === 'income' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-rose-500/10 text-rose-400 border border-rose-500/20'}`}>
+                <label className="text-xs font-semibold uppercase tracking-wider text-slate-600 dark:text-slate-400 mb-2 block">Jenis Transaksi</label>
+                <div className={`px-4 py-2.5 rounded-xl text-sm font-bold ${editingTransaction.type === 'income' ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20' : 'bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/20'}`}>
                   {editingTransaction.type === 'income' ? '📈 Income' : '📉 Outcome'}
                 </div>
               </div>
 
               <div>
-                <label className="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2 block">Jumlah (Rp)</label>
+                <label className="text-xs font-semibold uppercase tracking-wider text-slate-600 dark:text-slate-400 mb-2 block">Jumlah (Rp)</label>
                 <AmountCalculatorInput
                   value={editDisplayAmount}
                   onChange={setEditDisplayAmount}
@@ -872,25 +872,25 @@ export default function InputPage() {
               </div>
 
               <div>
-                <label className="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2 block">Tanggal & Waktu</label>
+                <label className="text-xs font-semibold uppercase tracking-wider text-slate-600 dark:text-slate-400 mb-2 block">Tanggal & Waktu</label>
                 <input
                   type="datetime-local"
                   value={editDate}
                   onChange={e => setEditDate(e.target.value)}
-                  className="w-full px-4 py-3 rounded-xl border border-slate-800 text-sm outline-none"
+                  className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-900 dark:text-white text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/30 transition-all"
                 />
               </div>
 
               <div>
-                <label className="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2 block">Sumber Dana</label>
+                <label className="text-xs font-semibold uppercase tracking-wider text-slate-600 dark:text-slate-400 mb-2 block">Sumber Dana</label>
                 <select 
                   value={editFundSourceId} 
                   onChange={e => setEditFundSourceId(e.target.value)}
-                  className="w-full px-4 py-3 rounded-xl border border-slate-800 bg-slate-900 text-slate-100 text-sm outline-none cursor-pointer"
+                  className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 text-sm outline-none cursor-pointer focus:border-blue-500 focus:ring-2 focus:ring-blue-500/30 transition-all"
                 >
-                  <option value="" className="bg-slate-900 text-slate-100">-- Tanpa Sumber Dana --</option>
+                  <option value="" className="bg-white text-slate-900 dark:bg-slate-900 dark:text-slate-100">-- Tanpa Sumber Dana --</option>
                   {fundSources.map(fs => (
-                    <option key={fs.id} value={fs.id} className="bg-slate-900 text-slate-100">
+                    <option key={fs.id} value={fs.id} className="bg-white text-slate-900 dark:bg-slate-900 dark:text-slate-100">
                       {fs.icon} {fs.name} ({fs.type})
                     </option>
                   ))}
@@ -898,20 +898,20 @@ export default function InputPage() {
               </div>
 
               <div>
-                <label className="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2 block">Subkategori</label>
+                <label className="text-xs font-semibold uppercase tracking-wider text-slate-600 dark:text-slate-400 mb-2 block">Subkategori</label>
                 <div className="relative" ref={editDropdownRef}>
                   <button
                     type="button"
                     onClick={() => setEditDropdownOpen(prev => !prev)}
-                    className={`w-full px-4 py-3 rounded-xl border border-slate-800 bg-slate-900 text-sm text-left flex items-center justify-between outline-none cursor-pointer ${editSubcategoryId ? 'text-slate-100 font-medium' : 'text-slate-400'}`}
+                    className={`w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-sm text-left flex items-center justify-between outline-none cursor-pointer ${editSubcategoryId ? 'text-slate-900 dark:text-slate-100 font-medium' : 'text-slate-400 dark:text-slate-500'}`}
                   >
                     <span>{editSubcategoryId ? editSubcategoryName : '-- Pilih Subkategori --'}</span>
                     <ChevronDown size={16} className={`text-slate-400 transition-transform ${editDropdownOpen ? 'rotate-180' : ''}`}/>
                   </button>
 
                   {editDropdownOpen && (
-                    <div className="absolute z-50 w-full mt-1 bg-slate-900 border border-slate-700/80 rounded-xl shadow-2xl overflow-hidden">
-                      <div className="p-2 border-b border-slate-800">
+                    <div className="absolute z-50 w-full mt-1 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700/80 rounded-xl shadow-2xl overflow-hidden">
+                      <div className="p-2 border-b border-slate-100 dark:border-slate-800">
                         <input
                           ref={editSearchRef}
                           type="text"
@@ -919,20 +919,20 @@ export default function InputPage() {
                           onChange={e => setEditSearch(e.target.value)}
                           onKeyDown={handleEditSearchKeyDown}
                           placeholder="Cari subkategori..."
-                          className="w-full px-3 py-2 rounded-lg border border-slate-700 bg-slate-950 text-slate-100 placeholder:text-slate-400 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          className="w-full px-3 py-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                         />
                       </div>
-                      <ul className="max-h-56 overflow-y-auto">
+                      <ul className="max-h-56 overflow-y-auto divide-y divide-slate-100 dark:divide-slate-800/40">
                         {editFilteredSubs.map((sub, idx) => (
                           <li key={sub.id}>
                             <button
                               type="button"
                               onClick={() => selectEditSubcategory(sub)}
-                              className={`w-full px-4 py-2.5 text-sm text-left flex items-center justify-between transition-colors cursor-pointer hover:bg-blue-600 hover:text-white group
-                                ${editSubcategoryId === sub.id ? 'text-blue-400 font-semibold bg-blue-500/10' : 'text-slate-300'}`}
+                              className={`w-full px-4 py-2.5 text-sm text-left flex items-center justify-between transition-colors cursor-pointer hover:bg-blue-50 dark:hover:bg-blue-600 hover:text-blue-700 dark:hover:text-white group
+                                ${editSubcategoryId === sub.id ? 'text-blue-600 dark:text-blue-400 font-semibold bg-blue-50/70 dark:bg-blue-500/10' : 'text-slate-700 dark:text-slate-300'}`}
                             >
                               <span>{sub.name}</span>
-                              {editSubcategoryId === sub.id && <Check size={14} className="text-blue-400 group-hover:text-white"/>}
+                              {editSubcategoryId === sub.id && <Check size={14} className="text-blue-600 dark:text-blue-400 group-hover:text-blue-700 dark:group-hover:text-white"/>}
                             </button>
                           </li>
                         ))}
@@ -943,25 +943,25 @@ export default function InputPage() {
               </div>
 
               <div>
-                <label className="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2 block">Deskripsi</label>
+                <label className="text-xs font-semibold uppercase tracking-wider text-slate-600 dark:text-slate-400 mb-2 block">Deskripsi</label>
                 <textarea
                   value={editDescription}
                   onChange={e => setEditDescription(e.target.value)}
                   rows={3}
-                  className="w-full px-4 py-3 rounded-xl border border-slate-800 text-sm resize-none outline-none"
+                  className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-900 dark:text-white text-sm resize-none outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/30 transition-all"
                 />
               </div>
             </div>
-            <div className="flex gap-3 p-5 border-t border-slate-800">
+            <div className="flex gap-3 p-5 border-t border-slate-100 dark:border-slate-800">
               <button
                 onClick={() => setEditingTransaction(null)}
-                className="flex-1 py-3 rounded-xl border border-slate-800 text-slate-400 font-medium hover:bg-slate-800 transition-colors cursor-pointer"
+                className="flex-1 py-3 rounded-xl border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 font-medium hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
               >
                 Batal
               </button>
               <button
                 onClick={handleEditSubmit}
-                className="flex-1 bg-blue-600 text-white py-3 rounded-xl font-bold hover:bg-blue-500 transition-colors cursor-pointer"
+                className="flex-1 bg-blue-600 text-white py-3 rounded-xl font-bold hover:bg-blue-500 transition-colors cursor-pointer shadow-md shadow-blue-500/20"
               >
                 Simpan Perubahan
               </button>
@@ -973,24 +973,24 @@ export default function InputPage() {
       {/* Modal Delete Confirmation */}
       {deleteConfirm.show && (
         <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="glass-card rounded-2xl max-w-sm w-full border border-slate-800">
+          <div className="bg-white dark:bg-slate-900 rounded-2xl max-w-sm w-full border border-slate-200 dark:border-slate-800 shadow-2xl">
             <div className="p-6 text-center">
               <div className="w-12 h-12 mx-auto mb-4 rounded-full bg-rose-500/10 border border-rose-500/20 flex items-center justify-center">
-                <Trash2 size={24} className="text-rose-400" />
+                <Trash2 size={24} className="text-rose-500 dark:text-rose-400" />
               </div>
-              <h3 className="text-lg font-bold text-white mb-2">Hapus Transaksi?</h3>
-              <p className="text-xs text-slate-400">Apakah anda yakin ingin menghapus transaksi ini? Tindakan ini tidak dapat dibatalkan.</p>
+              <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-2">Hapus Transaksi?</h3>
+              <p className="text-xs text-slate-600 dark:text-slate-400">Apakah anda yakin ingin menghapus transaksi ini? Tindakan ini tidak dapat dibatalkan.</p>
             </div>
-            <div className="flex gap-3 p-5 border-t border-slate-800">
+            <div className="flex gap-3 p-5 border-t border-slate-100 dark:border-slate-800">
               <button
                 onClick={() => setDeleteConfirm({ show: false, transactionId: null })}
-                className="flex-1 py-3 rounded-xl border border-slate-800 text-slate-400 font-medium hover:bg-slate-800 transition-colors cursor-pointer"
+                className="flex-1 py-3 rounded-xl border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 font-medium hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
               >
                 Batal
               </button>
               <button
                 onClick={handleDelete}
-                className="flex-1 bg-rose-600 text-white py-3 rounded-xl font-bold hover:bg-rose-500 transition-colors cursor-pointer"
+                className="flex-1 bg-rose-600 text-white py-3 rounded-xl font-bold hover:bg-rose-500 transition-colors cursor-pointer shadow-md shadow-rose-500/20"
               >
                 Hapus
               </button>
